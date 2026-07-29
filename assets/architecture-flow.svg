@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 210" width="780" height="210" role="img" aria-label="Fluxo de dados do MediStudy hoje">
+  <defs>
+    <linearGradient id="flow-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c140c"/>
+      <stop offset="1" stop-color="#0a0705"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="780" height="210" rx="10" fill="url(#flow-bg)" stroke="#3A2F2C" stroke-width="0.7"/>
+  <rect x="0.5" y="0.5" width="779" height="209" rx="9.5" fill="none" stroke="#8a7346" stroke-width="0.4" opacity="0.35"/>
+
+  <path d="M24,26 L34,26 L36,22 L39,30 L41,26 L48,26" fill="none" stroke="#C9A84C" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="54" y="29" font-family="monospace" font-size="9" letter-spacing="2.5" fill="#8a7346">ARQUITETURA HOJE · FRONT-END PURO, SEM BACKEND</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#8a7346"/>
+    </marker>
+  </defs>
+
+  <g font-family="monospace" font-size="10">
+    <!-- passo 1: login, icone de pessoa -->
+    <rect x="24" y="66" width="150" height="76" rx="8" fill="#171018" stroke="#3A2F2C" stroke-width="0.8"/>
+    <g transform="translate(148,84)" opacity="0.85">
+      <circle r="7" fill="none" stroke="#C9A84C" stroke-width="1"/>
+      <circle cx="0" cy="-2" r="2.4" fill="none" stroke="#C9A84C" stroke-width="1"/>
+      <path d="M-4.4,5 C-4.4,1 4.4,1 4.4,5" fill="none" stroke="#C9A84C" stroke-width="1" stroke-linecap="round"/>
+    </g>
+    <text x="38" y="92" font-family="Georgia, serif" font-style="italic" font-size="14" fill="#F4D06F">Login</text>
+    <text x="38" y="112" fill="#C7C2B8">index.html</text>
+    <text x="38" y="128" fill="#8f8a80">valida nome + email</text>
+
+    <path d="M180 104 L214 104" stroke="#8a7346" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <!-- passo 2: classe ativo, icone de pulso -->
+    <rect x="220" y="66" width="150" height="76" rx="8" fill="#171018" stroke="#3A2F2C" stroke-width="0.8"/>
+    <path d="M336,80 L342,80 L344,76 L347,86 L349,80 L356,80" fill="none" stroke="#C9A84C" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    <text x="234" y="92" font-family="Georgia, serif" font-style="italic" font-size="14" fill="#F4D06F">Classe .ativo</text>
+    <text x="234" y="112" fill="#C7C2B8">body + card</text>
+    <text x="234" y="128" fill="#8f8a80">sincroniza blur + subida</text>
+
+    <path d="M376 104 L410 104" stroke="#8a7346" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <!-- passo 3: localStorage, icone de disco -->
+    <rect x="416" y="66" width="160" height="76" rx="8" fill="#171018" stroke="#3A2F2C" stroke-width="0.8"/>
+    <g transform="translate(556,82)" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.85">
+      <ellipse cx="0" cy="-3" rx="6" ry="2.2"/>
+      <path d="M-6,-3 L-6,3 C-6,4.2 -2.6,5.2 0,5.2 C2.6,5.2 6,4.2 6,3 L6,-3"/>
+    </g>
+    <text x="430" y="92" font-family="Georgia, serif" font-style="italic" font-size="14" fill="#F4D06F">localStorage</text>
+    <text x="430" y="112" fill="#C7C2B8">nomeUsuario</text>
+    <text x="430" y="128" fill="#8f8a80">única persistência hoje</text>
+
+    <path d="M578 104 L612 104" stroke="#8a7346" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+    <!-- passo 4: home, icone de coracao -->
+    <rect x="618" y="66" width="138" height="76" rx="8" fill="#171018" stroke="#3A2F2C" stroke-width="0.8"/>
+    <path d="M738,78 C736,75 731,76 731,80 C731,84 738,88 738,88 C738,88 745,84 745,80 C745,76 740,75 738,78 Z"
+          fill="#7A2E3B" opacity="0.85"/>
+    <text x="632" y="92" font-family="Georgia, serif" font-style="italic" font-size="14" fill="#F4D06F">Home</text>
+    <text x="632" y="112" fill="#C7C2B8">home.html</text>
+    <text x="632" y="128" fill="#8f8a80">lê o nome, saudação</text>
+  </g>
+
+  <line x1="24" y1="164" x2="756" y2="164" stroke="#3A2F2C" stroke-width="0.5"/>
+  <text x="24" y="184" font-family="monospace" font-size="10" fill="#6b5c3d">Sem build step, sem backend rodando. API e banco de dados são visão de roadmap, não arquitetura atual.</text>
+</svg>
