@@ -1,13 +1,8 @@
 import { supabase } from "./supabaseClient.js";
+import { obterIdUsuarioLogado } from "./authService.js";
 import { calcularRepeticaoEspacada } from "./repeticaoEspacada.js";
 
 const TABELA_FLASHCARDS = "flashcards";
-
-async function obterIdUsuarioLogado() {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) throw new Error(error.message);
-    return data.user.id;
-}
 
 export async function criarFlashcard(pergunta, resposta, materia = null) {
     const userId = await obterIdUsuarioLogado();

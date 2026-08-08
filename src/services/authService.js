@@ -25,3 +25,9 @@ export async function obterSessao() {
     if (error) throw new Error(error.message);
     return data.session ? data.session : null;
 }
+
+export async function obterIdUsuarioLogado() {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) throw new Error(error.message);
+    return data.user.id;
+}

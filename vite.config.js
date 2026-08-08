@@ -9,6 +9,8 @@ export default defineConfig({
                 home: resolve(__dirname, "home.html"),
                 flashcards: resolve(__dirname, "flashcards.html"),
                 emBreve: resolve(__dirname, "em-breve.html"),
+                provas: resolve(__dirname, "provas.html"),
+                notas: resolve(__dirname, "notas.html"),
             },
         },
     },
