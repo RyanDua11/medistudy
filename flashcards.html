@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediStudy - Flashcards</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
+</head>
+
+<body class="pagina-home">
+
+    <header id="header">
+        <a href="home.html" class="logo-header">
+            <img src="caduceu.png" alt="Logo">
+            <span>MediStudy</span>
+        </a>
+
+        <div class="header-acoes">
+            <button id="sino" aria-label="Notificações">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+                </svg>
+                <span class="badge"></span>
+            </button>
+            <div class="usuario-menu">
+                <div class="avatar">RB</div>
+                <svg class="chevron-usuario" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </div>
+        </div>
+
+    </header>
+
+<main>
+
+    <a href="home.html" class="link-voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Painel
+    </a>
+
+    <h1 class="titulo-pagina">Flashcards</h1>
+
+    <section id="flashcards">
+        <div class="flashcards-coluna">
+            <h2>Novo flashcard</h2>
+            <form id="form-novo-flashcard">
+                <div class="input-group-simples">
+                    <label for="campo-pergunta">Pergunta</label>
+                    <input type="text" id="campo-pergunta" placeholder="Ex: O que é sepse?" required>
+                </div>
+                <div class="input-group-simples">
+                    <label for="campo-resposta">Resposta</label>
+                    <textarea id="campo-resposta" placeholder="Digite a resposta" required></textarea>
+                </div>
+                <div class="input-group-simples">
+                    <label for="campo-materia">Matéria (opcional)</label>
+                    <input type="text" id="campo-materia" placeholder="Ex: Farmacologia II">
+                </div>
+                <button type="submit">Adicionar flashcard</button>
+            </form>
+
+            <div class="importador-anki">
+                <label for="campo-arquivo-anki">Importar do Anki (.txt)</label>
+                <input type="file" id="campo-arquivo-anki" accept=".txt">
+                <button id="botao-importar-anki" type="button">Importar do Anki</button>
+            </div>
+            <p id="mensagem-flashcards" class="mensagem-erro" hidden></p>
+        </div>
+
+        <div class="flashcards-coluna">
+            <h2>Revisar</h2>
+
+            <div class="modos-estudo">
+                <button id="botao-revisao-rapida" type="button">Revisão rápida (5 min)</button>
+                <div class="vespera-de-prova">
+                    <select id="select-materia-vespera" aria-label="Escolher matéria">
+                        <option value="">Escolha a matéria...</option>
+                    </select>
+                    <button id="botao-vespera-prova" type="button">Véspera de prova</button>
+                </div>
+                <button id="botao-modo-padrao" type="button" class="link-modo-padrao">Ver todos os flashcards</button>
+            </div>
+
+            <div id="area-revisao">
+                <p id="revisao-vazia">Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!</p>
+                <div id="cartao-revisao" hidden>
+                    <p id="revisao-pergunta"></p>
+                    <p id="revisao-resposta" hidden></p>
+                    <button id="botao-mostrar-resposta" type="button">Mostrar resposta</button>
+                    <div id="botoes-revisao" hidden>
+                        <button id="botao-acertei" type="button">Acertei</button>
+                        <button id="botao-errei" type="button">Errei</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcards-coluna">
+            <h2>Meus flashcards</h2>
+            <ul id="lista-flashcards"></ul>
+        </div>
+    </section>
+
+</main>
+
+<script type="module" src="src/pages/flashcards/flashcardsPage.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+import { protegerRota } from "../../services/routeGuard.js";
+import {
+    criarFlashcard,
+    listarFlashcards,
+    marcarRevisao,
+    removerFlashcard,
+} from "../../services/flashcardsService.js";
+import { parsearArquivoAnki } from "../../services/importadorAnki.js";
+import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "../../services/selecaoRevisao.js";
+import { criarElementoFlashcard } from "../../components/flashcardCard.js";
+
+const formNovoFlashcard = document.getElementById("form-novo-flashcard");
+const campoPergunta = document.getElementById("campo-pergunta");
+const campoResposta = document.getElementById("campo-resposta");
+const campoMateria = document.getElementById("campo-materia");
+const mensagemFlashcards = document.getElementById("mensagem-flashcards");
+const listaFlashcards = document.getElementById("lista-flashcards");
+const campoArquivoAnki = document.getElementById("campo-arquivo-anki");
+const botaoImportarAnki = document.getElementById("botao-importar-anki");
+
+const botaoRevisaoRapida = document.getElementById("botao-revisao-rapida");
+const botaoVesperaProva = document.getElementById("botao-vespera-prova");
+const botaoModoPadrao = document.getElementById("botao-modo-padrao");
+const selectMateriaVespera = document.getElementById("select-materia-vespera");
+
+const revisaoVazia = document.getElementById("revisao-vazia");
+const cartaoRevisao = document.getElementById("cartao-revisao");
+const revisaoPergunta = document.getElementById("revisao-pergunta");
+const revisaoResposta = document.getElementById("revisao-resposta");
+const botaoMostrarResposta = document.getElementById("botao-mostrar-resposta");
+const botoesRevisao = document.getElementById("botoes-revisao");
+const botaoAcertei = document.getElementById("botao-acertei");
+const botaoErrei = document.getElementById("botao-errei");
+
+const MENSAGEM_VAZIA_PADRAO = "Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!";
+const MENSAGEM_VAZIA_VESPERA = "Nenhum flashcard cadastrado para essa matéria ainda.";
+const MENSAGEM_VAZIA_REVISAO_RAPIDA = "Nenhum flashcard vencido agora. Volte mais tarde!";
+
+let flashcards = [];
+let filaRevisao = [];
+let flashcardEmRevisao = null;
+let modoAtivo = "padrao";
+let materiaSelecionada = "";
+
+function mostrarMensagem(texto) {
+    mensagemFlashcards.textContent = texto;
+    mensagemFlashcards.hidden = false;
+}
+
+function limparMensagem() {
+    mensagemFlashcards.hidden = true;
+    mensagemFlashcards.textContent = "";
+}
+
+function renderizarListaFlashcards() {
+    listaFlashcards.innerHTML = "";
+    flashcards.forEach((flashcard) => {
+        const item = criarElementoFlashcard(flashcard, { aoRemover: tratarRemover });
+        listaFlashcards.appendChild(item);
+    });
+}
+
+function calcularFilaRevisao() {
+    if (modoAtivo === "revisaoRapida") {
+        return selecionarRevisaoRapida(flashcards);
+    }
+    if (modoAtivo === "vesperaDeProva") {
+        return selecionarVesperaDeProva(flashcards, materiaSelecionada);
+    }
+    return flashcards;
+}
+
+function obterMensagemVazia() {
+    if (modoAtivo === "vesperaDeProva") return MENSAGEM_VAZIA_VESPERA;
+    if (modoAtivo === "revisaoRapida") return MENSAGEM_VAZIA_REVISAO_RAPIDA;
+    return MENSAGEM_VAZIA_PADRAO;
+}
+
+function renderizarAreaRevisao() {
+    filaRevisao = calcularFilaRevisao();
+    flashcardEmRevisao = filaRevisao.length > 0 ? filaRevisao[0] : null;
+
+    if (!flashcardEmRevisao) {
+        revisaoVazia.textContent = obterMensagemVazia();
+        revisaoVazia.hidden = false;
+        cartaoRevisao.hidden = true;
+        return;
+    }
+
+    revisaoVazia.hidden = true;
+    cartaoRevisao.hidden = false;
+    revisaoPergunta.textContent = flashcardEmRevisao.pergunta;
+    revisaoResposta.textContent = flashcardEmRevisao.resposta;
+    revisaoResposta.hidden = true;
+    botoesRevisao.hidden = true;
+    botaoMostrarResposta.hidden = false;
+}
+
+function renderizarOpcoesDeMateria() {
+    const materiaAtual = selectMateriaVespera.value;
+    const materias = [...new Set(flashcards.map((f) => f.materia).filter(Boolean))].sort();
+
+    selectMateriaVespera.innerHTML = '<option value="">Escolha a matéria...</option>';
+    materias.forEach((materia) => {
+        const opcao = document.createElement("option");
+        opcao.value = materia;
+        opcao.textContent = materia;
+        selectMateriaVespera.appendChild(opcao);
+    });
+    selectMateriaVespera.value = materias.includes(materiaAtual) ? materiaAtual : "";
+}
+
+async function carregarFlashcards() {
+    flashcards = await listarFlashcards();
+    renderizarListaFlashcards();
+    renderizarOpcoesDeMateria();
+    renderizarAreaRevisao();
+}
+
+async function tratarNovoFlashcard(evento) {
+    evento.preventDefault();
+    limparMensagem();
+
+    try {
+        await criarFlashcard(campoPergunta.value, campoResposta.value, campoMateria.value || null);
+        formNovoFlashcard.reset();
+        await carregarFlashcards();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+    }
+}
+
+function tratarModoRevisaoRapida() {
+    modoAtivo = "revisaoRapida";
+    renderizarAreaRevisao();
+}
+
+function tratarModoVesperaDeProva() {
+    if (!selectMateriaVespera.value) {
+        mostrarMensagem("Escolha uma matéria antes de iniciar a véspera de prova.");
+        return;
+    }
+
+    limparMensagem();
+    modoAtivo = "vesperaDeProva";
+    materiaSelecionada = selectMateriaVespera.value;
+    renderizarAreaRevisao();
+}
+
+function tratarModoPadrao() {
+    modoAtivo = "padrao";
+    renderizarAreaRevisao();
+}
+
+async function tratarImportarAnki() {
+    limparMensagem();
+
+    const arquivo = campoArquivoAnki.files[0];
+    if (!arquivo) {
+        mostrarMensagem("Escolha um arquivo .txt exportado do Anki antes de importar.");
+        return;
+    }
+
+    botaoImportarAnki.disabled = true;
+
+    try {
+        const conteudo = await arquivo.text();
+        const { cards, linhasIgnoradas } = parsearArquivoAnki(conteudo);
+
+        let falhasAoCriar = 0;
+        for (const card of cards) {
+            try {
+                await criarFlashcard(card.frente, card.verso);
+            } catch {
+                falhasAoCriar += 1;
+            }
+        }
+
+        const totalIgnoradas = linhasIgnoradas + falhasAoCriar;
+        const criados = cards.length - falhasAoCriar;
+        mostrarMensagem(
+            totalIgnoradas > 0
+                ? `${criados} flashcard(s) importado(s). ${totalIgnoradas} linha(s) ignorada(s).`
+                : `${criados} flashcard(s) importado(s) com sucesso.`
+        );
+
+        campoArquivoAnki.value = "";
+        await carregarFlashcards();
+    } catch (erro) {
+        mostrarMensagem(`Não foi possível ler o arquivo: ${erro.message}`);
+    } finally {
+        botaoImportarAnki.disabled = false;
+    }
+}
+
+async function tratarRemover(id) {
+    try {
+        await removerFlashcard(id);
+        await carregarFlashcards();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+    }
+}
+
+function tratarMostrarResposta() {
+    revisaoResposta.hidden = false;
+    botoesRevisao.hidden = false;
+    botaoMostrarResposta.hidden = true;
+}
+
+async function tratarRevisao(acertou) {
+    if (!flashcardEmRevisao) return;
+
+    try {
+        await marcarRevisao(flashcardEmRevisao, acertou);
+        await carregarFlashcards();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+    }
+}
+
+formNovoFlashcard.addEventListener("submit", tratarNovoFlashcard);
+botaoImportarAnki.addEventListener("click", tratarImportarAnki);
+botaoRevisaoRapida.addEventListener("click", tratarModoRevisaoRapida);
+botaoVesperaProva.addEventListener("click", tratarModoVesperaDeProva);
+botaoModoPadrao.addEventListener("click", tratarModoPadrao);
+botaoMostrarResposta.addEventListener("click", tratarMostrarResposta);
+botaoAcertei.addEventListener("click", () => tratarRevisao(true));
+botaoErrei.addEventListener("click", () => tratarRevisao(false));
+
+async function iniciar() {
+    const sessao = await protegerRota();
+    if (!sessao) return;
+
+    await carregarFlashcards();
+}
+
+iniciar();

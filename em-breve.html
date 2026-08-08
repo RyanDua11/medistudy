@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediStudy - Em breve</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
+</head>
+
+<body class="pagina-home">
+
+    <header id="header">
+        <a href="home.html" class="logo-header">
+            <img src="caduceu.png" alt="Logo">
+            <span>MediStudy</span>
+        </a>
+
+        <div class="header-acoes">
+            <button id="sino" aria-label="Notificações">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+                </svg>
+                <span class="badge"></span>
+            </button>
+            <div class="usuario-menu">
+                <div class="avatar">RB</div>
+                <svg class="chevron-usuario" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </div>
+        </div>
+
+    </header>
+
+<main>
+
+    <a href="home.html" class="link-voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Painel
+    </a>
+
+    <section id="em-breve">
+        <span class="em-breve-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v5l3.2 2"/>
+            </svg>
+        </span>
+        <h1 id="em-breve-titulo">Ferramenta em breve</h1>
+        <p>Estamos preparando essa ferramenta com carinho. Enquanto isso, que tal revisar seus flashcards?</p>
+        <a href="flashcards.html" class="em-breve-cta">Ir para Flashcards</a>
+    </section>
+
+</main>
+
+<script type="module" src="src/pages/em-breve/emBreivePage.js"></script>
+
+</body>
+
+</html>
