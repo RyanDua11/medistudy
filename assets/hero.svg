@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="MediStudy, app de estudo que se adapta a cada aluno de medicina">
+  <defs>
+    <linearGradient id="hero-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1008"/>
+      <stop offset="1" stop-color="#0a0705"/>
+    </linearGradient>
+    <radialGradient id="hero-glow" cx="0.78" cy="0.5" r="0.55">
+      <stop offset="0" stop-color="#C9A84C" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="hero-glow-2" cx="0.06" cy="0.9" r="0.5">
+      <stop offset="0" stop-color="#7A2E3B" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#7A2E3B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="name-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F9EAB8"/>
+      <stop offset="0.5" stop-color="#E8C066"/>
+      <stop offset="1" stop-color="#B98A34"/>
+    </linearGradient>
+    <radialGradient id="monitor-face" cx="0.4" cy="0.32" r="0.85">
+      <stop offset="0" stop-color="#241a10"/>
+      <stop offset="1" stop-color="#0d0906"/>
+    </radialGradient>
+    <linearGradient id="bezel-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4D06F"/>
+      <stop offset="0.5" stop-color="#8a6a2e"/>
+      <stop offset="1" stop-color="#3a2c14"/>
+    </linearGradient>
+    <radialGradient id="heart-body" cx="0.32" cy="0.24" r="0.9">
+      <stop offset="0" stop-color="#FFF3D2"/>
+      <stop offset="0.4" stop-color="#F4D06F"/>
+      <stop offset="0.75" stop-color="#CB9A3C"/>
+      <stop offset="1" stop-color="#8C6423"/>
+    </radialGradient>
+    <filter id="soft-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="soft-glow-lg" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <clipPath id="monitor-clip">
+      <circle cx="0" cy="0" r="92"/>
+    </clipPath>
+    <radialGradient id="ecg-fade" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="0.78" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <mask id="ecg-mask">
+      <circle cx="0" cy="0" r="92" fill="url(#ecg-fade)"/>
+    </mask>
+    <pattern id="chart-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26,0 L0,0 L0,26" fill="none" stroke="#3a2c18" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="320" rx="14" fill="url(#hero-bg)"/>
+  <rect width="1200" height="320" rx="14" fill="url(#chart-grid)" opacity="0.35"/>
+  <rect width="1200" height="320" rx="14" fill="url(#hero-glow)"/>
+  <rect width="1200" height="320" rx="14" fill="url(#hero-glow-2)"/>
+  <rect x="1" y="1" width="1198" height="318" rx="13" fill="none" stroke="#3A2F2C" stroke-width="1"/>
+
+  <!-- ===== bloco de texto ===== -->
+  <text x="80" y="140" font-family="Georgia, serif" font-size="62" font-style="italic" font-weight="700" fill="url(#name-grad)">MediStudy</text>
+  <rect x="82" y="163" width="230" height="1" fill="#8a7346" opacity="0.5"/>
+  <text x="82" y="190" font-family="Helvetica, Arial, sans-serif" font-size="17" letter-spacing="0.3" fill="#C7C2B8">App de estudo que se adapta a cada aluno de medicina</text>
+
+  <g font-family="monospace" font-size="10" letter-spacing="1.3">
+    <rect x="82" y="214" width="140" height="26" rx="13" fill="#171018" stroke="#4a3c26" stroke-width="0.8"/>
+    <circle cx="98" cy="227" r="3" fill="#F4D06F"/>
+    <text x="108" y="231" fill="#F4D06F">IA ADAPTATIVA</text>
+
+    <rect x="232" y="214" width="118" height="26" rx="13" fill="#171018" stroke="#4a3c26" stroke-width="0.8"/>
+    <circle cx="248" cy="227" r="3" fill="#CDA349"/>
+    <text x="258" y="231" fill="#CDA349">USO REAL</text>
+
+    <rect x="360" y="214" width="176" height="26" rx="13" fill="#171018" stroke="#4a3c26" stroke-width="0.8"/>
+    <circle cx="376" cy="227" r="3" fill="#D98FA0"/>
+    <text x="386" y="231" fill="#D98FA0">EM DESENVOLVIMENTO</text>
+  </g>
+
+  <text x="82" y="272" font-family="monospace" font-size="10" letter-spacing="2.5" fill="#5c4e30">MEDICINA &#183; FLASHCARDS &#183; CASOS CLÍNICOS &#183; ROTINA DE REVISÃO</text>
+
+  <!-- ===== monitor cardíaco: peça central da direita ===== -->
+  <g transform="translate(930,152)">
+    <!-- halo externo, dois aneis de pulso defasados -->
+    <circle r="92" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.14">
+      <animate attributeName="r" values="80;104;80" dur="2.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.22;0;0.22" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="92" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.10">
+      <animate attributeName="r" values="80;104;80" dur="2.6s" begin="0.65s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.16;0;0.16" dur="2.6s" begin="0.65s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- sombra de apoio do disco no fundo do hero -->
+    <ellipse cx="0" cy="98" rx="70" ry="10" fill="#000" opacity="0.3" filter="url(#soft-glow-lg)"/>
+
+    <!-- bezel do monitor, dupla camada pra dar espessura de vidro -->
+    <circle r="94" fill="#0d0906"/>
+    <circle r="92" fill="url(#monitor-face)" stroke="url(#bezel-grad)" stroke-width="3"/>
+    <circle r="86" fill="none" stroke="#000" stroke-width="3" opacity="0.35" filter="url(#soft-glow)"/>
+    <circle r="92" fill="none" stroke="#000" stroke-width="1" opacity="0.4"/>
+
+    <!-- marcacoes tipo mostrador, 4 cardeais + parafusos discretos -->
+    <g stroke="#6b5636" stroke-width="1" opacity="0.6">
+      <line x1="0" y1="-92" x2="0" y2="-83"/>
+      <line x1="0" y1="92" x2="0" y2="83"/>
+      <line x1="-92" y1="0" x2="-83" y2="0"/>
+      <line x1="92" y1="0" x2="83" y2="0"/>
+    </g>
+    <g fill="#5c4a28" opacity="0.55">
+      <circle cx="0" cy="-87" r="1.6"/>
+      <circle cx="0" cy="87" r="1.6"/>
+      <circle cx="-87" cy="0" r="1.6"/>
+      <circle cx="87" cy="0" r="1.6"/>
+    </g>
+
+    <g clip-path="url(#monitor-clip)">
+      <!-- grade fina de fundo do monitor -->
+      <g stroke="#3a2c18" stroke-width="0.5" opacity="0.5">
+        <line x1="-90" y1="-40" x2="90" y2="-40"/>
+        <line x1="-90" y1="0" x2="90" y2="0"/>
+        <line x1="-90" y1="40" x2="90" y2="40"/>
+        <line x1="-40" y1="-90" x2="-40" y2="90"/>
+        <line x1="0" y1="-90" x2="0" y2="90"/>
+        <line x1="40" y1="-90" x2="40" y2="90"/>
+      </g>
+
+      <!-- traco de ecg atravessando o monitor, complexo PQRST, com fade suave nas bordas.
+           fica ATRAS do coracao de proposito: o disco esconde o pico central e a linha
+           so aparece entrando e saindo dos dois lados, como num monitor de verdade. -->
+      <g mask="url(#ecg-mask)">
+        <path d="M-90,0 L-54,0 C-50,-5 -46,-5 -42,0 L-24,0 L-18,0 L-14,5 L-9,-20 L-4,17 L1,0 L18,0 C23,-7 28,-7 33,0 L90,0"
+              fill="none" stroke="#4a3a22" stroke-width="1.2" opacity="0.5"/>
+        <path d="M-90,0 L-54,0 C-50,-5 -46,-5 -42,0 L-24,0 L-18,0 L-14,5 L-9,-20 L-4,17 L1,0 L18,0 C23,-7 28,-7 33,0 L90,0"
+              fill="none" stroke="#FCE7A8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+              stroke-dasharray="16 900" opacity="0.95">
+          <animate attributeName="stroke-dashoffset" from="90" to="-960" dur="2.6s" repeatCount="indefinite"/>
+        </path>
+      </g>
+
+      <!-- sombra suave sob o coracao -->
+      <ellipse cx="0" cy="30" rx="26" ry="7" fill="#000" opacity="0.4" filter="url(#soft-glow)"/>
+
+      <!-- coracao, proporcao anatomica real (path testado, nao mais um blob a mao livre) -->
+      <g>
+        <animateTransform attributeName="transform" type="scale"
+          values="1;1.08;1;1.05;1" keyTimes="0;0.33;0.46;0.65;1"
+          dur="2.6s" repeatCount="indefinite"/>
+        <g transform="scale(3.2) translate(-12,-12.175)">
+          <path d="M12,21.35 L10.55,20.03 C5.4,15.36 2,12.28 2,8.5
+                   C2,5.42 4.42,3 7.5,3 C9.24,3 10.91,3.81 12,5.09
+                   C13.09,3.81 14.76,3 16.5,3 C19.58,3 22,5.42 22,8.5
+                   C22,12.28 18.6,15.36 13.45,20.03 Z"
+                fill="url(#heart-body)" stroke="#8a6a2e" stroke-width="0.4" stroke-linejoin="round"/>
+          <!-- realce especular no lobo esquerdo -->
+          <path d="M6.4,7.6 C5,6.3 3,7.1 3.2,9.4" fill="none" stroke="#FFF8E4" stroke-width="0.55" stroke-linecap="round" opacity="0.85"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- vidro: reflexo superior, por cima de tudo -->
+    <path d="M-58,-64 A88,88 0 0,1 58,-64" fill="none" stroke="#FCE7A8" stroke-width="7" opacity="0.07" stroke-linecap="round"/>
+    <path d="M-70,-40 A90,90 0 0,1 -78,-6" fill="none" stroke="#FCE7A8" stroke-width="3" opacity="0.04" stroke-linecap="round"/>
+
+    <!-- leitura de bpm, eco de um monitor cardiaco de verdade -->
+    <g font-family="monospace" text-anchor="middle" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;1;0.9;1;0.9" keyTimes="0;0.33;0.46;0.65;1" dur="2.6s" repeatCount="indefinite"/>
+      <text x="0" y="132" font-size="19" font-weight="700" letter-spacing="0.5" fill="#F4D06F">72</text>
+      <text x="0" y="146" font-size="8" letter-spacing="2" fill="#8a7346">BPM</text>
+    </g>
+  </g>
+</svg>

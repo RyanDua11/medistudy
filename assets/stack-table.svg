@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 168" width="780" height="168" role="img" aria-label="Stack técnica do MediStudy">
+  <defs>
+    <linearGradient id="stack-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c140c"/>
+      <stop offset="1" stop-color="#0a0705"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="780" height="168" rx="10" fill="url(#stack-bg)" stroke="#3A2F2C" stroke-width="0.7"/>
+  <rect x="0.5" y="0.5" width="779" height="167" rx="9.5" fill="none" stroke="#8a7346" stroke-width="0.4" opacity="0.35"/>
+
+  <path d="M24,26 L34,26 L36,22 L39,30 L41,26 L48,26" fill="none" stroke="#C9A84C" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="54" y="29" font-family="monospace" font-size="9" letter-spacing="2.5" fill="#8a7346">STACK</text>
+
+  <text x="24" y="54" font-family="monospace" font-size="10" letter-spacing="1.5" fill="#6b5c3d">CAMADA</text>
+  <text x="220" y="54" font-family="monospace" font-size="10" letter-spacing="1.5" fill="#6b5c3d">TECNOLOGIA</text>
+  <line x1="24" y1="62" x2="756" y2="62" stroke="#3A2F2C" stroke-width="0.5"/>
+
+  <g font-family="monospace" font-size="11">
+    <!-- </> frontend puro -->
+    <path d="M182,74 L177,82 L182,90 M198,74 L203,82 L198,90" fill="none" stroke="#CDA349" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="24" y="82" font-weight="700" fill="#CDA349">Frontend</text>
+    <text x="220" y="82" fill="#E9E2D6">HTML5 + CSS3 + JavaScript puro (sem framework)</text>
+    <line x1="24" y1="90" x2="756" y2="90" stroke="#3A2F2C" stroke-width="0.4"/>
+
+    <!-- Aa fontes -->
+    <text x="176" y="112" font-family="Georgia, serif" font-style="italic" font-size="13" fill="#CDA349">Aa</text>
+    <text x="24" y="108" font-weight="700" fill="#CDA349">Fontes</text>
+    <text x="220" y="108" fill="#E9E2D6">Google Fonts (Cinzel)</text>
+    <line x1="24" y1="116" x2="756" y2="116" stroke="#3A2F2C" stroke-width="0.4"/>
+
+    <!-- disco persistencia -->
+    <g transform="translate(184,128)" stroke="#CDA349" stroke-width="1.1" fill="none">
+      <ellipse cx="0" cy="-4" rx="8" ry="3"/>
+      <path d="M-8,-4 L-8,4 C-8,5.7 -3.5,7 0,7 C3.5,7 8,5.7 8,4 L8,-4"/>
+    </g>
+    <text x="24" y="134" font-weight="700" fill="#CDA349">Persistência</text>
+    <text x="220" y="134" fill="#E9E2D6">localStorage (navegador)</text>
+  </g>
+</svg>
