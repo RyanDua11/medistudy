@@ -426,8 +426,10 @@ body.pagina-home::before {
 }
 
 main {
-    margin-top: 90px;
+    max-width: 1280px;
+    margin: 90px auto 0;
     padding: 30px;
+    box-sizing: border-box;
 }
 
 .missao-texto {
@@ -515,6 +517,7 @@ main {
     border-radius: 16px;
     padding: 40px;
     max-width: 900px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -898,7 +901,8 @@ main {
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin: 40px 0 18px;
+    max-width: 900px;
+    margin: 40px auto 18px;
 }
 
 /* grid de ferramentas de estudo */
@@ -907,6 +911,7 @@ main {
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
     max-width: 900px;
+    margin: 0 auto;
 }
 
 .ferramenta-card {
@@ -983,6 +988,7 @@ main {
     align-items: center;
     gap: 22px;
     max-width: 900px;
+    margin: 0 auto;
     background-color: #141416;
     border: 1px solid #3A2F2C;
     border-radius: 16px;
