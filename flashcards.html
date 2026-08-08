@@ -88,8 +88,15 @@
                 <button id="botao-modo-padrao" type="button" class="link-modo-padrao">Ver todos os flashcards</button>
             </div>
 
+            <p id="revisao-carregando" class="estado-carregando">Carregando…</p>
+
             <div id="area-revisao">
-                <p id="revisao-vazia">Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!</p>
+                <div id="revisao-vazia" class="estado-vazio" hidden>
+                    <span class="estado-vazio-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
+                    </span>
+                    <p id="revisao-vazia-texto">Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!</p>
+                </div>
                 <div id="cartao-revisao" hidden>
                     <p id="revisao-pergunta"></p>
                     <p id="revisao-resposta" hidden></p>
@@ -105,6 +112,12 @@
         <div class="flashcards-coluna">
             <h2>Meus flashcards</h2>
             <ul id="lista-flashcards"></ul>
+            <div id="flashcards-vazio" class="estado-vazio" hidden>
+                <span class="estado-vazio-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </span>
+                <p>Nenhum flashcard criado ainda.</p>
+            </div>
         </div>
     </section>
 

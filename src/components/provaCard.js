@@ -19,7 +19,7 @@ export function criarElementoProva(prova, { aoEditar, aoRemover }) {
 
     const botaoEditar = document.createElement("button");
     botaoEditar.type = "button";
-    botaoEditar.className = "flashcard-remover";
+    botaoEditar.className = "flashcard-editar";
     botaoEditar.textContent = "Editar";
     botaoEditar.addEventListener("click", () => aoEditar(prova));
 

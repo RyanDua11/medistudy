@@ -23,7 +23,10 @@ const botaoVesperaProva = document.getElementById("botao-vespera-prova");
 const botaoModoPadrao = document.getElementById("botao-modo-padrao");
 const selectMateriaVespera = document.getElementById("select-materia-vespera");
 
+const revisaoCarregando = document.getElementById("revisao-carregando");
 const revisaoVazia = document.getElementById("revisao-vazia");
+const revisaoVaziaTexto = document.getElementById("revisao-vazia-texto");
+const flashcardsVazio = document.getElementById("flashcards-vazio");
 const cartaoRevisao = document.getElementById("cartao-revisao");
 const revisaoPergunta = document.getElementById("revisao-pergunta");
 const revisaoResposta = document.getElementById("revisao-resposta");
@@ -54,6 +57,8 @@ function limparMensagem() {
 
 function renderizarListaFlashcards() {
     listaFlashcards.innerHTML = "";
+    flashcardsVazio.hidden = flashcards.length > 0;
+
     flashcards.forEach((flashcard) => {
         const item = criarElementoFlashcard(flashcard, { aoRemover: tratarRemover });
         listaFlashcards.appendChild(item);
@@ -81,7 +86,7 @@ function renderizarAreaRevisao() {
     flashcardEmRevisao = filaRevisao.length > 0 ? filaRevisao[0] : null;
 
     if (!flashcardEmRevisao) {
-        revisaoVazia.textContent = obterMensagemVazia();
+        revisaoVaziaTexto.textContent = obterMensagemVazia();
         revisaoVazia.hidden = false;
         cartaoRevisao.hidden = true;
         return;
@@ -112,6 +117,7 @@ function renderizarOpcoesDeMateria() {
 
 async function carregarFlashcards() {
     flashcards = await listarFlashcards();
+    revisaoCarregando.hidden = true;
     renderizarListaFlashcards();
     renderizarOpcoesDeMateria();
     renderizarAreaRevisao();

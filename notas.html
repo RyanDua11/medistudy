@@ -75,8 +75,14 @@
 
         <div class="flashcards-coluna">
             <h2>Notas lançadas</h2>
+            <p id="notas-carregando" class="estado-carregando">Carregando…</p>
             <ul id="lista-notas"></ul>
-            <p id="notas-vazio">Nenhuma nota lançada ainda.</p>
+            <div id="notas-vazio" class="estado-vazio" hidden>
+                <span class="estado-vazio-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
+                </span>
+                <p>Nenhuma nota lançada ainda. Adicione a primeira ao lado.</p>
+            </div>
         </div>
 
         <div class="flashcards-coluna">

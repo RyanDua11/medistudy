@@ -9,6 +9,7 @@ const campoNotaNecessaria = document.getElementById("campo-nota-necessaria-prova
 const mensagemProvas = document.getElementById("mensagem-provas");
 const listaProvas = document.getElementById("lista-provas");
 const provasVazio = document.getElementById("provas-vazio");
+const provasCarregando = document.getElementById("provas-carregando");
 const tituloFormProva = document.getElementById("titulo-form-prova");
 const botaoSalvarProva = document.getElementById("botao-salvar-prova");
 const botaoCancelarEdicao = document.getElementById("botao-cancelar-edicao-prova");
@@ -58,6 +59,7 @@ function renderizarListaProvas(provas) {
 
 async function carregarProvas() {
     const provas = await listarProvas();
+    provasCarregando.hidden = true;
     renderizarListaProvas(provas);
 }
 

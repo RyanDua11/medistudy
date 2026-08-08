@@ -11,6 +11,7 @@ const campoValorNota = document.getElementById("campo-valor-nota");
 const mensagemNotas = document.getElementById("mensagem-notas");
 const listaNotas = document.getElementById("lista-notas");
 const notasVazio = document.getElementById("notas-vazio");
+const notasCarregando = document.getElementById("notas-carregando");
 const tituloFormNota = document.getElementById("titulo-form-nota");
 const botaoSalvarNota = document.getElementById("botao-salvar-nota");
 const botaoCancelarEdicao = document.getElementById("botao-cancelar-edicao-nota");
@@ -82,6 +83,7 @@ function renderizarOpcoesDeMateria() {
 
 async function carregarNotas() {
     notas = await listarNotas();
+    notasCarregando.hidden = true;
     renderizarListaNotas();
     renderizarOpcoesDeMateria();
 }

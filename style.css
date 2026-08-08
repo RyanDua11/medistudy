@@ -430,6 +430,12 @@ main {
     margin: 90px auto 0;
     padding: 30px;
     box-sizing: border-box;
+    animation: pagina-entrada 0.4s ease-out;
+}
+
+@keyframes pagina-entrada {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .missao-texto {
@@ -832,6 +838,12 @@ main {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.flashcard-item:hover {
+    border-color: rgba(205, 163, 73, 0.75);
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .flashcard-pergunta {
@@ -853,6 +865,65 @@ main {
     background-color: transparent;
     color: #ff8080;
     border-color: #ff8080;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flashcard-remover:hover {
+    background-color: rgba(255, 128, 128, 0.12);
+    box-shadow: none;
+}
+
+.flashcard-editar {
+    align-self: flex-start;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 12px;
+    background-color: transparent;
+    color: var(--terciary-color);
+    border-color: var(--terciary-color);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flashcard-editar:hover {
+    background-color: rgba(201, 168, 76, 0.12);
+    box-shadow: none;
+}
+
+.estado-vazio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 28px 12px;
+    color: #8D8B88;
+}
+
+.estado-vazio[hidden] {
+    display: none;
+}
+
+.estado-vazio-icone {
+    color: var(--terciary-color);
+    opacity: 0.65;
+}
+
+.estado-vazio-icone svg {
+    width: 28px;
+    height: 28px;
+}
+
+.estado-vazio p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.estado-carregando {
+    color: #8D8B88;
+    font-size: 13px;
+    text-align: center;
+    padding: 24px 0;
 }
 
 #area-revisao {
@@ -924,12 +995,23 @@ main {
     border-radius: 16px;
     padding: 26px 22px;
     text-decoration: none;
-    transition: border-color 0.25s ease, transform 0.25s ease;
+    transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 .ferramenta-card:hover {
     border-color: rgba(205, 163, 73, 0.55);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.ferramenta-card:active {
+    transform: translateY(-1px) scale(0.99);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ferramenta-card:focus-visible {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 3px;
 }
 
 .ferramenta-icone {
@@ -940,6 +1022,7 @@ main {
     height: 52px;
     border-radius: 14px;
     background-color: rgba(255, 255, 255, 0.03);
+    transition: transform 0.22s ease;
 }
 
 .ferramenta-icone svg {
@@ -947,12 +1030,16 @@ main {
     height: 26px;
 }
 
-.ferramenta-card[data-cor="azul"] .ferramenta-icone     { color: #5B9BF0; }
-.ferramenta-card[data-cor="vermelho"] .ferramenta-icone { color: #E4685C; }
-.ferramenta-card[data-cor="verde"] .ferramenta-icone     { color: #5FBF87; }
-.ferramenta-card[data-cor="roxo"] .ferramenta-icone      { color: #A184E8; }
-.ferramenta-card[data-cor="ciano"] .ferramenta-icone     { color: #52C4D6; }
-.ferramenta-card[data-cor="dourado"] .ferramenta-icone   { color: var(--terciary-color); }
+.ferramenta-card:hover .ferramenta-icone {
+    transform: scale(1.06);
+}
+
+.ferramenta-card[data-cor="azul"] .ferramenta-icone     { color: #5B9BF0; background-color: rgba(91, 155, 240, 0.12); }
+.ferramenta-card[data-cor="vermelho"] .ferramenta-icone { color: #E4685C; background-color: rgba(228, 104, 92, 0.12); }
+.ferramenta-card[data-cor="verde"] .ferramenta-icone     { color: #5FBF87; background-color: rgba(95, 191, 135, 0.12); }
+.ferramenta-card[data-cor="roxo"] .ferramenta-icone      { color: #A184E8; background-color: rgba(161, 132, 232, 0.12); }
+.ferramenta-card[data-cor="ciano"] .ferramenta-icone     { color: #52C4D6; background-color: rgba(82, 196, 214, 0.12); }
+.ferramenta-card[data-cor="dourado"] .ferramenta-icone   { color: var(--terciary-color); background-color: rgba(201, 168, 76, 0.12); }
 
 .ferramenta-titulo {
     color: var(--text-color);
@@ -994,12 +1081,22 @@ main {
     border-radius: 16px;
     padding: 20px 24px;
     text-decoration: none;
-    transition: border-color 0.25s ease, transform 0.25s ease;
+    transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 .continuar-card:hover {
     border-color: rgba(205, 163, 73, 0.55);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.continuar-card:active {
+    transform: translateY(-1px) scale(0.995);
+}
+
+.continuar-card:focus-visible {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 3px;
 }
 
 .continuar-capa {
@@ -1187,4 +1284,5 @@ main {
     .coracao, .glow-ring, .ecg-c, .sparkle { animation: none; }
     .ecg-c1 { stroke-dasharray: none; }
     .ecg-c2, .ecg-c3, .ecg-c4 { display: none; }
+    main { animation: none; }
 }
