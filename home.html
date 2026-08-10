@@ -270,6 +270,34 @@
         </div>
     </section>
 
+    <section id="evolucao">
+        <h2 class="titulo-secao">Evolução</h2>
+
+        <div class="evolucao-grid">
+            <div class="grafico-card">
+                <h3 class="grafico-card-titulo">Notas por matéria</h3>
+                <div id="grafico-notas" class="grafico-linha-container" hidden></div>
+                <div id="grafico-notas-vazio" class="estado-vazio" hidden>
+                    <span class="estado-vazio-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
+                    </span>
+                    <p>Lance notas em <a href="notas.html">Notas</a> para ver a evolução aqui.</p>
+                </div>
+            </div>
+
+            <div class="grafico-card">
+                <h3 class="grafico-card-titulo">Flashcards criados (acumulado)</h3>
+                <div id="grafico-flashcards" class="grafico-linha-container" hidden></div>
+                <div id="grafico-flashcards-vazio" class="estado-vazio" hidden>
+                    <span class="estado-vazio-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="15" rx="2"/><path d="M3 3h13a2 2 0 0 1 2 2v13"/></svg>
+                    </span>
+                    <p>Crie flashcards em <a href="flashcards.html">Flashcards</a> para ver a evolução aqui.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </main>
 
 <script type="module" src="src/pages/home/dashboardPage.js"></script>
