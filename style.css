@@ -788,10 +788,25 @@ main {
     margin: 0;
 }
 
+#form-novo-flashcard {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#form-novo-flashcard button[type="submit"] {
+    margin-top: 4px;
+}
+
 .input-group-simples {
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+.input-group-simples input {
+    padding: 10px;
+    border-radius: 12px;
 }
 
 .input-group-simples label {
