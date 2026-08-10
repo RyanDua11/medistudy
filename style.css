@@ -1052,19 +1052,24 @@ main {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: space-between;
     gap: 14px;
-    background-color: #141416;
+    min-height: 216px;
+    background:
+        radial-gradient(120% 90% at 20% 0%, rgba(var(--cor-categoria), 0.16) 0%, rgba(var(--cor-categoria), 0.05) 35%, #141416 70%),
+        #141416;
     border: 1px solid rgba(var(--cor-categoria), 0.3);
     border-radius: 16px;
-    padding: 26px 22px;
+    padding: 30px 24px;
     text-decoration: none;
+    box-shadow: 0 0 22px -10px rgba(var(--cor-categoria), 0.3);
     transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 .ferramenta-card:hover {
     border-color: rgba(var(--cor-categoria), 0.75);
     transform: translateY(-3px);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35), 0 0 18px rgba(var(--cor-categoria), 0.22);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35), 0 0 20px rgba(var(--cor-categoria), 0.3);
 }
 
 .ferramenta-card:active {
@@ -1085,6 +1090,7 @@ main {
     height: 52px;
     border-radius: 14px;
     background-color: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 16px rgba(var(--cor-categoria), 0.35), inset 0 0 0 1px rgba(var(--cor-categoria), 0.4);
     transition: transform 0.22s ease;
 }
 
@@ -1106,13 +1112,13 @@ main {
 
 .ferramenta-icone {
     color: rgb(var(--cor-categoria));
-    background-color: rgba(var(--cor-categoria), 0.12);
+    background-color: rgba(var(--cor-categoria), 0.16);
 }
 
 .ferramenta-titulo {
-    color: var(--text-color);
+    color: #F5F3F0;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .ferramenta-descricao {
@@ -1120,6 +1126,10 @@ main {
     font-size: 12.5px;
     line-height: 1.5;
     margin: -6px 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .ferramenta-seta {
@@ -1129,8 +1139,8 @@ main {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    border: 1px solid rgba(205, 163, 73, 0.45);
-    color: var(--terciary-color);
+    border: 1px solid rgba(var(--cor-categoria), 0.45);
+    color: rgb(var(--cor-categoria));
     transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -1140,8 +1150,8 @@ main {
 }
 
 .ferramenta-card:hover .ferramenta-seta {
-    background-color: var(--terciary-color);
-    color: var(--primary-color);
+    background-color: rgb(var(--cor-categoria));
+    color: #141416;
 }
 
 /* continue de onde parou */
