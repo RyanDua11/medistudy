@@ -806,8 +806,10 @@ main {
     gap: 8px;
     margin-top: 22px;
     padding-top: 22px;
-    border-top: 1px solid transparent;
-    border-image: linear-gradient(90deg, rgba(201, 168, 76, 0.32), rgba(201, 168, 76, 0.02)) 1;
+    background-image: linear-gradient(90deg, rgba(201, 168, 76, 0.32), rgba(201, 168, 76, 0.02));
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: top;
 }
 
 .importador-anki label {
@@ -817,6 +819,12 @@ main {
 }
 
 .importador-anki input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 12px;
+    background-color: var(--primary-color);
     color: #8D8B88;
     font-size: 13px;
 }
@@ -825,7 +833,7 @@ main {
     padding: 8px 14px;
     margin-right: 10px;
     border: 1px solid var(--terciary-color);
-    border-radius: 12px;
+    border-radius: 18px;
     background-color: transparent;
     color: var(--terciary-color);
     font-size: 12px;
@@ -856,8 +864,10 @@ main {
     gap: 10px;
     margin-bottom: 20px;
     padding-bottom: 20px;
-    border-bottom: 1px solid transparent;
-    border-image: linear-gradient(90deg, rgba(201, 168, 76, 0.32), rgba(201, 168, 76, 0.02)) 1;
+    background-image: linear-gradient(90deg, rgba(201, 168, 76, 0.32), rgba(201, 168, 76, 0.02));
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: bottom;
 }
 
 .vespera-de-prova {
@@ -865,6 +875,9 @@ main {
     gap: 8px;
 }
 
+/* o <select> fechado segue o tema; a lista aberta usa a aparência nativa do
+   SO/navegador (fundo azul do sistema) — CSS puro não estiliza esse popup de
+   forma confiável entre navegadores sem reconstruir o componente do zero */
 .vespera-de-prova select {
     flex: 1;
     min-width: 0;
@@ -901,6 +914,8 @@ main {
 }
 
 .link-modo-padrao:hover {
+    background: none;
+    box-shadow: none;
     color: var(--terciary-color);
 }
 
