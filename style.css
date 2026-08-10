@@ -833,20 +833,22 @@ main {
     opacity: 0.85;
 }
 
-.importador-anki input[type="file"] {
+.campo-arquivo-custom {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
     width: 100%;
     box-sizing: border-box;
     padding: 8px 10px;
     border: 1px solid rgba(201, 168, 76, 0.3);
     border-radius: 12px;
     background-color: var(--primary-color);
-    color: #8D8B88;
-    font-size: 13px;
 }
 
-.importador-anki input[type="file"]::file-selector-button {
+.campo-arquivo-botao {
+    flex-shrink: 0;
     padding: 8px 14px;
-    margin-right: 10px;
     border: 1px solid var(--terciary-color);
     border-radius: 18px;
     background-color: transparent;
@@ -856,8 +858,31 @@ main {
     transition: background-color 0.2s ease;
 }
 
-.importador-anki input[type="file"]::file-selector-button:hover {
+.campo-arquivo-botao:hover {
     background-color: rgba(201, 168, 76, 0.12);
+}
+
+.campo-arquivo-nome {
+    color: #8D8B88;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.campo-arquivo-input-oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.campo-arquivo-input-oculto:focus-visible ~ .campo-arquivo-botao {
+    outline: 2px solid #E4C878;
+    outline-offset: 2px;
 }
 
 #botao-importar-anki,
@@ -890,26 +915,83 @@ main {
     gap: 8px;
 }
 
-/* o <select> fechado segue o tema; a lista aberta usa a aparência nativa do
-   SO/navegador (fundo azul do sistema) — CSS puro não estiliza esse popup de
-   forma confiável entre navegadores sem reconstruir o componente do zero */
-.vespera-de-prova select {
+.select-custom {
+    position: relative;
     flex: 1;
     min-width: 0;
+}
+
+.select-custom-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     padding: 10px;
     border: 1px solid var(--terciary-color);
     border-radius: 12px;
     background-color: var(--primary-color);
     color: var(--text-color);
     font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.vespera-de-prova select:focus {
+.select-custom-valor {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.select-custom-seta {
+    flex-shrink: 0;
+    color: var(--terciary-color);
+    font-size: 11px;
+}
+
+.select-custom-trigger:focus-visible,
+.select-custom-trigger[aria-expanded="true"] {
     border-color: #E4C878;
     background-color: #22150c;
     box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
     outline: none;
+}
+
+.select-custom-lista {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--terciary-color);
+    border-radius: 12px;
+    background-color: #22150c;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.select-custom-lista li {
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.select-custom-lista li:hover,
+.select-custom-lista li:focus {
+    background-color: rgba(201, 168, 76, 0.18);
+    outline: none;
+}
+
+.select-custom-lista li[aria-selected="true"] {
+    color: var(--terciary-color);
+    font-weight: 600;
 }
 
 #botao-vespera-prova {
