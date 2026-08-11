@@ -8,6 +8,7 @@ import {
 import { parsearArquivoAnki } from "../../services/importadorAnki.js";
 import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "../../services/selecaoRevisao.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
 const campoPergunta = document.getElementById("campo-pergunta");
@@ -234,11 +235,20 @@ botaoMostrarResposta.addEventListener("click", tratarMostrarResposta);
 botaoAcertei.addEventListener("click", () => tratarRevisao(true));
 botaoErrei.addEventListener("click", () => tratarRevisao(false));
 
+function abrirModoConformeParametroDeUrl() {
+    const parametros = new URLSearchParams(window.location.search);
+    if (parametros.get("modo") === "revisaoRapida") {
+        tratarModoRevisaoRapida();
+    }
+}
+
 async function iniciar() {
     const sessao = await protegerRota();
     if (!sessao) return;
 
+    inicializarNotificacaoRevisao();
     await carregarFlashcards();
+    abrirModoConformeParametroDeUrl();
 }
 
 iniciar();
