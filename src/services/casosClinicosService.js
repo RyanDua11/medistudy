@@ -3,6 +3,7 @@ import { obterIdUsuarioLogado } from "./authService.js";
 import { validarCasoClinico } from "./validacaoCasoClinico.js";
 
 const TABELA_CASOS_CLINICOS = "casos_clinicos";
+const TABELA_LOG_RESOLUCOES_CASOS = "log_resolucoes_casos";
 
 export async function gerarCasoClinico(materia) {
     const { data, error } = await supabase.functions.invoke("gerar-caso-clinico", {
@@ -25,6 +26,34 @@ export async function criarCasoClinico(materia) {
         .insert({ materia, criado_por: userId, ...caso })
         .select()
         .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+}
+
+export async function registrarResolucaoCaso(casoClinicoId, alternativaEscolhida, acertou) {
+    const userId = await obterIdUsuarioLogado();
+
+    const { data, error } = await supabase
+        .from(TABELA_LOG_RESOLUCOES_CASOS)
+        .insert({
+            caso_clinico_id: casoClinicoId,
+            usuario_id: userId,
+            alternativa_escolhida: alternativaEscolhida,
+            acertou,
+        })
+        .select()
+        .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+}
+
+export async function listarLogResolucoesCasos() {
+    const { data, error } = await supabase
+        .from(TABELA_LOG_RESOLUCOES_CASOS)
+        .select()
+        .order("resolvido_em", { ascending: false });
 
     if (error) throw new Error(error.message);
     return data;
