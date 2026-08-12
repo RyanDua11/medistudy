@@ -6,6 +6,10 @@ import {
     calcularProvasProximos7Dias,
     agruparNotasPorMateria,
     calcularFlashcardsCriadosAcumulados,
+    calcularStreakDias,
+    calcularRevisadosHoje,
+    categorizarFlashcards,
+    calcularProgressoGeral,
 } from "./estatisticas.js";
 
 const AGORA = new Date("2026-08-08T12:00:00.000Z");
@@ -146,5 +150,171 @@ describe("calcularFlashcardsCriadosAcumulados", () => {
 
     it("retorna lista vazia quando não há flashcards", () => {
         expect(calcularFlashcardsCriadosAcumulados([])).toEqual([]);
+    });
+});
+
+describe("calcularStreakDias", () => {
+    it("retorna 0 quando não há nenhum log", () => {
+        expect(calcularStreakDias([])).toBe(0);
+    });
+
+    it("retorna 0 quando a última revisão foi há mais de um dia (streak quebrado)", () => {
+        const logs = [{ revisado_em: dias(-2) }];
+        expect(calcularStreakDias(logs)).toBe(0);
+    });
+
+    it("conta 1 quando só revisou hoje", () => {
+        const logs = [{ revisado_em: dias(0) }];
+        expect(calcularStreakDias(logs)).toBe(1);
+    });
+
+    it("não zera o streak se hoje ainda não revisou, desde que tenha revisado ontem", () => {
+        const logs = [{ revisado_em: dias(-1) }];
+        expect(calcularStreakDias(logs)).toBe(1);
+    });
+
+    it("conta dias consecutivos terminando hoje", () => {
+        const logs = [
+            { revisado_em: dias(0) },
+            { revisado_em: dias(-1) },
+            { revisado_em: dias(-2) },
+        ];
+        expect(calcularStreakDias(logs)).toBe(3);
+    });
+
+    it("conta dias consecutivos terminando ontem quando hoje ainda não revisou", () => {
+        const logs = [
+            { revisado_em: dias(-1) },
+            { revisado_em: dias(-2) },
+            { revisado_em: dias(-3) },
+        ];
+        expect(calcularStreakDias(logs)).toBe(3);
+    });
+
+    it("para de contar quando a sequência quebra", () => {
+        const logs = [
+            { revisado_em: dias(0) },
+            { revisado_em: dias(-1) },
+            { revisado_em: dias(-3) },
+        ];
+        expect(calcularStreakDias(logs)).toBe(2);
+    });
+
+    it("ignora múltiplas revisões no mesmo dia (conta o dia uma vez)", () => {
+        const logs = [
+            { revisado_em: dias(0) },
+            { revisado_em: horas(-1) },
+            { revisado_em: dias(-1) },
+        ];
+        expect(calcularStreakDias(logs)).toBe(2);
+    });
+});
+
+describe("calcularRevisadosHoje", () => {
+    it("conta apenas logs do dia corrente", () => {
+        const logs = [
+            { revisado_em: dias(0) },
+            { revisado_em: horas(-3) },
+            { revisado_em: dias(-1) },
+        ];
+        expect(calcularRevisadosHoje(logs)).toBe(2);
+    });
+
+    it("retorna 0 quando não há logs hoje", () => {
+        const logs = [{ revisado_em: dias(-1) }];
+        expect(calcularRevisadosHoje(logs)).toBe(0);
+    });
+
+    it("retorna 0 quando não há logs", () => {
+        expect(calcularRevisadosHoje([])).toBe(0);
+    });
+});
+
+describe("categorizarFlashcards", () => {
+    it("classifica como Novos os flashcards sem nenhum log, mesmo sem proxima_revisao definida", () => {
+        const flashcards = [{ id: "1" }, { id: "2", proxima_revisao: horas(-5) }];
+        const logs = [];
+
+        const { novos, revisar, aprendidos } = categorizarFlashcards(flashcards, logs);
+
+        expect(novos.map((f) => f.id)).toEqual(["1", "2"]);
+        expect(revisar).toEqual([]);
+        expect(aprendidos).toEqual([]);
+    });
+
+    it("classifica como Revisar flashcards já revisados com proxima_revisao vencida", () => {
+        const flashcards = [
+            { id: "1", proxima_revisao: horas(-2), fator_facilidade: 1.5 },
+        ];
+        const logs = [{ flashcard_id: "1" }];
+
+        const { novos, revisar } = categorizarFlashcards(flashcards, logs);
+
+        expect(novos).toEqual([]);
+        expect(revisar.map((f) => f.id)).toEqual(["1"]);
+    });
+
+    it("não classifica como Revisar um flashcard vencido que nunca foi revisado (é Novo)", () => {
+        const flashcards = [{ id: "1", proxima_revisao: horas(-2) }];
+        const logs = [];
+
+        const { novos, revisar } = categorizarFlashcards(flashcards, logs);
+
+        expect(novos.map((f) => f.id)).toEqual(["1"]);
+        expect(revisar).toEqual([]);
+    });
+
+    it("classifica como Aprendidos flashcards com fator_facilidade >= 2.5", () => {
+        const flashcards = [
+            { id: "1", fator_facilidade: 2.5, proxima_revisao: horas(5) },
+            { id: "2", fator_facilidade: 2.8, proxima_revisao: horas(5) },
+            { id: "3", fator_facilidade: 1.8, proxima_revisao: horas(5) },
+        ];
+        const logs = [{ flashcard_id: "1" }, { flashcard_id: "2" }, { flashcard_id: "3" }];
+
+        const { aprendidos } = categorizarFlashcards(flashcards, logs);
+
+        expect(aprendidos.map((f) => f.id)).toEqual(["1", "2"]);
+    });
+
+    it("um flashcard pode ser simultaneamente Revisar e Aprendidos", () => {
+        const flashcards = [
+            { id: "1", fator_facilidade: 2.7, proxima_revisao: horas(-1) },
+        ];
+        const logs = [{ flashcard_id: "1" }];
+
+        const { revisar, aprendidos } = categorizarFlashcards(flashcards, logs);
+
+        expect(revisar.map((f) => f.id)).toEqual(["1"]);
+        expect(aprendidos.map((f) => f.id)).toEqual(["1"]);
+    });
+
+    it("retorna categorias vazias quando não há flashcards", () => {
+        expect(categorizarFlashcards([], [])).toEqual({ novos: [], revisar: [], aprendidos: [] });
+    });
+});
+
+describe("calcularProgressoGeral", () => {
+    it("calcula a porcentagem de flashcards aprendidos sobre o total", () => {
+        const flashcards = [
+            { id: "1", fator_facilidade: 2.6 },
+            { id: "2", fator_facilidade: 2.5 },
+            { id: "3", fator_facilidade: 1.5 },
+            { id: "4", fator_facilidade: 1.5 },
+        ];
+        const logs = flashcards.map((f) => ({ flashcard_id: f.id }));
+
+        expect(calcularProgressoGeral(flashcards, logs)).toBe(50);
+    });
+
+    it("retorna 0 quando não há flashcards, sem dividir por zero", () => {
+        expect(calcularProgressoGeral([], [])).toBe(0);
+    });
+
+    it("retorna 0 quando nenhum flashcard está aprendido ainda", () => {
+        const flashcards = [{ id: "1", fator_facilidade: 1.5 }];
+        const logs = [{ flashcard_id: "1" }];
+
+        expect(calcularProgressoGeral(flashcards, logs)).toBe(0);
     });
 });

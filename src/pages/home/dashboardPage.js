@@ -11,6 +11,7 @@ import {
     calcularFlashcardsCriadosAcumulados,
 } from "../../services/estatisticas.js";
 import { criarGraficoLinha } from "../../components/graficoLinha.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 
 const spanNomeUsuario = document.getElementById("nome-usuario-saudacao");
 const elTaxaAcerto = document.getElementById("estatistica-taxa-acerto");
@@ -68,6 +69,7 @@ async function iniciar() {
     if (!sessao) return;
 
     exibirSaudacao(sessao.user.email);
+    inicializarNotificacaoRevisao();
     await carregarEstatisticas();
     await carregarEvolucao();
 }
