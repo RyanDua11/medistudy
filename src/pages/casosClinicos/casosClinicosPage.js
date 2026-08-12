@@ -2,7 +2,10 @@ import { protegerRota } from "../../services/routeGuard.js";
 import {
     criarCasoClinico,
     listarCasosClinicos,
+    registrarResolucaoCaso,
+    listarLogResolucoesCasos,
 } from "../../services/casosClinicosService.js";
+import { calcularCasosResolvidos, calcularTaxaAcertoCasos } from "../../services/estatisticas.js";
 import { criarElementoCasoClinico } from "../../components/casoClinicoCard.js";
 
 const selectMateria = document.getElementById("select-materia-caso");
@@ -23,7 +26,12 @@ const resolucaoFeedback = document.getElementById("resolucao-feedback");
 const resolucaoResultado = document.getElementById("resolucao-resultado");
 const resolucaoExplicacao = document.getElementById("resolucao-explicacao");
 
+const statTotalCasos = document.getElementById("stat-total-casos");
+const statCasosResolvidos = document.getElementById("stat-casos-resolvidos");
+const statTaxaAcertoCasos = document.getElementById("stat-taxa-acerto-casos");
+
 let casos = [];
+let logsResolucoes = [];
 
 function mostrarMensagem(texto) {
     mensagemCasos.textContent = texto;
@@ -35,14 +43,36 @@ function limparMensagem() {
     mensagemCasos.textContent = "";
 }
 
+function calcularUltimaResolucaoPorCaso() {
+    const mapa = new Map();
+    logsResolucoes.forEach((log) => {
+        const atual = mapa.get(log.caso_clinico_id);
+        if (!atual || new Date(log.resolvido_em) > new Date(atual)) {
+            mapa.set(log.caso_clinico_id, log.resolvido_em);
+        }
+    });
+    return mapa;
+}
+
 function renderizarListaCasos() {
     listaCasos.innerHTML = "";
     casosVazio.hidden = casos.length > 0;
 
+    const ultimaResolucaoPorCaso = calcularUltimaResolucaoPorCaso();
+
     casos.forEach((caso) => {
-        const item = criarElementoCasoClinico(caso, { aoAbrir: renderizarResolucao });
+        const item = criarElementoCasoClinico(caso, {
+            aoAbrir: renderizarResolucao,
+            ultimaResolucao: ultimaResolucaoPorCaso.get(caso.id) ?? null,
+        });
         listaCasos.appendChild(item);
     });
+}
+
+function renderizarEstatisticas() {
+    statTotalCasos.textContent = casos.length;
+    statCasosResolvidos.textContent = calcularCasosResolvidos(logsResolucoes);
+    statTaxaAcertoCasos.textContent = `${calcularTaxaAcertoCasos(logsResolucoes)}%`;
 }
 
 function renderizarResolucao(caso) {
@@ -66,7 +96,7 @@ function renderizarResolucao(caso) {
     });
 }
 
-function tratarResposta(caso, indiceEscolhido, botaoEscolhido) {
+async function tratarResposta(caso, indiceEscolhido, botaoEscolhido) {
     const botoes = resolucaoAlternativas.querySelectorAll(".resolucao-alternativa");
     botoes.forEach((botao) => (botao.disabled = true));
 
@@ -79,18 +109,38 @@ function tratarResposta(caso, indiceEscolhido, botaoEscolhido) {
     resolucaoResultado.textContent = acertou ? "Você acertou!" : "Você errou.";
     resolucaoExplicacao.textContent = caso.explicacao;
     resolucaoFeedback.hidden = false;
+
+    try {
+        await registrarResolucaoCaso(caso.id, indiceEscolhido, acertou);
+        logsResolucoes = await listarLogResolucoesCasos();
+        renderizarEstatisticas();
+        renderizarListaCasos();
+    } catch (erro) {
+        mostrarMensagem(`Resposta registrada aqui, mas não foi possível salvar seu histórico: ${erro.message}`);
+    }
 }
 
 async function carregarCasos() {
     casosCarregando.hidden = false;
     try {
         casos = await listarCasosClinicos();
-        renderizarListaCasos();
     } catch (erro) {
         mostrarMensagem(erro.message);
+        casosCarregando.hidden = true;
+        return;
+    }
+
+    try {
+        logsResolucoes = await listarLogResolucoesCasos();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+        logsResolucoes = [];
     } finally {
         casosCarregando.hidden = true;
     }
+
+    renderizarListaCasos();
+    renderizarEstatisticas();
 }
 
 async function tratarGerarCaso() {
@@ -109,6 +159,7 @@ async function tratarGerarCaso() {
         const novoCaso = await criarCasoClinico(materia);
         casos = [novoCaso, ...casos];
         renderizarListaCasos();
+        renderizarEstatisticas();
     } catch (erro) {
         mostrarMensagem(erro.message);
     } finally {

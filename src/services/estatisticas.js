@@ -83,6 +83,17 @@ export function calcularProgressoGeral(flashcards, logs) {
     return Math.round((aprendidos.length / flashcards.length) * 100);
 }
 
+export function calcularCasosResolvidos(logsResolucoesCasos) {
+    return new Set(logsResolucoesCasos.map((log) => log.caso_clinico_id)).size;
+}
+
+export function calcularTaxaAcertoCasos(logsResolucoesCasos) {
+    if (logsResolucoesCasos.length === 0) return 0;
+
+    const acertos = logsResolucoesCasos.filter((log) => log.acertou).length;
+    return Math.round((acertos / logsResolucoesCasos.length) * 100);
+}
+
 export function calcularProvasProximos7Dias(provas) {
     const agora = Date.now();
     const limite = agora + SETE_DIAS_MS;

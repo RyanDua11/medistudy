@@ -32,6 +32,8 @@ const {
     gerarCasoClinico,
     criarCasoClinico,
     listarCasosClinicos,
+    registrarResolucaoCaso,
+    listarLogResolucoesCasos,
 } = await import("./casosClinicosService.js");
 
 const CASO_VALIDO = {
@@ -135,5 +137,57 @@ describe("listarCasosClinicos", () => {
         mockFrom.mockReturnValue(builder);
 
         await expect(listarCasosClinicos()).rejects.toThrow("Falha ao listar");
+    });
+});
+
+describe("registrarResolucaoCaso", () => {
+    it("persiste a resolução com o usuário logado, a alternativa escolhida e se acertou", async () => {
+        const builder = criarQueryBuilderMock({
+            data: { id: "log-1", caso_clinico_id: "caso-1", usuario_id: "usuario-1", alternativa_escolhida: 0, acertou: true },
+            error: null,
+        });
+        mockFrom.mockReturnValue(builder);
+
+        const resultado = await registrarResolucaoCaso("caso-1", 0, true);
+
+        expect(mockFrom).toHaveBeenCalledWith("log_resolucoes_casos");
+        expect(builder.insert).toHaveBeenCalledWith({
+            caso_clinico_id: "caso-1",
+            usuario_id: "usuario-1",
+            alternativa_escolhida: 0,
+            acertou: true,
+        });
+        expect(resultado.acertou).toBe(true);
+    });
+
+    it("propaga o erro do Supabase ao registrar a resolução", async () => {
+        const builder = criarQueryBuilderMock({ data: null, error: { message: "Falha ao registrar resolução" } });
+        mockFrom.mockReturnValue(builder);
+
+        await expect(registrarResolucaoCaso("caso-1", 0, true)).rejects.toThrow("Falha ao registrar resolução");
+    });
+});
+
+describe("listarLogResolucoesCasos", () => {
+    it("retorna o log de resoluções, mais recente primeiro", async () => {
+        const logs = [
+            { id: "log-1", caso_clinico_id: "caso-1", acertou: true },
+            { id: "log-2", caso_clinico_id: "caso-2", acertou: false },
+        ];
+        const builder = criarQueryBuilderMock({ data: logs, error: null });
+        mockFrom.mockReturnValue(builder);
+
+        const resultado = await listarLogResolucoesCasos();
+
+        expect(mockFrom).toHaveBeenCalledWith("log_resolucoes_casos");
+        expect(builder.order).toHaveBeenCalledWith("resolvido_em", { ascending: false });
+        expect(resultado).toEqual(logs);
+    });
+
+    it("lança erro quando o Supabase retorna erro", async () => {
+        const builder = criarQueryBuilderMock({ data: null, error: { message: "Falha ao listar log" } });
+        mockFrom.mockReturnValue(builder);
+
+        await expect(listarLogResolucoesCasos()).rejects.toThrow("Falha ao listar log");
     });
 });

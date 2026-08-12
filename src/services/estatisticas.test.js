@@ -10,6 +10,8 @@ import {
     calcularRevisadosHoje,
     categorizarFlashcards,
     calcularProgressoGeral,
+    calcularCasosResolvidos,
+    calcularTaxaAcertoCasos,
 } from "./estatisticas.js";
 
 const AGORA = new Date("2026-08-08T12:00:00.000Z");
@@ -316,5 +318,38 @@ describe("calcularProgressoGeral", () => {
         const logs = [{ flashcard_id: "1" }];
 
         expect(calcularProgressoGeral(flashcards, logs)).toBe(0);
+    });
+});
+
+describe("calcularCasosResolvidos", () => {
+    it("conta casos clínicos distintos resolvidos, ignorando resoluções repetidas do mesmo caso", () => {
+        const logs = [
+            { caso_clinico_id: "1", acertou: true },
+            { caso_clinico_id: "2", acertou: false },
+            { caso_clinico_id: "1", acertou: false },
+        ];
+
+        expect(calcularCasosResolvidos(logs)).toBe(2);
+    });
+
+    it("retorna 0 quando não há nenhuma resolução", () => {
+        expect(calcularCasosResolvidos([])).toBe(0);
+    });
+});
+
+describe("calcularTaxaAcertoCasos", () => {
+    it("calcula a porcentagem de acertos sobre o total de resoluções (não de casos distintos)", () => {
+        const logs = [
+            { caso_clinico_id: "1", acertou: true },
+            { caso_clinico_id: "2", acertou: false },
+            { caso_clinico_id: "1", acertou: true },
+            { caso_clinico_id: "3", acertou: true },
+        ];
+
+        expect(calcularTaxaAcertoCasos(logs)).toBe(75);
+    });
+
+    it("retorna 0 quando não há nenhuma resolução, sem dividir por zero", () => {
+        expect(calcularTaxaAcertoCasos([])).toBe(0);
     });
 });
