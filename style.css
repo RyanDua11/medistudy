@@ -381,22 +381,37 @@ body.pagina-home::before {
     filter: drop-shadow(0 0 8px rgba(244, 208, 111, 0.6));
 }
 
+#sino:focus-visible {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 2px;
+}
+
 /* ponto de notificacao pulsando no ritmo do coracao (2.6s) */
 .badge {
     position: absolute;
-    top: 6px;
-    right: 7px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
+    top: 3px;
+    right: 3px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    border-radius: 999px;
     background: #F4D06F;
+    color: #1a1008;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
     box-shadow: 0 0 6px 1px rgba(244, 208, 111, 0.85);
     animation: badge-pulso 2.6s ease-in-out infinite;
 }
 
+.badge[hidden] {
+    display: none;
+}
+
 @keyframes badge-pulso {
-    0%, 100% { transform: scale(0.8);  opacity: 0.7; }
-    50%      { transform: scale(1.15); opacity: 1;   }
+    0%, 100% { transform: scale(0.85); opacity: 0.85; }
+    50%      { transform: scale(1.08); opacity: 1;    }
 }
 
 .avatar {
@@ -1762,7 +1777,7 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .coracao, .glow-ring, .ecg-c, .sparkle { animation: none; }
+    .coracao, .glow-ring, .ecg-c, .sparkle, .badge { animation: none; }
     .ecg-c1 { stroke-dasharray: none; }
     .ecg-c2, .ecg-c3, .ecg-c4 { display: none; }
     main { animation: none; }

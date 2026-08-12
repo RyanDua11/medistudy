@@ -1,6 +1,7 @@
 import { protegerRota } from "../../services/routeGuard.js";
 import { criarProva, listarProvas, editarProva, removerProva } from "../../services/provasService.js";
 import { criarElementoProva } from "../../components/provaCard.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 
 const formProva = document.getElementById("form-prova");
 const campoMateria = document.getElementById("campo-materia-prova");
@@ -104,6 +105,7 @@ async function iniciar() {
     const sessao = await protegerRota();
     if (!sessao) return;
 
+    inicializarNotificacaoRevisao();
     await carregarProvas();
 }
 
