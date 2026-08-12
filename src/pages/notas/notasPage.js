@@ -3,6 +3,8 @@ import { criarNota, listarNotas, editarNota, removerNota } from "../../services/
 import { calcularNotaNecessaria } from "../../services/calculoNota.js";
 import { criarElementoNota } from "../../components/notaCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
+import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { calcularMateriasComNotas } from "../../services/estatisticas.js";
 
 const formNota = document.getElementById("form-nota");
 const campoMateria = document.getElementById("campo-materia-nota");
@@ -22,6 +24,8 @@ const campoMediaNecessaria = document.getElementById("campo-media-necessaria");
 const campoPesoProxima = document.getElementById("campo-peso-proxima");
 const botaoCalcularNota = document.getElementById("botao-calcular-nota");
 const resultadoCalculo = document.getElementById("resultado-calculo");
+const statTotalNotas = document.getElementById("stat-total-notas");
+const statMateriasComNotas = document.getElementById("stat-materias-com-notas");
 
 let notas = [];
 let notaEmEdicaoId = null;
@@ -82,11 +86,17 @@ function renderizarOpcoesDeMateria() {
     selectMateriaCalculo.value = materias.includes(materiaAtual) ? materiaAtual : "";
 }
 
+function renderizarEstatisticas() {
+    statTotalNotas.textContent = notas.length;
+    statMateriasComNotas.textContent = calcularMateriasComNotas(notas);
+}
+
 async function carregarNotas() {
     notas = await listarNotas();
     notasCarregando.hidden = true;
     renderizarListaNotas();
     renderizarOpcoesDeMateria();
+    renderizarEstatisticas();
 }
 
 async function tratarSalvarNota(evento) {
@@ -166,6 +176,7 @@ async function iniciar() {
     if (!sessao) return;
 
     inicializarNotificacaoRevisao();
+    inicializarUsuarioMenu();
     await carregarNotas();
 }
 

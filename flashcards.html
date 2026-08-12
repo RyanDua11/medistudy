@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediStudy - Flashcards</title>
+    <link rel="icon" type="image/png" href="caduceu.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,15 +105,15 @@
             <form id="form-novo-flashcard">
                 <div class="input-group-simples">
                     <label for="campo-pergunta">Pergunta</label>
-                    <input type="text" id="campo-pergunta" placeholder="Ex: O que é sepse?" autocomplete="off" required>
+                    <input type="text" id="campo-pergunta" placeholder="Ex: O que é sepse?" autocomplete="off" maxlength="300" required>
                 </div>
                 <div class="input-group-simples">
                     <label for="campo-resposta">Resposta</label>
-                    <textarea id="campo-resposta" placeholder="Digite a resposta" autocomplete="off" required></textarea>
+                    <textarea id="campo-resposta" placeholder="Digite a resposta" autocomplete="off" maxlength="2000" required></textarea>
                 </div>
                 <div class="input-group-simples">
                     <label for="campo-materia">Matéria (opcional)</label>
-                    <input type="text" id="campo-materia" placeholder="Ex: Farmacologia II">
+                    <input type="text" id="campo-materia" placeholder="Ex: Farmacologia II" maxlength="60">
                 </div>
                 <button type="submit">Adicionar flashcard</button>
             </form>

@@ -7,6 +7,7 @@ import {
 } from "../../services/casosClinicosService.js";
 import { calcularCasosResolvidos, calcularTaxaAcertoCasos } from "../../services/estatisticas.js";
 import { criarElementoCasoClinico } from "../../components/casoClinicoCard.js";
+import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 
 const selectMateria = document.getElementById("select-materia-caso");
 const botaoGerarCaso = document.getElementById("botao-gerar-caso");
@@ -173,6 +174,7 @@ async function iniciar() {
     if (!sessao) return;
 
     botaoGerarCaso.addEventListener("click", tratarGerarCaso);
+    inicializarUsuarioMenu();
     await carregarCasos();
 }
 

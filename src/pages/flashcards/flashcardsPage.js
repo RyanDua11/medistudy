@@ -16,6 +16,7 @@ import {
 } from "../../services/estatisticas.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
+import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
 const campoPergunta = document.getElementById("campo-pergunta");
@@ -131,17 +132,26 @@ function obterMensagemVazia() {
     return MENSAGEM_VAZIA_PADRAO;
 }
 
+function sessaoDeRevisaoRapidaConcluidaHoje() {
+    return modoAtivo === "revisaoRapida" && flashcards.length > 0 && calcularRevisadosHoje(logs) > 0;
+}
+
 function renderizarAreaRevisao() {
     filaRevisao = calcularFilaRevisao();
     flashcardEmRevisao = filaRevisao.length > 0 ? filaRevisao[0] : null;
 
     if (!flashcardEmRevisao) {
-        revisaoVaziaTexto.textContent = obterMensagemVazia();
+        const concluida = sessaoDeRevisaoRapidaConcluidaHoje();
+        revisaoVaziaTexto.textContent = concluida
+            ? "Sequência concluída hoje! Você revisou tudo o que estava pendente."
+            : obterMensagemVazia();
+        revisaoVazia.classList.toggle("revisao-concluida", concluida);
         revisaoVazia.hidden = false;
         cartaoRevisao.hidden = true;
         return;
     }
 
+    revisaoVazia.classList.remove("revisao-concluida");
     revisaoVazia.hidden = true;
     cartaoRevisao.hidden = false;
     revisaoPergunta.textContent = flashcardEmRevisao.pergunta;
@@ -312,6 +322,7 @@ async function iniciar() {
     if (!sessao) return;
 
     inicializarNotificacaoRevisao();
+    inicializarUsuarioMenu();
     await carregarFlashcards();
     abrirModoConformeParametroDeUrl();
 }

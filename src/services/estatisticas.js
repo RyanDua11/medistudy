@@ -94,6 +94,10 @@ export function calcularTaxaAcertoCasos(logsResolucoesCasos) {
     return Math.round((acertos / logsResolucoesCasos.length) * 100);
 }
 
+export function calcularMateriasComNotas(notas) {
+    return new Set(notas.map((nota) => nota.materia)).size;
+}
+
 export function calcularProvasProximos7Dias(provas) {
     const agora = Date.now();
     const limite = agora + SETE_DIAS_MS;

@@ -437,10 +437,55 @@ body.pagina-home::before {
 }
 
 .usuario-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.usuario-menu-gatilho {
     display: flex;
     align-items: center;
     gap: 6px;
+    padding: 0;
+    background: none;
+    border: none;
     cursor: pointer;
+}
+
+.usuario-menu-gatilho:hover {
+    background: none;
+    box-shadow: none;
+}
+
+.usuario-menu-opcoes {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 5;
+    background-color: var(--secondary-color);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.usuario-menu-opcoes[hidden] {
+    display: none;
+}
+
+.usuario-menu-sair {
+    width: 100%;
+    white-space: nowrap;
+    padding: 6px 14px;
+    font-size: 13px;
+    background-color: transparent;
+    color: #ff8080;
+    border-color: #ff8080;
+}
+
+.usuario-menu-sair:hover {
+    background-color: rgba(255, 128, 128, 0.12);
+    box-shadow: none;
 }
 
 .chevron-usuario {
@@ -450,7 +495,7 @@ body.pagina-home::before {
     transition: color 0.25s ease;
 }
 
-.usuario-menu:hover .chevron-usuario {
+.usuario-menu-gatilho:hover .chevron-usuario {
     color: var(--terciary-color);
 }
 
@@ -1031,6 +1076,33 @@ main {
     outline: none;
 }
 
+.input-group-simples select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid var(--terciary-color);
+    border-radius: 12px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.input-group-simples select:focus {
+    border-color: #E4C878;
+    background-color: #22150c;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
+    outline: none;
+}
+
+/* estado de foco visível consistente para elementos interativos que ainda não tinham tratamento dedicado */
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 2px;
+}
+
 #lista-flashcards,
 #lista-casos-clinicos {
     list-style: none;
@@ -1192,6 +1264,12 @@ main {
     display: none;
 }
 
+.estado-vazio.revisao-concluida .estado-vazio-icone {
+    color: var(--terciary-color);
+    box-shadow: 0 0 24px rgba(201, 168, 76, 0.45), inset 0 0 0 1px rgba(201, 168, 76, 0.4);
+    animation: badge-pulso 2.6s ease-in-out infinite;
+}
+
 .estado-vazio-icone {
     display: flex;
     align-items: center;
@@ -1297,6 +1375,15 @@ main {
     flex-direction: column;
     gap: 14px;
     color: var(--text-color);
+    min-height: 160px;
+    justify-content: center;
+}
+
+#revisao-carregando:not([hidden]) {
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #revisao-pergunta {
@@ -1362,7 +1449,8 @@ main {
 
 /* glow por categoria compartilhado entre .ferramenta-card e .stat-card */
 .ferramenta-card,
-.stat-card {
+.stat-card,
+#resultado-calculo:not(:empty) {
     --cor-categoria: 205, 163, 73;
     background:
         radial-gradient(120% 90% at 20% 0%, rgba(var(--cor-categoria), 0.16) 0%, rgba(var(--cor-categoria), 0.05) 35%, #141416 70%),
@@ -1370,6 +1458,14 @@ main {
     border: 1px solid rgba(var(--cor-categoria), 0.3);
     border-radius: 16px;
     box-shadow: 0 0 22px -10px rgba(var(--cor-categoria), 0.3);
+}
+
+#resultado-calculo:not(:empty) {
+    margin: 4px 0 0;
+    padding: 14px 16px;
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .ferramenta-card {
@@ -1844,12 +1940,19 @@ main {
 #em-breve {
     max-width: 480px;
     margin: 60px auto 0;
+    padding: 40px 32px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 14px;
     color: var(--text-color);
+    background:
+        radial-gradient(140% 100% at 15% 0%, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0.02) 35%, var(--secondary-color) 70%),
+        var(--secondary-color);
+    border: 1px solid var(--terciary-color);
+    border-radius: 18px;
+    box-shadow: 0 0 26px -14px rgba(201, 168, 76, 0.4);
 }
 
 .em-breve-icone {
@@ -1895,7 +1998,7 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .coracao, .glow-ring, .ecg-c, .sparkle, .badge { animation: none; }
+    .coracao, .glow-ring, .ecg-c, .sparkle, .badge, .estado-vazio.revisao-concluida .estado-vazio-icone { animation: none; }
     .ecg-c1 { stroke-dasharray: none; }
     .ecg-c2, .ecg-c3, .ecg-c4 { display: none; }
     main { animation: none; }
