@@ -1420,7 +1420,7 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .coracao, .glow-ring, .ecg-c, .sparkle { animation: none; }
+    .coracao, .glow-ring, .ecg-c, .sparkle, .badge { animation: none; }
     .ecg-c1 { stroke-dasharray: none; }
     .ecg-c2, .ecg-c3, .ecg-c4 { display: none; }
     main { animation: none; }
