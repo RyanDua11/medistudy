@@ -15,6 +15,7 @@ import {
     calcularProgressoGeral,
 } from "../../services/estatisticas.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
+import { criarSelectCustomizado } from "../../components/customSelect.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
@@ -24,12 +25,15 @@ const campoMateria = document.getElementById("campo-materia");
 const mensagemFlashcards = document.getElementById("mensagem-flashcards");
 const listaFlashcards = document.getElementById("lista-flashcards");
 const campoArquivoAnki = document.getElementById("campo-arquivo-anki");
+const nomeArquivoAnki = document.getElementById("nome-arquivo-anki");
 const botaoImportarAnki = document.getElementById("botao-importar-anki");
+
+const TEXTO_NENHUM_ARQUIVO = "Nenhum ficheiro selecionado";
 
 const botaoRevisaoRapida = document.getElementById("botao-revisao-rapida");
 const botaoVesperaProva = document.getElementById("botao-vespera-prova");
 const botaoModoPadrao = document.getElementById("botao-modo-padrao");
-const selectMateriaVespera = document.getElementById("select-materia-vespera");
+const selectMateriaVespera = criarSelectCustomizado(document.getElementById("select-materia-vespera"));
 
 const revisaoCarregando = document.getElementById("revisao-carregando");
 const revisaoVazia = document.getElementById("revisao-vazia");
@@ -155,13 +159,7 @@ function renderizarOpcoesDeMateria() {
     const materiaAtual = selectMateriaVespera.value;
     const materias = [...new Set(flashcards.map((f) => f.materia).filter(Boolean))].sort();
 
-    selectMateriaVespera.innerHTML = '<option value="">Escolha a matéria...</option>';
-    materias.forEach((materia) => {
-        const opcao = document.createElement("option");
-        opcao.value = materia;
-        opcao.textContent = materia;
-        selectMateriaVespera.appendChild(opcao);
-    });
+    selectMateriaVespera.setOptions(materias.map((materia) => ({ valor: materia, texto: materia })));
     selectMateriaVespera.value = materias.includes(materiaAtual) ? materiaAtual : "";
 }
 
@@ -257,6 +255,7 @@ async function tratarImportarAnki() {
         );
 
         campoArquivoAnki.value = "";
+        nomeArquivoAnki.textContent = TEXTO_NENHUM_ARQUIVO;
         await carregarFlashcards();
     } catch (erro) {
         mostrarMensagem(`Não foi possível ler o arquivo: ${erro.message}`);
@@ -292,6 +291,9 @@ async function tratarRevisao(acertou) {
 }
 
 formNovoFlashcard.addEventListener("submit", tratarNovoFlashcard);
+campoArquivoAnki.addEventListener("change", () => {
+    nomeArquivoAnki.textContent = campoArquivoAnki.files[0]?.name ?? TEXTO_NENHUM_ARQUIVO;
+});
 botaoImportarAnki.addEventListener("click", tratarImportarAnki);
 botaoRevisaoRapida.addEventListener("click", tratarModoRevisaoRapida);
 botaoVesperaProva.addEventListener("click", tratarModoVesperaDeProva);

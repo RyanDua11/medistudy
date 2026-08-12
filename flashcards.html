@@ -119,7 +119,11 @@
 
             <div class="importador-anki">
                 <label for="campo-arquivo-anki">Importar do Anki (.txt)</label>
-                <input type="file" id="campo-arquivo-anki" accept=".txt">
+                <div class="campo-arquivo-custom">
+                    <input type="file" id="campo-arquivo-anki" accept=".txt" class="campo-arquivo-input-oculto">
+                    <label for="campo-arquivo-anki" class="campo-arquivo-botao">Escolher ficheiro</label>
+                    <span id="nome-arquivo-anki" class="campo-arquivo-nome">Nenhum ficheiro selecionado</span>
+                </div>
                 <button id="botao-importar-anki" type="button">Importar do Anki</button>
             </div>
             <p id="mensagem-flashcards" class="mensagem-erro" hidden></p>
@@ -131,9 +135,13 @@
             <div class="modos-estudo">
                 <button id="botao-revisao-rapida" type="button">Revisão rápida (5 min)</button>
                 <div class="vespera-de-prova">
-                    <select id="select-materia-vespera" aria-label="Escolher matéria">
-                        <option value="">Escolha a matéria...</option>
-                    </select>
+                    <div class="select-custom" id="select-materia-vespera">
+                        <button type="button" class="select-custom-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Escolher matéria">
+                            <span class="select-custom-valor">Escolha a matéria...</span>
+                            <span class="select-custom-seta" aria-hidden="true">▾</span>
+                        </button>
+                        <ul class="select-custom-lista" role="listbox" hidden></ul>
+                    </div>
                     <button id="botao-vespera-prova" type="button">Véspera de prova</button>
                 </div>
                 <button id="botao-modo-padrao" type="button" class="link-modo-padrao">Ver todos os flashcards</button>
