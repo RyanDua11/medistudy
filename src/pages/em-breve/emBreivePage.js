@@ -1,4 +1,5 @@
 import { protegerRota } from "../../services/routeGuard.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 
 const tituloFerramenta = document.getElementById("em-breve-titulo");
 
@@ -15,6 +16,7 @@ async function iniciar() {
     const sessao = await protegerRota();
     if (!sessao) return;
 
+    inicializarNotificacaoRevisao();
     exibirNomeFerramenta();
 }
 

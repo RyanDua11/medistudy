@@ -30,6 +30,7 @@ const {
     criarFlashcard,
     listarFlashcards,
     marcarRevisao,
+    listarLogRevisoes,
     removerFlashcard,
 } = await import("./flashcardsService.js");
 
@@ -122,45 +123,138 @@ describe("listarFlashcards", () => {
 });
 
 describe("marcarRevisao", () => {
+    function mockTabelas({ flashcardResultado, logResultado }) {
+        const builderFlashcards = criarQueryBuilderMock(flashcardResultado);
+        const builderLog = criarQueryBuilderMock(
+            logResultado ?? { data: { id: "log-1" }, error: null }
+        );
+        mockFrom.mockImplementation((tabela) =>
+            tabela === "log_revisoes" ? builderLog : builderFlashcards
+        );
+        return { builderFlashcards, builderLog };
+    }
+
     it("incrementa acertos e avança a repetição espaçada quando o usuário acerta", async () => {
-        const builder = criarQueryBuilderMock({
-            data: { id: "1", acertos: 3, erros: 1 },
-            error: null,
+        const { builderFlashcards } = mockTabelas({
+            flashcardResultado: { data: { id: "1", acertos: 3, erros: 1 }, error: null },
         });
-        mockFrom.mockReturnValue(builder);
 
         const resultado = await marcarRevisao(
             { id: "1", acertos: 2, erros: 1, intervalo_dias: 1, fator_facilidade: 2.5 },
             true
         );
 
-        const atualizacao = builder.update.mock.calls[0][0];
+        const atualizacao = builderFlashcards.update.mock.calls[0][0];
         expect(atualizacao.acertos).toBe(3);
         expect(atualizacao.erros).toBe(1);
         expect(atualizacao.intervalo_dias).toBe(3);
         expect(atualizacao.fator_facilidade).toBeCloseTo(2.6);
         expect(atualizacao.proxima_revisao).toEqual(expect.any(String));
-        expect(builder.eq).toHaveBeenCalledWith("id", "1");
+        expect(builderFlashcards.eq).toHaveBeenCalledWith("id", "1");
         expect(resultado.acertos).toBe(3);
     });
 
     it("incrementa erros e reseta a repetição espaçada quando o usuário erra", async () => {
-        const builder = criarQueryBuilderMock({
-            data: { id: "1", acertos: 2, erros: 2 },
-            error: null,
+        const { builderFlashcards } = mockTabelas({
+            flashcardResultado: { data: { id: "1", acertos: 2, erros: 2 }, error: null },
         });
-        mockFrom.mockReturnValue(builder);
 
         await marcarRevisao(
             { id: "1", acertos: 2, erros: 1, intervalo_dias: 8, fator_facilidade: 2.7 },
             false
         );
 
-        const atualizacao = builder.update.mock.calls[0][0];
+        const atualizacao = builderFlashcards.update.mock.calls[0][0];
         expect(atualizacao.acertos).toBe(2);
         expect(atualizacao.erros).toBe(2);
         expect(atualizacao.intervalo_dias).toBe(1);
         expect(atualizacao.fator_facilidade).toBeCloseTo(2.5);
+    });
+
+    it("insere um log de revisão associado ao flashcard e ao usuário logado quando acerta", async () => {
+        const { builderLog } = mockTabelas({
+            flashcardResultado: { data: { id: "1", acertos: 1, erros: 0 }, error: null },
+        });
+
+        await marcarRevisao(
+            { id: "1", acertos: 0, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
+            true
+        );
+
+        expect(mockFrom).toHaveBeenCalledWith("log_revisoes");
+        expect(builderLog.insert).toHaveBeenCalledWith({
+            flashcard_id: "1",
+            usuario_id: "usuario-1",
+            acertou: true,
+        });
+    });
+
+    it("insere um log de revisão com acertou=false quando erra", async () => {
+        const { builderLog } = mockTabelas({
+            flashcardResultado: { data: { id: "1", acertos: 0, erros: 1 }, error: null },
+        });
+
+        await marcarRevisao(
+            { id: "1", acertos: 0, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
+            false
+        );
+
+        expect(builderLog.insert).toHaveBeenCalledWith({
+            flashcard_id: "1",
+            usuario_id: "usuario-1",
+            acertou: false,
+        });
+    });
+
+    it("continua retornando o flashcard atualizado mesmo com o log inserido", async () => {
+        mockTabelas({
+            flashcardResultado: { data: { id: "1", acertos: 5, erros: 0 }, error: null },
+        });
+
+        const resultado = await marcarRevisao(
+            { id: "1", acertos: 4, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
+            true
+        );
+
+        expect(resultado).toEqual({ id: "1", acertos: 5, erros: 0 });
+    });
+
+    it("lança erro quando a inserção do log falha, sem quebrar silenciosamente", async () => {
+        mockTabelas({
+            flashcardResultado: { data: { id: "1", acertos: 1, erros: 0 }, error: null },
+            logResultado: { data: null, error: { message: "Falha ao registrar log" } },
+        });
+
+        await expect(
+            marcarRevisao(
+                { id: "1", acertos: 0, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
+                true
+            )
+        ).rejects.toThrow("Falha ao registrar log");
+    });
+});
+
+describe("listarLogRevisoes", () => {
+    it("retorna os logs de revisão, mais recentes primeiro", async () => {
+        const logs = [
+            { id: "1", flashcard_id: "a", acertou: true },
+            { id: "2", flashcard_id: "b", acertou: false },
+        ];
+        const builder = criarQueryBuilderMock({ data: logs, error: null });
+        mockFrom.mockReturnValue(builder);
+
+        const resultado = await listarLogRevisoes();
+
+        expect(mockFrom).toHaveBeenCalledWith("log_revisoes");
+        expect(builder.order).toHaveBeenCalledWith("revisado_em", { ascending: false });
+        expect(resultado).toEqual(logs);
+    });
+
+    it("lança erro quando o Supabase retorna erro", async () => {
+        const builder = criarQueryBuilderMock({ data: null, error: { message: "Falha ao listar logs" } });
+        mockFrom.mockReturnValue(builder);
+
+        await expect(listarLogRevisoes()).rejects.toThrow("Falha ao listar logs");
     });
 });
 
