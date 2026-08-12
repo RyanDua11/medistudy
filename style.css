@@ -772,6 +772,56 @@ main {
     gap: 14px;
 }
 
+/* dica de rodapé — reaproveita .flashcards-coluna (fundo/borda/raio), layout em linha */
+.dica-medistudy {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.dica-medistudy-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    color: var(--terciary-color);
+    background-color: rgba(201, 168, 76, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.35);
+}
+
+.dica-medistudy-icone svg {
+    width: 20px;
+    height: 20px;
+}
+
+.dica-medistudy-texto strong {
+    display: block;
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.dica-medistudy-texto p {
+    color: var(--text-color);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .dica-medistudy {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 .flashcards-coluna h2 {
     font-family: 'Cinzel', serif;
     color: var(--terciary-color);
@@ -943,6 +993,83 @@ main {
     box-shadow: none;
 }
 
+/* cabeçalho do card de flashcard: pergunta + menu de contexto */
+.flashcard-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.flashcard-cabecalho .flashcard-pergunta {
+    flex: 1;
+    min-width: 0;
+}
+
+.tag-materia {
+    --cor-categoria: 201, 168, 76;
+    align-self: flex-start;
+    width: fit-content;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgb(var(--cor-categoria));
+    background-color: rgba(var(--cor-categoria), 0.16);
+    border: 1px solid rgba(var(--cor-categoria), 0.4);
+}
+
+.flashcard-status {
+    color: #8D8B88;
+    font-size: 12px;
+}
+
+.flashcard-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.flashcard-menu-botao {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: #8D8B88;
+    font-size: 16px;
+    line-height: 1;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.flashcard-menu-botao:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-color);
+    box-shadow: none;
+}
+
+.flashcard-menu-opcoes {
+    position: absolute;
+    top: 32px;
+    right: 0;
+    z-index: 5;
+    background-color: var(--secondary-color);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.flashcard-menu-opcoes[hidden] {
+    display: none;
+}
+
+.flashcard-menu-opcoes .flashcard-remover {
+    width: 100%;
+    white-space: nowrap;
+    border: none;
+}
+
 .estado-vazio {
     display: flex;
     flex-direction: column;
@@ -1047,22 +1174,27 @@ main {
     margin: 0 auto;
 }
 
-.ferramenta-card {
+/* glow por categoria compartilhado entre .ferramenta-card e .stat-card */
+.ferramenta-card,
+.stat-card {
     --cor-categoria: 205, 163, 73;
+    background:
+        radial-gradient(120% 90% at 20% 0%, rgba(var(--cor-categoria), 0.16) 0%, rgba(var(--cor-categoria), 0.05) 35%, #141416 70%),
+        #141416;
+    border: 1px solid rgba(var(--cor-categoria), 0.3);
+    border-radius: 16px;
+    box-shadow: 0 0 22px -10px rgba(var(--cor-categoria), 0.3);
+}
+
+.ferramenta-card {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
     gap: 14px;
     min-height: 216px;
-    background:
-        radial-gradient(120% 90% at 20% 0%, rgba(var(--cor-categoria), 0.16) 0%, rgba(var(--cor-categoria), 0.05) 35%, #141416 70%),
-        #141416;
-    border: 1px solid rgba(var(--cor-categoria), 0.3);
-    border-radius: 16px;
     padding: 30px 24px;
     text-decoration: none;
-    box-shadow: 0 0 22px -10px rgba(var(--cor-categoria), 0.3);
     transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -1103,12 +1235,15 @@ main {
     transform: scale(1.06);
 }
 
-.ferramenta-card[data-cor="azul"]     { --cor-categoria: 91, 155, 240; }
-.ferramenta-card[data-cor="vermelho"] { --cor-categoria: 228, 104, 92; }
-.ferramenta-card[data-cor="verde"]    { --cor-categoria: 95, 191, 135; }
-.ferramenta-card[data-cor="roxo"]     { --cor-categoria: 161, 132, 232; }
-.ferramenta-card[data-cor="ciano"]    { --cor-categoria: 82, 196, 214; }
-.ferramenta-card[data-cor="dourado"]  { --cor-categoria: 201, 168, 76; }
+/* paleta de categoria centralizada — qualquer elemento com data-cor herda a cor,
+   não só .ferramenta-card (reaproveitada por .stat-card e .tag-materia) */
+[data-cor="azul"]     { --cor-categoria: 91, 155, 240; }
+[data-cor="vermelho"] { --cor-categoria: 228, 104, 92; }
+[data-cor="verde"]    { --cor-categoria: 95, 191, 135; }
+[data-cor="roxo"]     { --cor-categoria: 161, 132, 232; }
+[data-cor="ciano"]    { --cor-categoria: 82, 196, 214; }
+[data-cor="dourado"]  { --cor-categoria: 201, 168, 76; }
+[data-cor="laranja"]  { --cor-categoria: 224, 138, 62; }
 
 .ferramenta-icone {
     color: rgb(var(--cor-categoria));
@@ -1152,6 +1287,50 @@ main {
 .ferramenta-card:hover .ferramenta-seta {
     background-color: rgb(var(--cor-categoria));
     color: #141416;
+}
+
+/* cards de estatística compactos (topo de Flashcards) — mesmo sistema de glow
+   por categoria de .ferramenta-card, sem seta/descrição */
+.stat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.stat-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-card-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    color: rgb(var(--cor-categoria));
+    background-color: rgba(var(--cor-categoria), 0.16);
+    box-shadow: 0 0 16px rgba(var(--cor-categoria), 0.35), inset 0 0 0 1px rgba(var(--cor-categoria), 0.4);
+}
+
+.stat-card-icone svg {
+    width: 22px;
+    height: 22px;
+}
+
+.stat-card .estatistica-valor {
+    font-size: 24px;
 }
 
 /* continue de onde parou */
@@ -1300,6 +1479,56 @@ main {
     font-size: 12.5px;
 }
 
+/* método de revisão — Novos/Revisar/Aprendidos, dentro do painel Revisar */
+.metodo-revisao {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(201, 168, 76, 0.25);
+}
+
+.metodo-revisao-titulo {
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 12px;
+}
+
+.metodo-revisao-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.metodo-revisao-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+    padding: 10px 6px;
+    border: 1px solid #3A2F2C;
+    border-radius: 12px;
+}
+
+.metodo-revisao-tile .estatistica-valor {
+    font-size: 20px;
+}
+
+.metodo-revisao-progresso-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12.5px;
+    color: #8D8B88;
+    margin-bottom: 6px;
+}
+
+.metodo-revisao-progresso-cabecalho strong {
+    color: var(--terciary-color);
+}
+
 @media (max-width: 900px) {
     .ferramentas-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1307,6 +1536,10 @@ main {
 
     .estatisticas-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-cards-grid {
+        grid-template-columns: 1fr;
     }
 }
 

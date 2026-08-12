@@ -3,10 +3,17 @@ import {
     criarFlashcard,
     listarFlashcards,
     marcarRevisao,
+    listarLogRevisoes,
     removerFlashcard,
 } from "../../services/flashcardsService.js";
 import { parsearArquivoAnki } from "../../services/importadorAnki.js";
 import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "../../services/selecaoRevisao.js";
+import {
+    calcularStreakDias,
+    calcularRevisadosHoje,
+    categorizarFlashcards,
+    calcularProgressoGeral,
+} from "../../services/estatisticas.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
@@ -35,11 +42,22 @@ const botoesRevisao = document.getElementById("botoes-revisao");
 const botaoAcertei = document.getElementById("botao-acertei");
 const botaoErrei = document.getElementById("botao-errei");
 
+const statTotalFlashcards = document.getElementById("stat-total-flashcards");
+const statRevisadosHoje = document.getElementById("stat-revisados-hoje");
+const statStreakDias = document.getElementById("stat-streak-dias");
+
+const metodoNovos = document.getElementById("metodo-novos");
+const metodoRevisar = document.getElementById("metodo-revisar");
+const metodoAprendidos = document.getElementById("metodo-aprendidos");
+const metodoProgressoValor = document.getElementById("metodo-progresso-valor");
+const metodoProgressoBarra = document.getElementById("metodo-progresso-barra");
+
 const MENSAGEM_VAZIA_PADRAO = "Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!";
 const MENSAGEM_VAZIA_VESPERA = "Nenhum flashcard cadastrado para essa matéria ainda.";
 const MENSAGEM_VAZIA_REVISAO_RAPIDA = "Nenhum flashcard vencido agora. Volte mais tarde!";
 
 let flashcards = [];
+let logs = [];
 let filaRevisao = [];
 let flashcardEmRevisao = null;
 let modoAtivo = "padrao";
@@ -55,14 +73,45 @@ function limparMensagem() {
     mensagemFlashcards.textContent = "";
 }
 
+function calcularUltimaRevisaoPorFlashcard() {
+    const mapa = new Map();
+    logs.forEach((log) => {
+        const atual = mapa.get(log.flashcard_id);
+        if (!atual || new Date(log.revisado_em) > new Date(atual)) {
+            mapa.set(log.flashcard_id, log.revisado_em);
+        }
+    });
+    return mapa;
+}
+
 function renderizarListaFlashcards() {
     listaFlashcards.innerHTML = "";
     flashcardsVazio.hidden = flashcards.length > 0;
 
+    const ultimaRevisaoPorFlashcard = calcularUltimaRevisaoPorFlashcard();
+
     flashcards.forEach((flashcard) => {
-        const item = criarElementoFlashcard(flashcard, { aoRemover: tratarRemover });
+        const item = criarElementoFlashcard(flashcard, {
+            aoRemover: tratarRemover,
+            ultimaRevisao: ultimaRevisaoPorFlashcard.get(flashcard.id) ?? null,
+        });
         listaFlashcards.appendChild(item);
     });
+}
+
+function renderizarEstatisticas() {
+    statTotalFlashcards.textContent = flashcards.length;
+    statRevisadosHoje.textContent = calcularRevisadosHoje(logs);
+    statStreakDias.textContent = calcularStreakDias(logs);
+
+    const { novos, revisar, aprendidos } = categorizarFlashcards(flashcards, logs);
+    metodoNovos.textContent = novos.length;
+    metodoRevisar.textContent = revisar.length;
+    metodoAprendidos.textContent = aprendidos.length;
+
+    const progresso = calcularProgressoGeral(flashcards, logs);
+    metodoProgressoValor.textContent = `${progresso}%`;
+    metodoProgressoBarra.style.width = `${progresso}%`;
 }
 
 function calcularFilaRevisao() {
@@ -116,11 +165,17 @@ function renderizarOpcoesDeMateria() {
 }
 
 async function carregarFlashcards() {
-    flashcards = await listarFlashcards();
-    revisaoCarregando.hidden = true;
-    renderizarListaFlashcards();
-    renderizarOpcoesDeMateria();
-    renderizarAreaRevisao();
+    try {
+        [flashcards, logs] = await Promise.all([listarFlashcards(), listarLogRevisoes()]);
+        renderizarListaFlashcards();
+        renderizarOpcoesDeMateria();
+        renderizarAreaRevisao();
+        renderizarEstatisticas();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+    } finally {
+        revisaoCarregando.hidden = true;
+    }
 }
 
 async function tratarNovoFlashcard(evento) {
