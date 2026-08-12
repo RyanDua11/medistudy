@@ -4,6 +4,8 @@ import {
     calcularRevisoesFeitas,
     calcularFlashcardsARevisar,
     calcularProvasProximos7Dias,
+    agruparNotasPorMateria,
+    calcularFlashcardsCriadosAcumulados,
     calcularStreakDias,
     calcularRevisadosHoje,
     categorizarFlashcards,
@@ -99,6 +101,55 @@ describe("calcularProvasProximos7Dias", () => {
         const provas = [{ data: dias(10) }];
 
         expect(calcularProvasProximos7Dias(provas)).toBe(0);
+    });
+});
+
+describe("agruparNotasPorMateria", () => {
+    it("agrupa notas por matéria, cada uma com seus pontos em ordem cronológica", () => {
+        const notas = [
+            { materia: "Farmacologia", nota: 7, created_at: dias(-1) },
+            { materia: "Anatomia", nota: 9, created_at: dias(-3) },
+            { materia: "Farmacologia", nota: 8.5, created_at: dias(-5) },
+        ];
+
+        const resultado = agruparNotasPorMateria(notas);
+
+        expect(resultado).toEqual([
+            {
+                materia: "Farmacologia",
+                pontos: [
+                    { data: dias(-5).slice(0, 10), nota: 8.5 },
+                    { data: dias(-1).slice(0, 10), nota: 7 },
+                ],
+            },
+            {
+                materia: "Anatomia",
+                pontos: [{ data: dias(-3).slice(0, 10), nota: 9 }],
+            },
+        ]);
+    });
+
+    it("retorna lista vazia quando não há notas", () => {
+        expect(agruparNotasPorMateria([])).toEqual([]);
+    });
+});
+
+describe("calcularFlashcardsCriadosAcumulados", () => {
+    it("retorna a contagem acumulada de flashcards criados por data", () => {
+        const flashcards = [
+            { created_at: dias(-3) },
+            { created_at: dias(-3) },
+            { created_at: dias(-1) },
+        ];
+
+        expect(calcularFlashcardsCriadosAcumulados(flashcards)).toEqual([
+            { data: dias(-3).slice(0, 10), total: 2 },
+            { data: dias(-1).slice(0, 10), total: 3 },
+        ]);
+    });
+
+    it("retorna lista vazia quando não há flashcards", () => {
+        expect(calcularFlashcardsCriadosAcumulados([])).toEqual([]);
     });
 });
 
