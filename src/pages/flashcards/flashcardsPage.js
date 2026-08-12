@@ -166,16 +166,26 @@ function renderizarOpcoesDeMateria() {
 
 async function carregarFlashcards() {
     try {
-        [flashcards, logs] = await Promise.all([listarFlashcards(), listarLogRevisoes()]);
-        renderizarListaFlashcards();
-        renderizarOpcoesDeMateria();
-        renderizarAreaRevisao();
-        renderizarEstatisticas();
+        flashcards = await listarFlashcards();
     } catch (erro) {
         mostrarMensagem(erro.message);
+        revisaoCarregando.hidden = true;
+        return;
+    }
+
+    try {
+        logs = await listarLogRevisoes();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+        logs = [];
     } finally {
         revisaoCarregando.hidden = true;
     }
+
+    renderizarListaFlashcards();
+    renderizarOpcoesDeMateria();
+    renderizarAreaRevisao();
+    renderizarEstatisticas();
 }
 
 async function tratarNovoFlashcard(evento) {
