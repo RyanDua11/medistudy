@@ -791,13 +791,16 @@ main {
 }
 
 .flashcards-coluna {
-    background-color: var(--secondary-color);
+    background:
+        radial-gradient(140% 100% at 15% 0%, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0.02) 35%, var(--secondary-color) 70%),
+        var(--secondary-color);
     border: 1px solid var(--terciary-color);
     border-radius: 18px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    box-shadow: 0 0 26px -14px rgba(201, 168, 76, 0.4);
 }
 
 /* dica de rodapé — reaproveita .flashcards-coluna (fundo/borda/raio), layout em linha */
@@ -888,9 +891,12 @@ main {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(201, 168, 76, 0.25);
+    margin-top: 22px;
+    padding-top: 22px;
+    background-image: linear-gradient(90deg, rgba(201, 168, 76, 0.32), rgba(201, 168, 76, 0.02));
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: top;
 }
 
 .importador-anki label {
@@ -930,18 +936,29 @@ main {
     box-shadow: none;
 }
 
-#botao-importar-anki {
+#botao-importar-anki,
+#botao-vespera-prova {
     background-color: transparent;
     color: var(--terciary-color);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#botao-importar-anki:hover,
+#botao-vespera-prova:hover {
+    background-color: rgba(201, 168, 76, 0.12);
+    box-shadow: none;
 }
 
 .modos-estudo {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    background-image: linear-gradient(90deg, rgba(201, 168, 76, 0.32), rgba(201, 168, 76, 0.02));
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-position: bottom;
 }
 
 .vespera-de-prova {
@@ -949,6 +966,9 @@ main {
     gap: 8px;
 }
 
+/* o <select> fechado segue o tema; a lista aberta usa a aparência nativa do
+   SO/navegador (fundo azul do sistema) — CSS puro não estiliza esse popup de
+   forma confiável entre navegadores sem reconstruir o componente do zero */
 .vespera-de-prova select {
     flex: 1;
     min-width: 0;
@@ -958,6 +978,14 @@ main {
     background-color: var(--primary-color);
     color: var(--text-color);
     font-size: 13px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.vespera-de-prova select:focus {
+    border-color: #E4C878;
+    background-color: #22150c;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
+    outline: none;
 }
 
 #botao-vespera-prova {
@@ -993,6 +1021,14 @@ main {
     resize: vertical;
     min-height: 70px;
     font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.input-group-simples textarea:focus {
+    border-color: #E4C878;
+    background-color: #22150c;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
+    outline: none;
 }
 
 #lista-flashcards,
@@ -1157,13 +1193,20 @@ main {
 }
 
 .estado-vazio-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     color: var(--terciary-color);
-    opacity: 0.65;
+    background-color: rgba(201, 168, 76, 0.08);
+    box-shadow: 0 0 18px rgba(201, 168, 76, 0.18), inset 0 0 0 1px rgba(201, 168, 76, 0.25);
 }
 
 .estado-vazio-icone svg {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
 }
 
 .estado-vazio p {
