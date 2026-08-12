@@ -26,7 +26,7 @@
                     <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
                     <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
                 </svg>
-                <span class="badge"></span>
+                <span class="badge" id="badge-revisao" hidden></span>
             </button>
             <div class="usuario-menu">
                 <div class="avatar">RB</div>
@@ -45,11 +45,17 @@
         <a href="flashcards.html" class="sidebar-link ativo" aria-label="Flashcards">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="15" rx="2"/><path d="M3 3h13a2 2 0 0 1 2 2v13"/></svg>
         </a>
+        <a href="casos-clinicos.html" class="sidebar-link" aria-label="Casos Clínicos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
+        </a>
         <a href="provas.html" class="sidebar-link" aria-label="Agenda de provas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
         </a>
         <a href="notas.html" class="sidebar-link" aria-label="Notas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
+        </a>
+        <a href="em-breve.html?ferramenta=Configura%C3%A7%C3%B5es" class="sidebar-link" aria-label="Configurações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </a>
     </nav>
 
@@ -61,6 +67,36 @@
     </a>
 
     <h1 class="titulo-pagina">Flashcards</h1>
+
+    <div class="stat-cards-grid">
+        <div class="stat-card" data-cor="dourado">
+            <span class="stat-card-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="15" rx="2"/><path d="M3 3h13a2 2 0 0 1 2 2v13"/></svg>
+            </span>
+            <span class="stat-card-info">
+                <span class="estatistica-valor" id="stat-total-flashcards">0</span>
+                <span class="estatistica-rotulo">Total de flashcards</span>
+            </span>
+        </div>
+        <div class="stat-card" data-cor="verde">
+            <span class="stat-card-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </span>
+            <span class="stat-card-info">
+                <span class="estatistica-valor" id="stat-revisados-hoje">0</span>
+                <span class="estatistica-rotulo">Revisados hoje</span>
+            </span>
+        </div>
+        <div class="stat-card" data-cor="laranja">
+            <span class="stat-card-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s5 5.5 5 10a5 5 0 0 1-10 0c0-1.5.7-2.6 1.5-3.5.2 1 .8 1.5 1.5 1.5-.3-2 .5-4 3-6.5-.3 1.5 0 2.5 1 3.5.7.7 1 1.7 1 2.5"/></svg>
+            </span>
+            <span class="stat-card-info">
+                <span class="estatistica-valor" id="stat-streak-dias">0</span>
+                <span class="estatistica-rotulo">Sequência atual</span>
+            </span>
+        </div>
+    </div>
 
     <section id="flashcards">
         <div class="flashcards-coluna">
@@ -122,6 +158,31 @@
                     </div>
                 </div>
             </div>
+
+            <div class="metodo-revisao">
+                <p class="metodo-revisao-titulo">Método de revisão</p>
+                <div class="metodo-revisao-tiles">
+                    <div class="metodo-revisao-tile">
+                        <span class="estatistica-valor" id="metodo-novos">0</span>
+                        <span class="estatistica-rotulo">Novos</span>
+                    </div>
+                    <div class="metodo-revisao-tile">
+                        <span class="estatistica-valor" id="metodo-revisar">0</span>
+                        <span class="estatistica-rotulo">Revisar</span>
+                    </div>
+                    <div class="metodo-revisao-tile">
+                        <span class="estatistica-valor" id="metodo-aprendidos">0</span>
+                        <span class="estatistica-rotulo">Aprendidos</span>
+                    </div>
+                </div>
+                <div class="metodo-revisao-progresso-cabecalho">
+                    <span>Progresso geral</span>
+                    <strong id="metodo-progresso-valor">0%</strong>
+                </div>
+                <div class="continuar-progresso">
+                    <div class="continuar-progresso-barra" id="metodo-progresso-barra" style="width: 0%"></div>
+                </div>
+            </div>
         </div>
 
         <div class="flashcards-coluna">
@@ -135,6 +196,16 @@
             </div>
         </div>
     </section>
+
+    <div class="flashcards-coluna dica-medistudy">
+        <span class="dica-medistudy-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.1V15h6v-.4c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 2z"/></svg>
+        </span>
+        <span class="dica-medistudy-texto">
+            <strong>Dica MediStudy</strong>
+            <p>A repetição espaçada é a chave para a retenção de longo prazo. Revise diariamente para fortalecer sua memória!</p>
+        </span>
+    </div>
 
 </main>
 

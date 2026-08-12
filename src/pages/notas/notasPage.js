@@ -2,6 +2,7 @@ import { protegerRota } from "../../services/routeGuard.js";
 import { criarNota, listarNotas, editarNota, removerNota } from "../../services/notasService.js";
 import { calcularNotaNecessaria } from "../../services/calculoNota.js";
 import { criarElementoNota } from "../../components/notaCard.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 
 const formNota = document.getElementById("form-nota");
 const campoMateria = document.getElementById("campo-materia-nota");
@@ -164,6 +165,7 @@ async function iniciar() {
     const sessao = await protegerRota();
     if (!sessao) return;
 
+    inicializarNotificacaoRevisao();
     await carregarNotas();
 }
 

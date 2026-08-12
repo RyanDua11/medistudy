@@ -3,6 +3,7 @@ import { obterIdUsuarioLogado } from "./authService.js";
 import { calcularRepeticaoEspacada } from "./repeticaoEspacada.js";
 
 const TABELA_FLASHCARDS = "flashcards";
+const TABELA_LOG_REVISOES = "log_revisoes";
 
 export async function criarFlashcard(pergunta, resposta, materia = null) {
     const userId = await obterIdUsuarioLogado();
@@ -43,6 +44,26 @@ export async function marcarRevisao(flashcard, acertou) {
         .eq("id", flashcard.id)
         .select()
         .single();
+
+    if (error) throw new Error(error.message);
+
+    const userId = await obterIdUsuarioLogado();
+    const { error: erroLog } = await supabase.from(TABELA_LOG_REVISOES).insert({
+        flashcard_id: flashcard.id,
+        usuario_id: userId,
+        acertou,
+    });
+
+    if (erroLog) throw new Error(erroLog.message);
+
+    return data;
+}
+
+export async function listarLogRevisoes() {
+    const { data, error } = await supabase
+        .from(TABELA_LOG_REVISOES)
+        .select()
+        .order("revisado_em", { ascending: false });
 
     if (error) throw new Error(error.message);
     return data;
