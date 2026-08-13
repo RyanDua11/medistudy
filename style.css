@@ -2226,8 +2226,19 @@ button:focus-visible {
 }
 
 @media (max-width: 600px) {
+    /* carrossel em vez de pilha vertical longa — cada card ocupa a maior
+       parte da largura, com o próximo espiando na borda como affordance */
     .ferramentas-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        grid-template-columns: none;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 6px;
+    }
+
+    .ferramentas-grid .ferramenta-card {
+        flex: 0 0 82%;
+        scroll-snap-align: start;
     }
 
     .estatisticas-grid {
