@@ -12,6 +12,7 @@ import {
     calcularProgressoGeral,
     calcularCasosResolvidos,
     calcularTaxaAcertoCasos,
+    calcularMateriasComNotas,
 } from "./estatisticas.js";
 
 const AGORA = new Date("2026-08-08T12:00:00.000Z");
@@ -351,5 +352,21 @@ describe("calcularTaxaAcertoCasos", () => {
 
     it("retorna 0 quando não há nenhuma resolução, sem dividir por zero", () => {
         expect(calcularTaxaAcertoCasos([])).toBe(0);
+    });
+});
+
+describe("calcularMateriasComNotas", () => {
+    it("conta matérias distintas com pelo menos uma nota lançada", () => {
+        const notas = [
+            { materia: "Farmacologia II" },
+            { materia: "Anatomia" },
+            { materia: "Farmacologia II" },
+        ];
+
+        expect(calcularMateriasComNotas(notas)).toBe(2);
+    });
+
+    it("retorna 0 quando não há notas", () => {
+        expect(calcularMateriasComNotas([])).toBe(0);
     });
 });

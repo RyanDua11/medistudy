@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediStudy - Notas</title>
+    <link rel="icon" type="image/png" href="caduceu.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,6 +68,27 @@
     </a>
 
     <h1 class="titulo-pagina">Notas</h1>
+
+    <div class="stat-cards-grid">
+        <div class="stat-card" data-cor="dourado">
+            <span class="stat-card-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
+            </span>
+            <span class="stat-card-info">
+                <span class="estatistica-valor" id="stat-total-notas">0</span>
+                <span class="estatistica-rotulo">Notas lançadas</span>
+            </span>
+        </div>
+        <div class="stat-card" data-cor="verde">
+            <span class="stat-card-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
+            </span>
+            <span class="stat-card-info">
+                <span class="estatistica-valor" id="stat-materias-com-notas">0</span>
+                <span class="estatistica-rotulo">Matérias com notas</span>
+            </span>
+        </div>
+    </div>
 
     <section id="notas">
         <div class="flashcards-coluna">

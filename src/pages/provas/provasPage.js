@@ -2,6 +2,8 @@ import { protegerRota } from "../../services/routeGuard.js";
 import { criarProva, listarProvas, editarProva, removerProva } from "../../services/provasService.js";
 import { criarElementoProva } from "../../components/provaCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
+import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { calcularProvasProximos7Dias } from "../../services/estatisticas.js";
 
 const formProva = document.getElementById("form-prova");
 const campoMateria = document.getElementById("campo-materia-prova");
@@ -14,6 +16,8 @@ const provasCarregando = document.getElementById("provas-carregando");
 const tituloFormProva = document.getElementById("titulo-form-prova");
 const botaoSalvarProva = document.getElementById("botao-salvar-prova");
 const botaoCancelarEdicao = document.getElementById("botao-cancelar-edicao-prova");
+const statTotalProvas = document.getElementById("stat-total-provas");
+const statProvasSemana = document.getElementById("stat-provas-semana");
 
 let provaEmEdicaoId = null;
 
@@ -58,10 +62,16 @@ function renderizarListaProvas(provas) {
     });
 }
 
+function renderizarEstatisticas(provas) {
+    statTotalProvas.textContent = provas.length;
+    statProvasSemana.textContent = calcularProvasProximos7Dias(provas);
+}
+
 async function carregarProvas() {
     const provas = await listarProvas();
     provasCarregando.hidden = true;
     renderizarListaProvas(provas);
+    renderizarEstatisticas(provas);
 }
 
 async function tratarSalvarProva(evento) {
@@ -106,6 +116,7 @@ async function iniciar() {
     if (!sessao) return;
 
     inicializarNotificacaoRevisao();
+    inicializarUsuarioMenu();
     await carregarProvas();
 }
 

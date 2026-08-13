@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient.js";
 import { obterIdUsuarioLogado } from "./authService.js";
 import { validarCasoClinico } from "./validacaoCasoClinico.js";
+import { traduzErroSupabase } from "./erroAmigavel.js";
 
 const TABELA_CASOS_CLINICOS = "casos_clinicos";
 const TABELA_LOG_RESOLUCOES_CASOS = "log_resolucoes_casos";
@@ -10,7 +11,7 @@ export async function gerarCasoClinico(materia) {
         body: { materia },
     });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     if (data?.erro) throw new Error(data.erro);
 
     return data.texto;
@@ -27,7 +28,7 @@ export async function criarCasoClinico(materia) {
         .select()
         .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }
 
@@ -45,7 +46,7 @@ export async function registrarResolucaoCaso(casoClinicoId, alternativaEscolhida
         .select()
         .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }
 
@@ -55,7 +56,7 @@ export async function listarLogResolucoesCasos() {
         .select()
         .order("resolvido_em", { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }
 
@@ -65,6 +66,6 @@ export async function listarCasosClinicos() {
         .select()
         .order("criado_em", { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }

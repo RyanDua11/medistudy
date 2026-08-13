@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient.js";
 import { obterIdUsuarioLogado } from "./authService.js";
 import { calcularRepeticaoEspacada } from "./repeticaoEspacada.js";
+import { traduzErroSupabase } from "./erroAmigavel.js";
 
 const TABELA_FLASHCARDS = "flashcards";
 const TABELA_LOG_REVISOES = "log_revisoes";
@@ -14,7 +15,7 @@ export async function criarFlashcard(pergunta, resposta, materia = null) {
         .select()
         .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }
 
@@ -24,7 +25,7 @@ export async function listarFlashcards() {
         .select()
         .order("created_at", { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }
 
@@ -45,7 +46,7 @@ export async function marcarRevisao(flashcard, acertou) {
         .select()
         .single();
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
 
     const userId = await obterIdUsuarioLogado();
     const { error: erroLog } = await supabase.from(TABELA_LOG_REVISOES).insert({
@@ -54,7 +55,7 @@ export async function marcarRevisao(flashcard, acertou) {
         acertou,
     });
 
-    if (erroLog) throw new Error(erroLog.message);
+    if (erroLog) throw new Error(traduzErroSupabase(erroLog));
 
     return data;
 }
@@ -65,11 +66,11 @@ export async function listarLogRevisoes() {
         .select()
         .order("revisado_em", { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
     return data;
 }
 
 export async function removerFlashcard(id) {
     const { error } = await supabase.from(TABELA_FLASHCARDS).delete().eq("id", id);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(traduzErroSupabase(error));
 }
