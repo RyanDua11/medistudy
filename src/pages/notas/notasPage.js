@@ -4,6 +4,8 @@ import { calcularNotaNecessaria } from "../../services/calculoNota.js";
 import { criarElementoNota } from "../../components/notaCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
+import { pulsarSucesso } from "../../components/feedbackAcao.js";
 import { calcularMateriasComNotas } from "../../services/estatisticas.js";
 
 const formNota = document.getElementById("form-nota");
@@ -70,6 +72,8 @@ function renderizarListaNotas() {
         });
         listaNotas.appendChild(item);
     });
+
+    aplicarEntradaEscalonada(listaNotas);
 }
 
 function renderizarOpcoesDeMateria() {
@@ -115,6 +119,7 @@ async function tratarSalvarNota(evento) {
             await criarNota(materia, avaliacao, peso, nota);
         }
 
+        pulsarSucesso(botaoSalvarNota);
         sairDoModoEdicao();
         await carregarNotas();
     } catch (erro) {

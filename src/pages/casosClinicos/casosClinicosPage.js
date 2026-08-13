@@ -8,6 +8,8 @@ import {
 import { calcularCasosResolvidos, calcularTaxaAcertoCasos } from "../../services/estatisticas.js";
 import { criarElementoCasoClinico } from "../../components/casoClinicoCard.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
+import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
 const selectMateria = document.getElementById("select-materia-caso");
 const botaoGerarCaso = document.getElementById("botao-gerar-caso");
@@ -68,6 +70,8 @@ function renderizarListaCasos() {
         });
         listaCasos.appendChild(item);
     });
+
+    aplicarEntradaEscalonada(listaCasos);
 }
 
 function renderizarEstatisticas() {
@@ -161,6 +165,7 @@ async function tratarGerarCaso() {
         casos = [novoCaso, ...casos];
         renderizarListaCasos();
         renderizarEstatisticas();
+        pulsarSucesso(botaoGerarCaso);
     } catch (erro) {
         mostrarMensagem(erro.message);
     } finally {

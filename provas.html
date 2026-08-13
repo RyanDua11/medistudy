@@ -114,7 +114,12 @@
 
         <div class="flashcards-coluna">
             <h2>Provas cadastradas</h2>
-            <p id="provas-carregando" class="estado-carregando">Carregando…</p>
+            <div id="provas-carregando" class="skeleton-carregando" role="status">
+                <span class="sr-only">Carregando…</span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra skeleton-barra-media"></span>
+            </div>
             <ul id="lista-provas"></ul>
             <div id="provas-vazio" class="estado-vazio" hidden>
                 <span class="estado-vazio-icone" aria-hidden="true">

@@ -137,7 +137,12 @@
 
         <div class="flashcards-coluna">
             <h2>Casos existentes</h2>
-            <p id="casos-carregando" class="estado-carregando">Carregando…</p>
+            <div id="casos-carregando" class="skeleton-carregando" role="status">
+                <span class="sr-only">Carregando…</span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra skeleton-barra-media"></span>
+            </div>
             <ul id="lista-casos-clinicos"></ul>
             <div id="casos-vazio" class="estado-vazio" hidden>
                 <span class="estado-vazio-icone" aria-hidden="true">
