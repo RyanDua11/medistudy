@@ -17,6 +17,7 @@ import {
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
 
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
 const campoPergunta = document.getElementById("campo-pergunta");
@@ -26,6 +27,7 @@ const mensagemFlashcards = document.getElementById("mensagem-flashcards");
 const listaFlashcards = document.getElementById("lista-flashcards");
 const campoArquivoAnki = document.getElementById("campo-arquivo-anki");
 const botaoImportarAnki = document.getElementById("botao-importar-anki");
+const nomeArquivoAnki = document.getElementById("nome-arquivo-anki");
 
 const botaoRevisaoRapida = document.getElementById("botao-revisao-rapida");
 const botaoVesperaProva = document.getElementById("botao-vespera-prova");
@@ -54,6 +56,7 @@ const metodoAprendidos = document.getElementById("metodo-aprendidos");
 const metodoProgressoValor = document.getElementById("metodo-progresso-valor");
 const metodoProgressoBarra = document.getElementById("metodo-progresso-barra");
 
+const NOME_ARQUIVO_ANKI_PADRAO = "Nenhum ficheiro selecionado";
 const MENSAGEM_VAZIA_PADRAO = "Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!";
 const MENSAGEM_VAZIA_VESPERA = "Nenhum flashcard cadastrado para essa matéria ainda.";
 const MENSAGEM_VAZIA_REVISAO_RAPIDA = "Nenhum flashcard vencido agora. Volte mais tarde!";
@@ -64,6 +67,13 @@ let filaRevisao = [];
 let flashcardEmRevisao = null;
 let modoAtivo = "padrao";
 let materiaSelecionada = "";
+
+function atualizarNomeArquivoAnki() {
+    const arquivo = campoArquivoAnki.files[0];
+    nomeArquivoAnki.textContent = arquivo ? arquivo.name : NOME_ARQUIVO_ANKI_PADRAO;
+    nomeArquivoAnki.title = arquivo ? arquivo.name : "";
+    nomeArquivoAnki.classList.toggle("tem-arquivo", Boolean(arquivo));
+}
 
 function mostrarMensagem(texto) {
     mensagemFlashcards.textContent = texto;
@@ -173,6 +183,7 @@ function renderizarOpcoesDeMateria() {
         selectMateriaVespera.appendChild(opcao);
     });
     selectMateriaVespera.value = materias.includes(materiaAtual) ? materiaAtual : "";
+    sincronizarSelectPersonalizado(selectMateriaVespera);
 }
 
 async function carregarFlashcards() {
@@ -267,6 +278,7 @@ async function tratarImportarAnki() {
         );
 
         campoArquivoAnki.value = "";
+        atualizarNomeArquivoAnki();
         await carregarFlashcards();
     } catch (erro) {
         mostrarMensagem(`Não foi possível ler o arquivo: ${erro.message}`);
@@ -302,6 +314,7 @@ async function tratarRevisao(acertou) {
 }
 
 formNovoFlashcard.addEventListener("submit", tratarNovoFlashcard);
+campoArquivoAnki.addEventListener("change", atualizarNomeArquivoAnki);
 botaoImportarAnki.addEventListener("click", tratarImportarAnki);
 botaoRevisaoRapida.addEventListener("click", tratarModoRevisaoRapida);
 botaoVesperaProva.addEventListener("click", tratarModoVesperaDeProva);
@@ -323,6 +336,7 @@ async function iniciar() {
 
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    melhorarSelect(selectMateriaVespera);
     await carregarFlashcards();
     abrirModoConformeParametroDeUrl();
 }

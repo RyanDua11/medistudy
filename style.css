@@ -1,8 +1,122 @@
-:root {
-    --primary-color: #1a1008;
-    --secondary-color: #2a1919;
-    --terciary-color: #C9A84C;
-    --text-color: #f5ede8;
+﻿:root {
+    /* superfícies */
+    --color-bg: #1a1008;
+    --color-surface: #2a1919;
+    --color-surface-2: #141416;
+    --color-surface-3: #0D0D0F;
+    --color-surface-2-alt: #131114;
+    --color-border-muted: #3A2F2C;
+
+    /* dourado — cada tom nomeado pelo papel que já cumpre (nenhum é redundante:
+       alimentam gradientes intencionais como o cometa do ECG e o texto do logo) */
+    --color-gold: #C9A84C;
+    --color-gold-bright: #F4D06F;
+    --color-gold-brightest: #F7E3A1;
+    --color-gold-soft: #E0B94E;
+    --color-gold-muted: #CDA349;
+    --color-gold-deep: #9E7C2F;
+    --color-gold-focus: #E4C878;
+    --color-gold-hot: #FFF3CE;
+    --color-surface-focus: #22150c;
+
+    /* texto */
+    --color-text: #f5ede8;
+    --color-text-soft: #C7C2B8;
+    --color-text-muted: #8D8B88;
+
+    /* estado */
+    --color-error: #ff4444;
+    --color-danger: #ff8080;
+    --color-danger-bg: rgba(255, 128, 128, 0.12);
+
+    /* tipografia */
+    --font-display: 'Cinzel', serif;
+    --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --text-xs: 12px;
+    --text-sm: 13px;
+    --text-base: 14px;
+    --text-md: 15px;
+    --text-lg: 16px;
+    --text-xl: 18px;
+    --text-2xl: 22px;
+    --text-3xl: 28px;
+    --text-4xl: 36px;
+
+    /* espaçamento (base 4px) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 40px;
+
+    /* raio */
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-pill: 999px;
+
+    /* sombra */
+    --shadow-card: 0 10px 26px rgba(0, 0, 0, 0.35);
+    --shadow-glow-gold: 0 0 22px -10px rgba(201, 168, 76, 0.3);
+
+    /* aliases legados — mantidos para não obrigar a reescrever todo o arquivo
+       de uma vez; código novo deve usar os tokens semânticos acima */
+    --primary-color: var(--color-bg);
+    --secondary-color: var(--color-surface);
+    --terciary-color: var(--color-gold);
+    --text-color: var(--color-text);
+}
+
+body,
+input,
+textarea,
+select,
+button,
+p {
+    font-family: var(--font-body);
+}
+
+/* scrollbar — dourado com brilho suave em deslize, ecoando o pulso do ECG da marca */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--terciary-color) var(--secondary-color);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-color);
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid var(--secondary-color);
+    background-clip: padding-box;
+    background-image: linear-gradient(180deg, #8a6d24 0%, var(--terciary-color) 45%, #f0d488 55%, var(--terciary-color) 65%, #8a6d24 100%);
+    background-size: 100% 260%;
+    animation: scrollbar-brilho 4.5s linear infinite;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-image: linear-gradient(180deg, #a3822e 0%, #e2c168 45%, #fbe9b8 55%, #e2c168 65%, #a3822e 100%);
+    background-size: 100% 260%;
+}
+
+@keyframes scrollbar-brilho {
+    0%   { background-position: 0 0%; }
+    100% { background-position: 0 -160%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::-webkit-scrollbar-thumb {
+        animation: none;
+    }
 }
 
 body {
@@ -41,6 +155,8 @@ body.ativo::before {
     border: 1px solid var(--terciary-color);
     border-radius: 10px;
     width: 380px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
     box-shadow: 0px 0px 15px rgba(201, 168, 76, 0.3);
     transition: box-shadow 0.6s ease, transform 0.3s ease;
 }
@@ -100,7 +216,7 @@ img {
 
 @keyframes piscar {
     0%, 100% { border-color: var(--terciary-color); }
-    50% { border-color: #ff4444; }
+    50% { border-color: var(--color-error); }
 }
 
 .campo-erro {
@@ -151,7 +267,7 @@ button:disabled {
 }
 
 .mensagem-erro {
-    color: #ff4444;
+    color: var(--color-error);
     font-size: 0.9em;
     margin: 0;
 }
@@ -193,8 +309,8 @@ input:hover {
 }
 
 input:focus {
-    border-color: #E4C878;
-    background-color: #22150c;
+    border-color: var(--color-gold-focus);
+    background-color: var(--color-surface-focus);
     box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
     outline: none;
 }
@@ -263,7 +379,7 @@ body.pagina-home {
 
 body.pagina-home::before {
     background-image: none;
-    background-color: #0D0D0F;
+    background-color: var(--color-surface-3);
 }
 
 #header {
@@ -275,7 +391,7 @@ body.pagina-home::before {
     /* fundo escuro com um leve calor dourado atras do logo */
     background:
         radial-gradient(620px 130px at 6% 50%, rgba(205, 163, 73, 0.07), transparent 70%),
-        linear-gradient(180deg, #131114 0%, #0D0D0F 100%);
+        linear-gradient(180deg, var(--color-surface-2-alt) 0%, var(--color-surface-3) 100%);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -336,7 +452,7 @@ body.pagina-home::before {
     font-size: 22px;
     font-weight: 600;
     letter-spacing: 1.5px;
-    background: linear-gradient(180deg, #F7E3A1 0%, #CDA349 52%, #9E7C2F 100%);
+    background: linear-gradient(180deg, var(--color-gold-brightest) 0%, var(--color-gold-muted) 52%, var(--color-gold-deep) 100%);
     -webkit-background-clip: text;
             background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -361,7 +477,7 @@ body.pagina-home::before {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    color: #CDA349;
+    color: var(--color-gold-muted);
     transition: color 0.25s ease, background-color 0.25s ease;
 }
 
@@ -373,7 +489,7 @@ body.pagina-home::before {
 }
 
 #sino:hover {
-    color: #F4D06F;
+    color: var(--color-gold-bright);
     background-color: rgba(205, 163, 73, 0.09);
 }
 
@@ -395,7 +511,7 @@ body.pagina-home::before {
     height: 16px;
     padding: 0 3px;
     border-radius: 999px;
-    background: #F4D06F;
+    background: var(--color-gold-bright);
     color: #1a1008;
     font-size: 10px;
     font-weight: 700;
@@ -422,7 +538,7 @@ body.pagina-home::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #F4D06F;
+    color: var(--color-gold-bright);
     font-family: 'Cinzel', serif;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -479,8 +595,8 @@ body.pagina-home::before {
     padding: 6px 14px;
     font-size: 13px;
     background-color: transparent;
-    color: #ff8080;
-    border-color: #ff8080;
+    color: var(--color-danger);
+    border-color: var(--color-danger);
 }
 
 .usuario-menu-sair:hover {
@@ -491,7 +607,7 @@ body.pagina-home::before {
 .chevron-usuario {
     width: 16px;
     height: 16px;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     transition: color 0.25s ease;
 }
 
@@ -511,7 +627,7 @@ body.pagina-home::before {
     align-items: center;
     gap: 10px;
     padding-top: 24px;
-    background: linear-gradient(180deg, #131114 0%, #0D0D0F 100%);
+    background: linear-gradient(180deg, var(--color-surface-2-alt) 0%, var(--color-surface-3) 100%);
     border-right: 1px solid rgba(201, 168, 76, 0.12);
     box-sizing: border-box;
     z-index: 9;
@@ -524,7 +640,7 @@ body.pagina-home::before {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     border: 1px solid transparent;
     transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -569,15 +685,17 @@ main {
     flex-direction: column;
     gap: 12px;
     text-align: left;
+    flex: 1 1 420px;
+    min-width: 0;
 }
 
 .saudacao {
-    color: #F4F1EA;
+    color: var(--color-text);
     font-size: 18px;
 }
 
 .label-missao {
-    color: #CDA349;
+    color: var(--color-gold-muted);
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -585,7 +703,7 @@ main {
 
 .titulo-missao {
     font-family: 'Cinzel', serif;
-    color: #F4D06F;
+    color: var(--color-gold-bright);
     font-size: 42px;
     margin: 0;
 }
@@ -594,7 +712,7 @@ main {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 14px;
 }
 
@@ -608,7 +726,7 @@ main {
 }
 
 .frase-motivacional {
-    color: #C7C2B8;
+    color: var(--color-text-soft);
     font-size: 15px;
     line-height: 1.6;
     margin: 0;
@@ -644,23 +762,22 @@ main {
 
 #missao-do-dia {
     position: relative;
-    background-color: #141416;
-    border: 1px solid #3A2F2C;
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border-muted);
     border-radius: 16px;
     padding: 40px;
-    max-width: 900px;
+    max-width: 1040px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    overflow: visible;
+    gap: 24px;
+    overflow: hidden;
 }
 
 .missao-ilustracao {
-    position: absolute;
-    top: 50%;
-    right: -60px;
-    transform: translateY(-50%);
+    position: relative;
+    flex: 0 0 auto;
     width: 380px;
     height: 330px;
     display: flex;
@@ -781,12 +898,12 @@ main {
     will-change: stroke-dashoffset;
 }
 
-.ecg-c1 { stroke: #FFF3CE; stroke-width: 3.2; stroke-dasharray: 4 1000;  animation-name: ecg1;
+.ecg-c1 { stroke: var(--color-gold-hot); stroke-width: 3.2; stroke-dasharray: 4 1000;  animation-name: ecg1;
           filter: drop-shadow(0 0 3px rgba(247,222,139,0.95)) drop-shadow(0 0 8px rgba(247,222,139,0.6)); }
-.ecg-c2 { stroke: #F4D06F; stroke-width: 2.7; stroke-dasharray: 12 1000; opacity: 0.62; animation-name: ecg2;
+.ecg-c2 { stroke: var(--color-gold-bright); stroke-width: 2.7; stroke-dasharray: 12 1000; opacity: 0.62; animation-name: ecg2;
           filter: drop-shadow(0 0 4px rgba(244,208,111,0.5)); }
-.ecg-c3 { stroke: #E0B94E; stroke-width: 2.1; stroke-dasharray: 22 1000; opacity: 0.32; animation-name: ecg3; }
-.ecg-c4 { stroke: #C9A84C; stroke-width: 1.6; stroke-dasharray: 34 1000; opacity: 0.15; animation-name: ecg4; }
+.ecg-c3 { stroke: var(--color-gold-soft); stroke-width: 2.1; stroke-dasharray: 22 1000; opacity: 0.32; animation-name: ecg3; }
+.ecg-c4 { stroke: var(--color-gold); stroke-width: 1.6; stroke-dasharray: 34 1000; opacity: 0.15; animation-name: ecg4; }
 
 @keyframes ecg1 { from { stroke-dashoffset: 38;  } to { stroke-dashoffset: -130; } }
 @keyframes ecg2 { from { stroke-dashoffset: 46;  } to { stroke-dashoffset: -122; } }
@@ -799,7 +916,7 @@ main {
     width: 3px;
     height: 3px;
     border-radius: 50%;
-    background: #F4D06F;
+    background: var(--color-gold-bright);
     box-shadow: 0 0 6px 1px rgba(244, 208, 111, 0.8);
     opacity: 0;
     z-index: 3;
@@ -848,12 +965,15 @@ main {
     box-shadow: 0 0 26px -14px rgba(201, 168, 76, 0.4);
 }
 
-/* dica de rodapé — reaproveita .flashcards-coluna (fundo/borda/raio), layout em linha */
+/* dica de rodapé — vive dentro da coluna "Novo flashcard", layout em linha */
 .dica-medistudy {
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    margin-top: 24px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(201, 168, 76, 0.25);
 }
 
 .dica-medistudy-icone {
@@ -944,41 +1064,74 @@ main {
     background-position: top;
 }
 
-.importador-anki label {
+.importador-anki-legenda {
     color: var(--text-color);
-    font-size: 13px;
+    font-size: var(--text-sm);
     opacity: 0.85;
 }
 
-.importador-anki input[type="file"] {
-    width: 100%;
-    box-sizing: border-box;
+/* campo de arquivo customizado — o nome do arquivo escolhido é renderizado
+   pelo próprio SO/navegador dentro do <input type="file"> nativo e não pode
+   ser truncado de forma legível via CSS puro; aqui o input fica visualmente
+   oculto (mas acessível via teclado) e o botão + nome do arquivo são
+   elementos próprios, com ellipsis controlado e title com o nome completo */
+.importador-anki-campo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 8px 10px;
     border: 1px solid rgba(201, 168, 76, 0.3);
     border-radius: 12px;
     background-color: var(--primary-color);
-    color: #8D8B88;
-    font-size: 13px;
 }
 
-.importador-anki input[type="file"]::file-selector-button {
+.importador-anki-botao-arquivo {
+    flex-shrink: 0;
     padding: 8px 14px;
-    margin-right: 10px;
     border: 1px solid var(--terciary-color);
     border-radius: 18px;
     background-color: transparent;
     color: var(--terciary-color);
-    font-size: 12px;
+    font-size: var(--text-xs);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
-.importador-anki input[type="file"]::file-selector-button:hover {
+.importador-anki-botao-arquivo:hover {
     background-color: rgba(201, 168, 76, 0.12);
 }
 
-.importador-anki input[type="file"]:hover {
-    box-shadow: none;
+.importador-anki-nome-arquivo {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.importador-anki-nome-arquivo.tem-arquivo {
+    color: var(--text-color);
+}
+
+.importador-anki-input-oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.importador-anki-input-oculto:focus-visible + .importador-anki-nome-arquivo,
+.importador-anki-campo:has(.importador-anki-input-oculto:focus-visible) {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 2px;
 }
 
 #botao-importar-anki,
@@ -1011,26 +1164,110 @@ main {
     gap: 8px;
 }
 
-/* o <select> fechado segue o tema; a lista aberta usa a aparência nativa do
-   SO/navegador (fundo azul do sistema) — CSS puro não estiliza esse popup de
-   forma confiável entre navegadores sem reconstruir o componente do zero */
-.vespera-de-prova select {
+/* select customizado — substitui o <select> nativo (mantido oculto no DOM como
+   fonte de verdade via src/components/selectPersonalizado.js) porque o popup
+   de opções de um <select> nativo é desenhado pelo SO/navegador e não pode
+   ser estilizado via CSS puro de forma confiável entre navegadores */
+.select-personalizado {
+    position: relative;
     flex: 1;
     min-width: 0;
-    padding: 10px;
+}
+
+.select-personalizado-gatilho {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
     border: 1px solid var(--terciary-color);
     border-radius: 12px;
     background-color: var(--primary-color);
     color: var(--text-color);
-    font-size: 13px;
+    font-size: var(--text-sm);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.vespera-de-prova select:focus {
-    border-color: #E4C878;
-    background-color: #22150c;
+.select-personalizado-rotulo {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select-personalizado-seta {
+    display: flex;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.select-personalizado-seta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.select-personalizado-gatilho[aria-expanded="true"] .select-personalizado-seta {
+    transform: rotate(180deg);
+    color: var(--terciary-color);
+}
+
+.select-personalizado-gatilho:hover {
+    background-color: var(--primary-color);
+    border-color: var(--color-gold-focus);
+    box-shadow: none;
+}
+
+.select-personalizado-gatilho:focus-visible {
+    border-color: var(--color-gold-focus);
+    background-color: var(--color-surface-focus);
     box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
     outline: none;
+}
+
+.select-personalizado-opcoes {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 6;
+    max-height: 240px;
+    overflow-y: auto;
+    background-color: var(--secondary-color);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.select-personalizado-opcao {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: var(--text-color);
+    font-size: var(--text-sm);
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.select-personalizado-opcao:hover,
+.select-personalizado-opcao:focus-visible {
+    background-color: rgba(201, 168, 76, 0.14);
+    outline: none;
+}
+
+.select-personalizado-opcao.selecionada {
+    color: var(--terciary-color);
+    font-weight: 600;
 }
 
 #botao-vespera-prova {
@@ -1043,7 +1280,7 @@ main {
     padding: 0;
     background: none;
     border: none;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 12px;
     text-decoration: underline;
     align-self: flex-start;
@@ -1070,8 +1307,8 @@ main {
 }
 
 .input-group-simples textarea:focus {
-    border-color: #E4C878;
-    background-color: #22150c;
+    border-color: var(--color-gold-focus);
+    background-color: var(--color-surface-focus);
     box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
     outline: none;
 }
@@ -1090,8 +1327,8 @@ main {
 }
 
 .input-group-simples select:focus {
-    border-color: #E4C878;
-    background-color: #22150c;
+    border-color: var(--color-gold-focus);
+    background-color: var(--color-surface-focus);
     box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18), 0 0 14px rgba(201, 168, 76, 0.5);
     outline: none;
 }
@@ -1147,8 +1384,8 @@ button:focus-visible {
     padding: 6px 12px;
     font-size: 12px;
     background-color: transparent;
-    color: #ff8080;
-    border-color: #ff8080;
+    color: var(--color-danger);
+    border-color: var(--color-danger);
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1200,7 +1437,7 @@ button:focus-visible {
 }
 
 .flashcard-status {
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 12px;
 }
 
@@ -1215,7 +1452,7 @@ button:focus-visible {
     padding: 0;
     background: none;
     border: none;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 16px;
     line-height: 1;
     border-radius: 8px;
@@ -1257,7 +1494,7 @@ button:focus-visible {
     text-align: center;
     gap: 8px;
     padding: 28px 12px;
-    color: #8D8B88;
+    color: var(--color-text-muted);
 }
 
 .estado-vazio[hidden] {
@@ -1298,7 +1535,7 @@ button:focus-visible {
 }
 
 .estado-carregando {
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 13px;
     text-align: center;
     padding: 24px 0;
@@ -1345,7 +1582,7 @@ button:focus-visible {
 }
 
 .resolucao-alternativa.resolucao-incorreta {
-    border-color: #ff8080;
+    border-color: var(--color-danger);
     background-color: rgba(255, 128, 128, 0.12);
     box-shadow: none;
 }
@@ -1406,8 +1643,8 @@ button:focus-visible {
 
 #botao-errei {
     background-color: transparent;
-    color: #ff8080;
-    border-color: #ff8080;
+    color: var(--color-danger);
+    border-color: var(--color-danger);
 }
 
 @media (max-width: 900px) {
@@ -1447,17 +1684,29 @@ button:focus-visible {
     margin: 0 auto;
 }
 
-/* glow por categoria compartilhado entre .ferramenta-card e .stat-card */
+/* glow por categoria compartilhado por toda a família de cards do dashboard —
+   ferramenta/stat/resultado de cálculo e as demais peças (estatística, gráfico)
+   herdam o mesmo tratamento em vez de ficarem planas ao lado das outras */
 .ferramenta-card,
 .stat-card,
+.estatistica-tile,
+.grafico-card,
 #resultado-calculo:not(:empty) {
     --cor-categoria: 205, 163, 73;
     background:
-        radial-gradient(120% 90% at 20% 0%, rgba(var(--cor-categoria), 0.16) 0%, rgba(var(--cor-categoria), 0.05) 35%, #141416 70%),
-        #141416;
+        radial-gradient(120% 90% at 20% 0%, rgba(var(--cor-categoria), 0.16) 0%, rgba(var(--cor-categoria), 0.05) 35%, var(--color-surface-2) 70%),
+        var(--color-surface-2);
     border: 1px solid rgba(var(--cor-categoria), 0.3);
     border-radius: 16px;
     box-shadow: 0 0 22px -10px rgba(var(--cor-categoria), 0.3);
+    transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.estatistica-tile:hover,
+.grafico-card:hover {
+    border-color: rgba(var(--cor-categoria), 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 16px rgba(var(--cor-categoria), 0.22);
 }
 
 #resultado-calculo:not(:empty) {
@@ -1533,14 +1782,14 @@ button:focus-visible {
 }
 
 .ferramenta-titulo {
-    color: #F5F3F0;
+    color: var(--color-text);
     font-size: 16px;
     font-weight: 700;
 }
 
 .ferramenta-descricao {
-    color: #8D8B88;
-    font-size: 12.5px;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
     line-height: 1.5;
     margin: -6px 0 0;
     display: -webkit-box;
@@ -1568,7 +1817,7 @@ button:focus-visible {
 
 .ferramenta-card:hover .ferramenta-seta {
     background-color: rgb(var(--cor-categoria));
-    color: #141416;
+    color: var(--color-surface-2);
 }
 
 /* cards de estatística compactos (topo de Flashcards) — mesmo sistema de glow
@@ -1577,7 +1826,7 @@ button:focus-visible {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
 .stat-card {
@@ -1622,8 +1871,8 @@ button:focus-visible {
     gap: 22px;
     max-width: 900px;
     margin: 0 auto;
-    background-color: #141416;
-    border: 1px solid #3A2F2C;
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border-muted);
     border-radius: 16px;
     padding: 20px 24px;
     text-decoration: none;
@@ -1661,7 +1910,7 @@ button:focus-visible {
 
 .continuar-capa-titulo {
     font-family: 'Cinzel', serif;
-    color: #F4D06F;
+    color: var(--color-gold-bright);
     font-size: 9px;
     line-height: 1.2;
 }
@@ -1687,7 +1936,7 @@ button:focus-visible {
 }
 
 .continuar-topico {
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 13px;
 }
 
@@ -1704,7 +1953,7 @@ button:focus-visible {
 .continuar-progresso-barra {
     height: 100%;
     border-radius: 3px;
-    background: linear-gradient(90deg, #9E7C2F, var(--terciary-color));
+    background: linear-gradient(90deg, var(--color-gold-deep), var(--terciary-color));
 }
 
 .continuar-seta {
@@ -1743,9 +1992,6 @@ button:focus-visible {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    background-color: #141416;
-    border: 1px solid #3A2F2C;
-    border-radius: 16px;
     padding: 20px 22px;
 }
 
@@ -1757,8 +2003,8 @@ button:focus-visible {
 }
 
 .estatistica-rotulo {
-    color: #8D8B88;
-    font-size: 12.5px;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
 }
 
 /* evolucao */
@@ -1774,9 +2020,6 @@ button:focus-visible {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background-color: #141416;
-    border: 1px solid #3A2F2C;
-    border-radius: 16px;
     padding: 20px 22px;
 }
 
@@ -1802,7 +2045,7 @@ button:focus-visible {
 }
 
 .grafico-linha-rotulo-eixo {
-    fill: #8D8B88;
+    fill: var(--color-text-muted);
     font-size: 10px;
 }
 
@@ -1817,7 +2060,7 @@ button:focus-visible {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     font-size: 12px;
 }
 
@@ -1830,8 +2073,8 @@ button:focus-visible {
 
 /* método de revisão — Novos/Revisar/Aprendidos, dentro do painel Revisar */
 .metodo-revisao {
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: auto;
+    padding-top: 12px;
     border-top: 1px solid rgba(201, 168, 76, 0.25);
 }
 
@@ -1848,7 +2091,7 @@ button:focus-visible {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .metodo-revisao-tile {
@@ -1856,22 +2099,23 @@ button:focus-visible {
     flex-direction: column;
     gap: 4px;
     text-align: center;
-    padding: 10px 6px;
-    border: 1px solid #3A2F2C;
+    padding: 8px 6px;
+    border: 1px solid rgba(201, 168, 76, 0.25);
     border-radius: 12px;
+    background-color: rgba(201, 168, 76, 0.04);
 }
 
 .metodo-revisao-tile .estatistica-valor {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .metodo-revisao-progresso-cabecalho {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    font-size: 12.5px;
-    color: #8D8B88;
-    margin-bottom: 6px;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
 }
 
 .metodo-revisao-progresso-cabecalho strong {
@@ -1915,7 +2159,7 @@ button:focus-visible {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #8D8B88;
+    color: var(--color-text-muted);
     text-decoration: none;
     font-size: 14px;
     transition: color 0.25s ease;
@@ -1973,7 +2217,7 @@ button:focus-visible {
 }
 
 #em-breve p {
-    color: #C7C2B8;
+    color: var(--color-text-soft);
     font-size: 15px;
     margin: 0;
 }
