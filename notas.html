@@ -118,7 +118,12 @@
 
         <div class="flashcards-coluna">
             <h2>Notas lançadas</h2>
-            <p id="notas-carregando" class="estado-carregando">Carregando…</p>
+            <div id="notas-carregando" class="skeleton-carregando" role="status">
+                <span class="sr-only">Carregando…</span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra skeleton-barra-media"></span>
+            </div>
             <ul id="lista-notas"></ul>
             <div id="notas-vazio" class="estado-vazio" hidden>
                 <span class="estado-vazio-icone" aria-hidden="true">

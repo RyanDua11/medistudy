@@ -15,9 +15,11 @@ import {
     calcularProgressoGeral,
 } from "../../services/estatisticas.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
+import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
+import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
 const campoPergunta = document.getElementById("campo-pergunta");
@@ -39,6 +41,8 @@ const revisaoVazia = document.getElementById("revisao-vazia");
 const revisaoVaziaTexto = document.getElementById("revisao-vazia-texto");
 const flashcardsVazio = document.getElementById("flashcards-vazio");
 const cartaoRevisao = document.getElementById("cartao-revisao");
+const cartaoRevisaoFrente = document.querySelector(".cartao-revisao-frente");
+const cartaoRevisaoVerso = document.querySelector(".cartao-revisao-verso");
 const revisaoPergunta = document.getElementById("revisao-pergunta");
 const revisaoResposta = document.getElementById("revisao-resposta");
 const botaoMostrarResposta = document.getElementById("botao-mostrar-resposta");
@@ -109,6 +113,8 @@ function renderizarListaFlashcards() {
         });
         listaFlashcards.appendChild(item);
     });
+
+    aplicarEntradaEscalonada(listaFlashcards);
 }
 
 function renderizarEstatisticas() {
@@ -146,6 +152,12 @@ function sessaoDeRevisaoRapidaConcluidaHoje() {
     return modoAtivo === "revisaoRapida" && flashcards.length > 0 && calcularRevisadosHoje(logs) > 0;
 }
 
+function definirEstadoFlip(virado) {
+    cartaoRevisao.classList.toggle("virado", virado);
+    cartaoRevisaoFrente.inert = virado;
+    cartaoRevisaoVerso.inert = !virado;
+}
+
 function renderizarAreaRevisao() {
     filaRevisao = calcularFilaRevisao();
     flashcardEmRevisao = filaRevisao.length > 0 ? filaRevisao[0] : null;
@@ -166,9 +178,7 @@ function renderizarAreaRevisao() {
     cartaoRevisao.hidden = false;
     revisaoPergunta.textContent = flashcardEmRevisao.pergunta;
     revisaoResposta.textContent = flashcardEmRevisao.resposta;
-    revisaoResposta.hidden = true;
-    botoesRevisao.hidden = true;
-    botaoMostrarResposta.hidden = false;
+    definirEstadoFlip(false);
 }
 
 function renderizarOpcoesDeMateria() {
@@ -216,6 +226,7 @@ async function tratarNovoFlashcard(evento) {
 
     try {
         await criarFlashcard(campoPergunta.value, campoResposta.value, campoMateria.value || null);
+        pulsarSucesso(formNovoFlashcard.querySelector('button[type="submit"]'));
         formNovoFlashcard.reset();
         await carregarFlashcards();
     } catch (erro) {
@@ -277,6 +288,7 @@ async function tratarImportarAnki() {
                 : `${criados} flashcard(s) importado(s) com sucesso.`
         );
 
+        if (criados > 0) pulsarSucesso(botaoImportarAnki);
         campoArquivoAnki.value = "";
         atualizarNomeArquivoAnki();
         await carregarFlashcards();
@@ -297,9 +309,8 @@ async function tratarRemover(id) {
 }
 
 function tratarMostrarResposta() {
-    revisaoResposta.hidden = false;
-    botoesRevisao.hidden = false;
-    botaoMostrarResposta.hidden = true;
+    definirEstadoFlip(true);
+    botaoAcertei.focus();
 }
 
 async function tratarRevisao(acertou) {

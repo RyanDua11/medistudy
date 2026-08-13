@@ -3,6 +3,8 @@ import { criarProva, listarProvas, editarProva, removerProva } from "../../servi
 import { criarElementoProva } from "../../components/provaCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
+import { pulsarSucesso } from "../../components/feedbackAcao.js";
 import { calcularProvasProximos7Dias } from "../../services/estatisticas.js";
 
 const formProva = document.getElementById("form-prova");
@@ -60,6 +62,8 @@ function renderizarListaProvas(provas) {
         });
         listaProvas.appendChild(item);
     });
+
+    aplicarEntradaEscalonada(listaProvas);
 }
 
 function renderizarEstatisticas(provas) {
@@ -91,6 +95,7 @@ async function tratarSalvarProva(evento) {
             await criarProva(campoMateria.value, campoData.value, notaNecessaria);
         }
 
+        pulsarSucesso(botaoSalvarProva);
         sairDoModoEdicao();
         await carregarProvas();
     } catch (erro) {

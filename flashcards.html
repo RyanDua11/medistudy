@@ -123,7 +123,7 @@
                 <div class="importador-anki-campo">
                     <label for="campo-arquivo-anki" class="importador-anki-botao-arquivo">Escolher ficheiro</label>
                     <span id="nome-arquivo-anki" class="importador-anki-nome-arquivo">Nenhum ficheiro selecionado</span>
-                    <input type="file" id="campo-arquivo-anki" accept=".txt" class="importador-anki-input-oculto">
+                    <input type="file" id="campo-arquivo-anki" accept=".txt" class="importador-anki-input-oculto sr-only">
                 </div>
                 <button id="botao-importar-anki" type="button">Importar do Anki</button>
             </div>
@@ -154,7 +154,11 @@
                 <button id="botao-modo-padrao" type="button" class="link-modo-padrao">Ver todos os flashcards</button>
             </div>
 
-            <p id="revisao-carregando" class="estado-carregando">Carregando…</p>
+            <div id="revisao-carregando" class="skeleton-carregando" role="status">
+                <span class="sr-only">Carregando…</span>
+                <span class="skeleton-barra"></span>
+                <span class="skeleton-barra skeleton-barra-curta"></span>
+            </div>
 
             <div id="area-revisao">
                 <div id="revisao-vazia" class="estado-vazio" hidden>
@@ -163,13 +167,19 @@
                     </span>
                     <p id="revisao-vazia-texto">Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!</p>
                 </div>
-                <div id="cartao-revisao" hidden>
-                    <p id="revisao-pergunta"></p>
-                    <p id="revisao-resposta" hidden></p>
-                    <button id="botao-mostrar-resposta" type="button">Mostrar resposta</button>
-                    <div id="botoes-revisao" hidden>
-                        <button id="botao-acertei" type="button">Acertei</button>
-                        <button id="botao-errei" type="button">Errei</button>
+                <div id="cartao-revisao" class="cartao-revisao" hidden>
+                    <div class="cartao-revisao-interior">
+                        <div class="cartao-revisao-face cartao-revisao-frente">
+                            <p id="revisao-pergunta"></p>
+                            <button id="botao-mostrar-resposta" type="button">Mostrar resposta</button>
+                        </div>
+                        <div class="cartao-revisao-face cartao-revisao-verso">
+                            <p id="revisao-resposta"></p>
+                            <div id="botoes-revisao">
+                                <button id="botao-acertei" type="button">Acertei</button>
+                                <button id="botao-errei" type="button">Errei</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
