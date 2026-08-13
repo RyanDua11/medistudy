@@ -5,6 +5,46 @@
     --text-color: #f5ede8;
 }
 
+/* scrollbar — dourado com brilho suave em deslize, ecoando o pulso do ECG da marca */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--terciary-color) var(--secondary-color);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-color);
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid var(--secondary-color);
+    background-clip: padding-box;
+    background-image: linear-gradient(180deg, #8a6d24 0%, var(--terciary-color) 45%, #f0d488 55%, var(--terciary-color) 65%, #8a6d24 100%);
+    background-size: 100% 260%;
+    animation: scrollbar-brilho 4.5s linear infinite;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-image: linear-gradient(180deg, #a3822e 0%, #e2c168 45%, #fbe9b8 55%, #e2c168 65%, #a3822e 100%);
+    background-size: 100% 260%;
+}
+
+@keyframes scrollbar-brilho {
+    0%   { background-position: 0 0%; }
+    100% { background-position: 0 -160%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::-webkit-scrollbar-thumb {
+        animation: none;
+    }
+}
+
 body {
     background-color: var(--primary-color);
     color: var(--text-color);
@@ -569,6 +609,8 @@ main {
     flex-direction: column;
     gap: 12px;
     text-align: left;
+    flex: 1 1 420px;
+    min-width: 0;
 }
 
 .saudacao {
@@ -648,19 +690,18 @@ main {
     border: 1px solid #3A2F2C;
     border-radius: 16px;
     padding: 40px;
-    max-width: 900px;
+    max-width: 1040px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    overflow: visible;
+    gap: 24px;
+    overflow: hidden;
 }
 
 .missao-ilustracao {
-    position: absolute;
-    top: 50%;
-    right: -60px;
-    transform: translateY(-50%);
+    position: relative;
+    flex: 0 0 auto;
     width: 380px;
     height: 330px;
     display: flex;
@@ -848,12 +889,15 @@ main {
     box-shadow: 0 0 26px -14px rgba(201, 168, 76, 0.4);
 }
 
-/* dica de rodapé — reaproveita .flashcards-coluna (fundo/borda/raio), layout em linha */
+/* dica de rodapé — vive dentro da coluna "Novo flashcard", layout em linha */
 .dica-medistudy {
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    margin-top: 24px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(201, 168, 76, 0.25);
 }
 
 .dica-medistudy-icone {
@@ -1577,7 +1621,7 @@ button:focus-visible {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
 .stat-card {
@@ -1830,8 +1874,8 @@ button:focus-visible {
 
 /* método de revisão — Novos/Revisar/Aprendidos, dentro do painel Revisar */
 .metodo-revisao {
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: auto;
+    padding-top: 12px;
     border-top: 1px solid rgba(201, 168, 76, 0.25);
 }
 
@@ -1848,7 +1892,7 @@ button:focus-visible {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .metodo-revisao-tile {
@@ -1856,13 +1900,13 @@ button:focus-visible {
     flex-direction: column;
     gap: 4px;
     text-align: center;
-    padding: 10px 6px;
+    padding: 8px 6px;
     border: 1px solid #3A2F2C;
     border-radius: 12px;
 }
 
 .metodo-revisao-tile .estatistica-valor {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .metodo-revisao-progresso-cabecalho {
@@ -1871,7 +1915,7 @@ button:focus-visible {
     align-items: baseline;
     font-size: 12.5px;
     color: #8D8B88;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .metodo-revisao-progresso-cabecalho strong {
