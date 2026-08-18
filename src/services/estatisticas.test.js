@@ -13,6 +13,8 @@ import {
     calcularCasosResolvidos,
     calcularTaxaAcertoCasos,
     calcularMateriasComNotas,
+    selecionarProximasProvas,
+    formatarContagemProva,
 } from "./estatisticas.js";
 
 const AGORA = new Date("2026-08-08T12:00:00.000Z");

@@ -108,6 +108,37 @@ export function calcularProvasProximos7Dias(provas) {
     }).length;
 }
 
+// interpreta "YYYY-MM-DD" como data local (não UTC) — new Date(string) sozinho
+// desloca um dia em fusos atrás de UTC (ex.: UTC-3), o que faria uma prova de
+// hoje aparecer como "atrasada" ou de amanhã aparecer como "hoje"
+function paraDataLocal(dataIso) {
+    const [ano, mes, dia] = dataIso.slice(0, 10).split("-").map(Number);
+    return new Date(ano, mes - 1, dia);
+}
+
+function inicioDoDiaLocal(data) {
+    return new Date(data.getFullYear(), data.getMonth(), data.getDate());
+}
+
+export function selecionarProximasProvas(provas) {
+    const hoje = inicioDoDiaLocal(new Date());
+
+    return provas
+        .filter((p) => paraDataLocal(p.data).getTime() >= hoje.getTime())
+        .sort((a, b) => paraDataLocal(a.data).getTime() - paraDataLocal(b.data).getTime());
+}
+
+export function formatarContagemProva(dataIso) {
+    const hoje = inicioDoDiaLocal(new Date());
+    const dataProva = paraDataLocal(dataIso);
+    const dias = Math.round((dataProva.getTime() - hoje.getTime()) / UM_DIA_MS);
+
+    if (dias === 0) return "Hoje";
+    if (dias === 1) return "Amanhã";
+    if (dias > 1) return `Em ${dias} dias`;
+    return "Atrasada";
+}
+
 function paraDataOrdenavel(timestamp) {
     return new Date(timestamp).toISOString().slice(0, 10);
 }
