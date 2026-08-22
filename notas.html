@@ -22,6 +22,41 @@
         </a>
 
         <div class="header-acoes">
+            <div class="pomodoro-widget pomodoro-foco" id="pomodoro-widget">
+                <button type="button" id="pomodoro-widget-botao" class="pomodoro-widget-botao" aria-haspopup="true" aria-expanded="false" aria-label="Pomodoro">
+                    <span class="pomodoro-widget-icone" aria-hidden="true">🍅</span>
+                    <span id="pomodoro-widget-tempo">25:00</span>
+                </button>
+
+                <div id="pomodoro-painel" class="pomodoro-painel" hidden>
+                    <div class="pomodoro-painel-cabecalho">
+                        <strong id="pomodoro-painel-titulo">Foco</strong>
+                        <button type="button" id="pomodoro-fechar" class="pomodoro-fechar" aria-label="Fechar">×</button>
+                    </div>
+
+                    <div class="pomodoro-anel-container">
+                        <svg class="pomodoro-anel" viewBox="0 0 120 120" aria-hidden="true">
+                            <circle class="pomodoro-anel-fundo" cx="60" cy="60" r="54"></circle>
+                            <circle id="pomodoro-anel-progresso" class="pomodoro-anel-progresso" cx="60" cy="60" r="54"></circle>
+                        </svg>
+                        <span id="pomodoro-tempo-grande" class="pomodoro-tempo-grande">25:00</span>
+                    </div>
+
+                    <p id="pomodoro-contador" class="pomodoro-contador">Pomodoros completados hoje: 0</p>
+
+                    <div class="pomodoro-botoes">
+                        <button type="button" id="pomodoro-iniciar-pausar">Iniciar</button>
+                        <button type="button" id="pomodoro-pular" class="botao-outline">Pular</button>
+                        <button type="button" id="pomodoro-reiniciar" class="botao-outline">Reiniciar</button>
+                    </div>
+
+                    <div class="pomodoro-modos" role="group" aria-label="Modo do pomodoro">
+                        <button type="button" class="pomodoro-modo-botao selecionado" data-modo="padrao">25/5</button>
+                        <button type="button" class="pomodoro-modo-botao" data-modo="leve">15/5</button>
+                        <button type="button" class="pomodoro-modo-botao" data-modo="intenso">50/10</button>
+                    </div>
+                </div>
+            </div>
             <button id="sino" aria-label="Notificações">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
