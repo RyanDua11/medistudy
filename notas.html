@@ -96,29 +96,54 @@
 
     <h1 class="titulo-pagina">Notas</h1>
 
-    <div class="stat-cards-grid">
-        <div class="stat-card" data-cor="dourado">
-            <span class="stat-card-icone" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
-            </span>
-            <span class="stat-card-info">
-                <span class="estatistica-valor" id="stat-total-notas">0</span>
-                <span class="estatistica-rotulo">Notas lançadas</span>
-            </span>
-        </div>
-        <div class="stat-card" data-cor="verde">
-            <span class="stat-card-icone" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
-            </span>
-            <span class="stat-card-info">
-                <span class="estatistica-valor" id="stat-materias-com-notas">0</span>
-                <span class="estatistica-rotulo">Matérias com notas</span>
-            </span>
-        </div>
-    </div>
+    <p id="mensagem-notas" class="mensagem-erro" hidden></p>
 
-    <section id="notas">
-        <div class="flashcards-coluna">
+    <!-- TELA 1 — ESCOLHA -->
+    <section id="tela-escolha" class="tela-modo" data-tela="escolha">
+
+        <div class="stat-cards-grid">
+            <div class="stat-card" data-cor="dourado">
+                <span class="stat-card-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
+                </span>
+                <span class="stat-card-info">
+                    <span class="estatistica-valor" id="stat-total-notas">0</span>
+                    <span class="estatistica-rotulo">Notas lançadas</span>
+                </span>
+            </div>
+            <div class="stat-card" data-cor="verde">
+                <span class="stat-card-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
+                </span>
+                <span class="stat-card-info">
+                    <span class="estatistica-valor" id="stat-materias-com-notas">0</span>
+                    <span class="estatistica-rotulo">Matérias com notas</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="escolha-acoes">
+            <button id="botao-ir-lancar" type="button" class="botao-escolha botao-escolha-primario">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Lançar nota
+            </button>
+            <button id="botao-ir-calcular" type="button" class="botao-escolha botao-escolha-secundario">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>
+                Calcular o que falta
+            </button>
+        </div>
+
+        <button id="botao-ir-lista" type="button" class="link-modo-padrao link-ver-todos">Ver notas lançadas</button>
+    </section>
+
+    <!-- TELA 2 — LANÇAR -->
+    <section id="tela-lancar" class="tela-modo" data-tela="lancar" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div class="flashcards-coluna flashcards-coluna-criacao">
             <h2 id="titulo-form-nota">Nova nota</h2>
             <form id="form-nota">
                 <div class="input-group-simples">
@@ -138,12 +163,19 @@
                     <input type="number" id="campo-valor-nota" step="0.1" min="0" max="10" required>
                 </div>
                 <button type="submit" id="botao-salvar-nota">Adicionar nota</button>
-                <button type="button" id="botao-cancelar-edicao-nota" hidden>Cancelar edição</button>
+                <button type="button" id="botao-cancelar-edicao-nota" class="botao-outline" hidden>Cancelar edição</button>
             </form>
-            <p id="mensagem-notas" class="mensagem-erro" hidden></p>
         </div>
+    </section>
 
-        <div class="flashcards-coluna">
+    <!-- TELA 3 — VER NOTAS -->
+    <section id="tela-lista" class="tela-modo" data-tela="lista" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div class="flashcards-coluna flashcards-coluna-lista">
             <h2>Notas lançadas</h2>
             <div id="notas-carregando" class="skeleton-carregando" role="status">
                 <span class="sr-only">Carregando…</span>
@@ -152,15 +184,25 @@
                 <span class="skeleton-barra skeleton-barra-media"></span>
             </div>
             <ul id="lista-notas"></ul>
-            <div id="notas-vazio" class="estado-vazio" hidden>
+            <div id="notas-vazio" class="estado-vazio" data-cor="verde" hidden>
                 <span class="estado-vazio-icone" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
                 </span>
-                <p>Nenhuma nota lançada ainda. Adicione a primeira ao lado.</p>
+                <strong class="estado-vazio-titulo">Nenhuma nota lançada</strong>
+                <p>Lance sua primeira nota para acompanhar sua evolução.</p>
+                <button id="botao-ir-lancar-vazio" type="button" class="estado-vazio-cta">Lançar nota</button>
             </div>
         </div>
+    </section>
 
-        <div class="flashcards-coluna">
+    <!-- TELA 4 — CALCULAR -->
+    <section id="tela-calcular" class="tela-modo" data-tela="calcular" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div class="flashcards-coluna flashcards-coluna-criacao">
             <h2>O que falta tirar</h2>
             <div class="input-group-simples">
                 <label for="select-materia-calculo">Matéria</label>
