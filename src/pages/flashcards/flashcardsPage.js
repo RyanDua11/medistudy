@@ -16,6 +16,7 @@ import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js"
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
+import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
@@ -527,6 +528,7 @@ async function iniciar() {
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
     inicializarNavegacaoPrincipal();
+    inicializarPomodoroWidget();
     melhorarSelect(selectMateriaVespera);
     await carregarFlashcards();
 

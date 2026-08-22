@@ -2796,6 +2796,199 @@ button:focus-visible {
     }
 }
 
+/* pomodoro — widget compacto no header + painel flutuante */
+.pomodoro-widget {
+    position: relative;
+    --cor-fase: 201, 168, 76;
+}
+
+.pomodoro-widget.pomodoro-pausa-curta {
+    --cor-fase: 95, 191, 135;
+}
+
+.pomodoro-widget.pomodoro-pausa-longa {
+    --cor-fase: 91, 155, 240;
+}
+
+.pomodoro-widget-botao {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    padding: 6px 12px;
+    background: none;
+    border: 1px solid rgba(var(--cor-fase), 0.4);
+    border-radius: var(--radius-pill);
+    color: rgb(var(--cor-fase));
+    cursor: pointer;
+    transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.pomodoro-widget-botao:hover {
+    background-color: rgba(var(--cor-fase), 0.12);
+    box-shadow: none;
+}
+
+.pomodoro-widget-botao:focus-visible {
+    outline: 2px solid rgb(var(--cor-fase));
+    outline-offset: 2px;
+}
+
+.pomodoro-widget-icone {
+    font-size: 15px;
+    line-height: 1;
+}
+
+#pomodoro-widget-tempo {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.pomodoro-painel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 20;
+    width: 280px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+    background:
+        radial-gradient(140% 100% at 50% 0%, rgba(var(--cor-fase), 0.1) 0%, rgba(var(--cor-fase), 0.02) 40%, var(--secondary-color) 70%),
+        var(--secondary-color);
+    border: 1px solid rgb(var(--cor-fase));
+    border-radius: var(--radius-lg);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45), 0 0 26px -12px rgba(var(--cor-fase), 0.5);
+}
+
+.pomodoro-painel[hidden] {
+    display: none;
+}
+
+.pomodoro-painel-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.pomodoro-painel-cabecalho strong {
+    font-family: 'Cinzel', serif;
+    color: rgb(var(--cor-fase));
+    font-size: var(--text-lg);
+}
+
+.pomodoro-fechar {
+    width: auto;
+    padding: 2px 8px;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.pomodoro-fechar:hover {
+    color: var(--color-text);
+    box-shadow: none;
+}
+
+.pomodoro-anel-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.pomodoro-anel {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.pomodoro-anel-fundo {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 8;
+}
+
+.pomodoro-anel-progresso {
+    fill: none;
+    stroke: rgb(var(--cor-fase));
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.pomodoro-tempo-grande {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-variant-numeric: tabular-nums;
+    font-family: 'Cinzel', serif;
+    font-size: 26px;
+    color: var(--color-text);
+}
+
+.pomodoro-contador {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.pomodoro-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.pomodoro-botoes button {
+    flex: 1;
+    min-width: 76px;
+    padding: 9px;
+    font-size: var(--text-sm);
+}
+
+#pomodoro-iniciar-pausar {
+    background-color: rgb(var(--cor-fase));
+    border-color: rgb(var(--cor-fase));
+    color: var(--primary-color);
+}
+
+.pomodoro-modos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+}
+
+.pomodoro-modo-botao {
+    flex: 1;
+    min-width: 76px;
+    padding: 7px;
+    background: none;
+    border: 1px solid var(--color-border-muted);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.pomodoro-modo-botao.selecionado {
+    border-color: rgb(var(--cor-fase));
+    color: rgb(var(--cor-fase));
+    background-color: rgba(var(--cor-fase), 0.1);
+}
+
+.pomodoro-modo-botao:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 @media (prefers-reduced-motion: reduce) {
     /* momentos autorais do hero */
     .coracao, .glow-ring, .ecg-c, .sparkle, .badge, .estado-vazio.revisao-concluida .estado-vazio-icone { animation: none; }
@@ -2812,4 +3005,5 @@ button:focus-visible {
     .item-entrada { animation: none; }
     .skeleton-barra { animation: none; background-position: 0 0; }
     .pulso-sucesso { animation: none; }
+    .pomodoro-anel-progresso { transition: none; }
 }

@@ -10,6 +10,7 @@ import { criarElementoCasoClinico } from "../../components/casoClinicoCard.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
+import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
@@ -254,6 +255,7 @@ async function iniciar() {
     inicializarUsuarioMenu();
     inicializarNotificacaoRevisao();
     inicializarNavegacaoPrincipal();
+    inicializarPomodoroWidget();
     melhorarSelect(selectMateria);
     mostrarTela(TELAS.ESCOLHA);
     await carregarCasos();
