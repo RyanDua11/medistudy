@@ -3,6 +3,7 @@ import { criarProva, listarProvas, editarProva, removerProva } from "../../servi
 import { criarElementoProva } from "../../components/provaCard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 import { calcularProvasProximos7Dias } from "../../services/estatisticas.js";
@@ -122,6 +123,7 @@ async function iniciar() {
 
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    inicializarNavegacaoPrincipal();
     await carregarProvas();
 }
 

@@ -15,6 +15,7 @@ import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
 import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
@@ -525,6 +526,7 @@ async function iniciar() {
 
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    inicializarNavegacaoPrincipal();
     melhorarSelect(selectMateriaVespera);
     await carregarFlashcards();
 
