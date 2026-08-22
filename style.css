@@ -2485,6 +2485,98 @@ button:focus-visible {
     margin: 0 auto;
 }
 
+.criacao-ia-escolha {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.criacao-ia-escolha[hidden] {
+    display: none;
+}
+
+.botao-gerar-ia {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.criacao-ia-divisor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.criacao-ia-divisor::before,
+.criacao-ia-divisor::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: rgba(201, 168, 76, 0.25);
+}
+
+.criacao-ia-fluxo {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.criacao-ia-fluxo[hidden] {
+    display: none;
+}
+
+.ia-passo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ia-passo[hidden] {
+    display: none;
+}
+
+.ia-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ia-preview[hidden] {
+    display: none;
+}
+
+.ia-preview-acoes {
+    display: flex;
+    gap: 10px;
+}
+
+#ia-erro .botao-criar-primeiro {
+    width: auto;
+}
+
+.criacao-manual {
+    margin-top: 4px;
+}
+
+.criacao-manual-resumo {
+    cursor: pointer;
+    list-style: none;
+    text-decoration: underline;
+}
+
+.criacao-manual-resumo::-webkit-details-marker {
+    display: none;
+}
+
+.criacao-manual form {
+    margin-top: 16px;
+}
+
 .importador-anki summary {
     cursor: pointer;
     list-style: none;
