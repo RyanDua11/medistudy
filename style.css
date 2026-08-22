@@ -1776,6 +1776,7 @@ button:focus-visible {
 .stat-card,
 .estatistica-tile,
 .grafico-card,
+.prova-card,
 #resultado-calculo:not(:empty) {
     --cor-categoria: 205, 163, 73;
     background:
@@ -2115,6 +2116,60 @@ button:focus-visible {
     margin: 0;
 }
 
+/* carrossel de próximas provas — tira horizontal com scroll-snap */
+.carrossel-provas {
+    display: flex;
+    gap: var(--space-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: var(--space-2);
+}
+
+.carrossel-provas[hidden] {
+    display: none;
+}
+
+.prova-card {
+    flex: 0 0 200px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 18px 20px;
+}
+
+.prova-card-materia {
+    color: var(--terciary-color);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.prova-card-data {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.prova-card-contagem {
+    margin-top: auto;
+    color: var(--text-color);
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.carrossel-provas-vazio {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.carrossel-provas-vazio[hidden] {
+    display: none;
+}
+
+.carrossel-provas-vazio a {
+    color: var(--terciary-color);
+}
+
 .grafico-linha-container {
     width: 100%;
 }
@@ -2226,19 +2281,8 @@ button:focus-visible {
 }
 
 @media (max-width: 600px) {
-    /* carrossel em vez de pilha vertical longa — cada card ocupa a maior
-       parte da largura, com o próximo espiando na borda como affordance */
     .ferramentas-grid {
-        display: flex;
-        grid-template-columns: none;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding-bottom: 6px;
-    }
-
-    .ferramentas-grid .ferramenta-card {
-        flex: 0 0 82%;
-        scroll-snap-align: start;
+        grid-template-columns: 1fr;
     }
 
     .estatisticas-grid {
