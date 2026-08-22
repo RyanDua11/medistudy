@@ -55,7 +55,7 @@
         <a href="notas.html" class="sidebar-link" aria-label="Notas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
         </a>
-        <a href="em-breve.html?ferramenta=Configura%C3%A7%C3%B5es" class="sidebar-link" aria-label="Configurações">
+        <a href="em-breve.html?ferramenta=configuracoes" class="sidebar-link" aria-label="Configurações">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </a>
     </nav>
@@ -153,8 +153,9 @@
                     <span class="estado-vazio-icone" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
                     </span>
+                    <strong id="revisao-vazia-titulo" class="estado-vazio-titulo">Nada para revisar agora</strong>
                     <p id="revisao-vazia-texto">Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!</p>
-                    <button id="botao-criar-primeiro-flashcard" type="button" class="botao-criar-primeiro" hidden>Criar meu primeiro flashcard</button>
+                    <button id="botao-criar-primeiro-flashcard" type="button" class="estado-vazio-cta" hidden>Criar meu primeiro flashcard</button>
                 </div>
                 <div id="cartao-revisao" class="cartao-revisao" hidden>
                     <div class="cartao-revisao-interior">
@@ -228,7 +229,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
                     </span>
                     <p id="ia-erro-texto"></p>
-                    <button id="botao-tentar-manualmente" type="button" class="botao-criar-primeiro">Tentar manualmente</button>
+                    <button id="botao-tentar-manualmente" type="button" class="estado-vazio-cta">Tentar manualmente</button>
                 </div>
             </div>
 
@@ -284,7 +285,9 @@
                 <span class="estado-vazio-icone" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </span>
-                <p>Nenhum flashcard criado ainda.</p>
+                <strong class="estado-vazio-titulo">Nenhum flashcard ainda</strong>
+                <p>Crie seu primeiro flashcard ou importe do Anki.</p>
+                <button id="botao-ir-criar-vazio" type="button" class="estado-vazio-cta">Criar flashcard</button>
             </div>
         </div>
     </section>
