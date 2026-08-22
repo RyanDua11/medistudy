@@ -2226,8 +2226,19 @@ button:focus-visible {
 }
 
 @media (max-width: 600px) {
+    /* carrossel em vez de pilha vertical longa — cada card ocupa a maior
+       parte da largura, com o próximo espiando na borda como affordance */
     .ferramentas-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        grid-template-columns: none;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 6px;
+    }
+
+    .ferramentas-grid .ferramenta-card {
+        flex: 0 0 82%;
+        scroll-snap-align: start;
     }
 
     .estatisticas-grid {
@@ -2324,6 +2335,209 @@ button:focus-visible {
 
 .em-breve-cta:hover {
     box-shadow: 0px 0px 10px rgb(216, 163, 14);
+}
+
+/* flashcards — telas de baixa carga cognitiva (uma tela, uma decisão) */
+
+.tela-flashcards {
+    margin-top: 40px;
+}
+
+.tela-flashcards[hidden] {
+    display: none;
+}
+
+.botao-voltar-tela {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    margin-bottom: 24px;
+    background: none;
+    border: 1px solid var(--terciary-color);
+    color: var(--terciary-color);
+    font-size: var(--text-xs);
+}
+
+.botao-voltar-tela svg {
+    width: 16px;
+    height: 16px;
+}
+
+.botao-voltar-tela:hover {
+    background-color: rgba(201, 168, 76, 0.12);
+    box-shadow: none;
+}
+
+/* modo 1 — escolha */
+.escolha-acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 380px;
+    margin: 48px auto 20px;
+}
+
+.botao-escolha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+}
+
+.botao-escolha svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.botao-escolha-secundario {
+    background: none;
+    color: var(--terciary-color);
+}
+
+.botao-escolha-secundario:hover {
+    background-color: rgba(201, 168, 76, 0.12);
+    box-shadow: none;
+}
+
+.link-ver-todos {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* modo 2 — revisão */
+.revisao-escolha-metodo {
+    max-width: 420px;
+    margin: 40px auto 0;
+    text-align: center;
+}
+
+.revisao-escolha-metodo-pergunta {
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 18px;
+    margin: 0 0 20px;
+}
+
+.escolha-metodo-botoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.botao-outline {
+    background: none;
+    color: var(--terciary-color);
+}
+
+.botao-outline:hover {
+    background-color: rgba(201, 168, 76, 0.12);
+    box-shadow: none;
+}
+
+.vespera-materia-painel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.vespera-materia-painel[hidden] {
+    display: none;
+}
+
+.revisao-sessao {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.badge-progresso-revisao {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 16px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background-color: rgba(201, 168, 76, 0.14);
+    color: var(--terciary-color);
+    font-size: 12px;
+    letter-spacing: 0.4px;
+}
+
+.badge-progresso-revisao[hidden] {
+    display: none;
+}
+
+.botao-criar-primeiro {
+    width: auto;
+    margin-top: 4px;
+}
+
+/* modo 3 — criação */
+.flashcards-coluna-criacao {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.importador-anki summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.importador-anki summary::-webkit-details-marker {
+    display: none;
+}
+
+.importador-anki summary::after {
+    content: "▸";
+    float: right;
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease;
+}
+
+.importador-anki[open] summary::after {
+    transform: rotate(90deg);
+}
+
+.importador-anki-conteudo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* modo 4 — ver todos */
+.flashcards-coluna-lista {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.lista-flashcards-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lista-flashcards-cabecalho select {
+    width: auto;
+    min-width: 180px;
+    padding: 8px 10px;
+    border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+    .lista-flashcards-cabecalho {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

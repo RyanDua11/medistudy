@@ -8,12 +8,8 @@ import {
 } from "../../services/flashcardsService.js";
 import { parsearArquivoAnki } from "../../services/importadorAnki.js";
 import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "../../services/selecaoRevisao.js";
-import {
-    calcularStreakDias,
-    calcularRevisadosHoje,
-    categorizarFlashcards,
-    calcularProgressoGeral,
-} from "../../services/estatisticas.js";
+import { calcularStreakDias, calcularRevisadosHoje } from "../../services/estatisticas.js";
+import { TELAS, calcularTelaInicial, filtrarFlashcardsPorMateria } from "../../services/telaFlashcards.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
@@ -21,24 +17,36 @@ import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
+const telas = document.querySelectorAll(".tela-flashcards");
+const botoesVoltar = document.querySelectorAll("[data-voltar]");
+const botaoIrRevisar = document.getElementById("botao-ir-revisar");
+const botaoIrCriar = document.getElementById("botao-ir-criar");
+const botaoIrLista = document.getElementById("botao-ir-lista");
+
 const formNovoFlashcard = document.getElementById("form-novo-flashcard");
 const campoPergunta = document.getElementById("campo-pergunta");
 const campoResposta = document.getElementById("campo-resposta");
 const campoMateria = document.getElementById("campo-materia");
 const mensagemFlashcards = document.getElementById("mensagem-flashcards");
 const listaFlashcards = document.getElementById("lista-flashcards");
+const filtroMateriaLista = document.getElementById("filtro-materia-lista");
 const campoArquivoAnki = document.getElementById("campo-arquivo-anki");
 const botaoImportarAnki = document.getElementById("botao-importar-anki");
 const nomeArquivoAnki = document.getElementById("nome-arquivo-anki");
 
-const botaoRevisaoRapida = document.getElementById("botao-revisao-rapida");
-const botaoVesperaProva = document.getElementById("botao-vespera-prova");
-const botaoModoPadrao = document.getElementById("botao-modo-padrao");
+const revisaoEscolhaMetodo = document.getElementById("revisao-escolha-metodo");
+const revisaoSessao = document.getElementById("revisao-sessao");
+const botaoMetodoRapida = document.getElementById("botao-metodo-rapida");
+const botaoMetodoVespera = document.getElementById("botao-metodo-vespera");
+const vesperaMateriaPainel = document.getElementById("vespera-materia-painel");
 const selectMateriaVespera = document.getElementById("select-materia-vespera");
+const botaoConfirmarVespera = document.getElementById("botao-confirmar-vespera");
 
+const badgeProgressoRevisao = document.getElementById("badge-progresso-revisao");
 const revisaoCarregando = document.getElementById("revisao-carregando");
 const revisaoVazia = document.getElementById("revisao-vazia");
 const revisaoVaziaTexto = document.getElementById("revisao-vazia-texto");
+const botaoCriarPrimeiroFlashcard = document.getElementById("botao-criar-primeiro-flashcard");
 const flashcardsVazio = document.getElementById("flashcards-vazio");
 const cartaoRevisao = document.getElementById("cartao-revisao");
 const cartaoRevisaoFrente = document.querySelector(".cartao-revisao-frente");
@@ -46,19 +54,12 @@ const cartaoRevisaoVerso = document.querySelector(".cartao-revisao-verso");
 const revisaoPergunta = document.getElementById("revisao-pergunta");
 const revisaoResposta = document.getElementById("revisao-resposta");
 const botaoMostrarResposta = document.getElementById("botao-mostrar-resposta");
-const botoesRevisao = document.getElementById("botoes-revisao");
 const botaoAcertei = document.getElementById("botao-acertei");
 const botaoErrei = document.getElementById("botao-errei");
 
 const statTotalFlashcards = document.getElementById("stat-total-flashcards");
 const statRevisadosHoje = document.getElementById("stat-revisados-hoje");
 const statStreakDias = document.getElementById("stat-streak-dias");
-
-const metodoNovos = document.getElementById("metodo-novos");
-const metodoRevisar = document.getElementById("metodo-revisar");
-const metodoAprendidos = document.getElementById("metodo-aprendidos");
-const metodoProgressoValor = document.getElementById("metodo-progresso-valor");
-const metodoProgressoBarra = document.getElementById("metodo-progresso-barra");
 
 const NOME_ARQUIVO_ANKI_PADRAO = "Nenhum ficheiro selecionado";
 const MENSAGEM_VAZIA_PADRAO = "Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!";
@@ -69,14 +70,16 @@ let flashcards = [];
 let logs = [];
 let filaRevisao = [];
 let flashcardEmRevisao = null;
-let modoAtivo = "padrao";
+let metodoRevisao = "padrao";
 let materiaSelecionada = "";
+let totalSessaoRevisao = 0;
+let revisadosNaSessao = 0;
+let materiaFiltroLista = "";
 
-function atualizarNomeArquivoAnki() {
-    const arquivo = campoArquivoAnki.files[0];
-    nomeArquivoAnki.textContent = arquivo ? arquivo.name : NOME_ARQUIVO_ANKI_PADRAO;
-    nomeArquivoAnki.title = arquivo ? arquivo.name : "";
-    nomeArquivoAnki.classList.toggle("tem-arquivo", Boolean(arquivo));
+function mostrarTela(tela) {
+    telas.forEach((secao) => {
+        secao.hidden = secao.dataset.tela !== tela;
+    });
 }
 
 function mostrarMensagem(texto) {
@@ -87,6 +90,13 @@ function mostrarMensagem(texto) {
 function limparMensagem() {
     mensagemFlashcards.hidden = true;
     mensagemFlashcards.textContent = "";
+}
+
+function atualizarNomeArquivoAnki() {
+    const arquivo = campoArquivoAnki.files[0];
+    nomeArquivoAnki.textContent = arquivo ? arquivo.name : NOME_ARQUIVO_ANKI_PADRAO;
+    nomeArquivoAnki.title = arquivo ? arquivo.name : "";
+    nomeArquivoAnki.classList.toggle("tem-arquivo", Boolean(arquivo));
 }
 
 function calcularUltimaRevisaoPorFlashcard() {
@@ -101,12 +111,13 @@ function calcularUltimaRevisaoPorFlashcard() {
 }
 
 function renderizarListaFlashcards() {
+    const flashcardsFiltrados = filtrarFlashcardsPorMateria(flashcards, materiaFiltroLista);
     listaFlashcards.innerHTML = "";
     flashcardsVazio.hidden = flashcards.length > 0;
 
     const ultimaRevisaoPorFlashcard = calcularUltimaRevisaoPorFlashcard();
 
-    flashcards.forEach((flashcard) => {
+    flashcardsFiltrados.forEach((flashcard) => {
         const item = criarElementoFlashcard(flashcard, {
             aoRemover: tratarRemover,
             ultimaRevisao: ultimaRevisaoPorFlashcard.get(flashcard.id) ?? null,
@@ -117,45 +128,67 @@ function renderizarListaFlashcards() {
     aplicarEntradaEscalonada(listaFlashcards);
 }
 
+function renderizarFiltroDeMateria(select, materiaAtual) {
+    const materias = [...new Set(flashcards.map((f) => f.materia).filter(Boolean))].sort();
+    const opcaoInicial = select.querySelector("option[value='']");
+
+    select.innerHTML = "";
+    if (opcaoInicial) select.appendChild(opcaoInicial);
+
+    materias.forEach((materia) => {
+        const opcao = document.createElement("option");
+        opcao.value = materia;
+        opcao.textContent = materia;
+        select.appendChild(opcao);
+    });
+    select.value = materias.includes(materiaAtual) ? materiaAtual : "";
+}
+
+function renderizarOpcoesDeMateria() {
+    renderizarFiltroDeMateria(selectMateriaVespera, selectMateriaVespera.value);
+    sincronizarSelectPersonalizado(selectMateriaVespera);
+    renderizarFiltroDeMateria(filtroMateriaLista, materiaFiltroLista);
+}
+
 function renderizarEstatisticas() {
     statTotalFlashcards.textContent = flashcards.length;
     statRevisadosHoje.textContent = calcularRevisadosHoje(logs);
     statStreakDias.textContent = calcularStreakDias(logs);
-
-    const { novos, revisar, aprendidos } = categorizarFlashcards(flashcards, logs);
-    metodoNovos.textContent = novos.length;
-    metodoRevisar.textContent = revisar.length;
-    metodoAprendidos.textContent = aprendidos.length;
-
-    const progresso = calcularProgressoGeral(flashcards, logs);
-    metodoProgressoValor.textContent = `${progresso}%`;
-    metodoProgressoBarra.style.width = `${progresso}%`;
 }
 
 function calcularFilaRevisao() {
-    if (modoAtivo === "revisaoRapida") {
+    if (metodoRevisao === "revisaoRapida") {
         return selecionarRevisaoRapida(flashcards);
     }
-    if (modoAtivo === "vesperaDeProva") {
+    if (metodoRevisao === "vesperaDeProva") {
         return selecionarVesperaDeProva(flashcards, materiaSelecionada);
     }
     return flashcards;
 }
 
 function obterMensagemVazia() {
-    if (modoAtivo === "vesperaDeProva") return MENSAGEM_VAZIA_VESPERA;
-    if (modoAtivo === "revisaoRapida") return MENSAGEM_VAZIA_REVISAO_RAPIDA;
+    if (metodoRevisao === "vesperaDeProva") return MENSAGEM_VAZIA_VESPERA;
+    if (metodoRevisao === "revisaoRapida") return MENSAGEM_VAZIA_REVISAO_RAPIDA;
     return MENSAGEM_VAZIA_PADRAO;
 }
 
 function sessaoDeRevisaoRapidaConcluidaHoje() {
-    return modoAtivo === "revisaoRapida" && flashcards.length > 0 && calcularRevisadosHoje(logs) > 0;
+    return metodoRevisao === "revisaoRapida" && flashcards.length > 0 && calcularRevisadosHoje(logs) > 0;
 }
 
 function definirEstadoFlip(virado) {
     cartaoRevisao.classList.toggle("virado", virado);
     cartaoRevisaoFrente.inert = virado;
     cartaoRevisaoVerso.inert = !virado;
+}
+
+function atualizarBadgeProgresso() {
+    if (!flashcardEmRevisao || totalSessaoRevisao === 0) {
+        badgeProgressoRevisao.hidden = true;
+        return;
+    }
+    badgeProgressoRevisao.hidden = false;
+    badgeProgressoRevisao.textContent = `${revisadosNaSessao + 1} de ${totalSessaoRevisao}`;
 }
 
 function renderizarAreaRevisao() {
@@ -168,8 +201,10 @@ function renderizarAreaRevisao() {
             ? "Sequência concluída hoje! Você revisou tudo o que estava pendente."
             : obterMensagemVazia();
         revisaoVazia.classList.toggle("revisao-concluida", concluida);
+        botaoCriarPrimeiroFlashcard.hidden = flashcards.length > 0;
         revisaoVazia.hidden = false;
         cartaoRevisao.hidden = true;
+        atualizarBadgeProgresso();
         return;
     }
 
@@ -179,21 +214,7 @@ function renderizarAreaRevisao() {
     revisaoPergunta.textContent = flashcardEmRevisao.pergunta;
     revisaoResposta.textContent = flashcardEmRevisao.resposta;
     definirEstadoFlip(false);
-}
-
-function renderizarOpcoesDeMateria() {
-    const materiaAtual = selectMateriaVespera.value;
-    const materias = [...new Set(flashcards.map((f) => f.materia).filter(Boolean))].sort();
-
-    selectMateriaVespera.innerHTML = '<option value="">Escolha a matéria...</option>';
-    materias.forEach((materia) => {
-        const opcao = document.createElement("option");
-        opcao.value = materia;
-        opcao.textContent = materia;
-        selectMateriaVespera.appendChild(opcao);
-    });
-    selectMateriaVespera.value = materias.includes(materiaAtual) ? materiaAtual : "";
-    sincronizarSelectPersonalizado(selectMateriaVespera);
+    atualizarBadgeProgresso();
 }
 
 async function carregarFlashcards() {
@@ -216,8 +237,10 @@ async function carregarFlashcards() {
 
     renderizarListaFlashcards();
     renderizarOpcoesDeMateria();
-    renderizarAreaRevisao();
     renderizarEstatisticas();
+    if (!revisaoSessao.hidden) {
+        renderizarAreaRevisao();
+    }
 }
 
 async function tratarNovoFlashcard(evento) {
@@ -234,26 +257,36 @@ async function tratarNovoFlashcard(evento) {
     }
 }
 
-function tratarModoRevisaoRapida() {
-    modoAtivo = "revisaoRapida";
+function iniciarSessaoDeRevisao() {
+    revisaoEscolhaMetodo.hidden = true;
+    vesperaMateriaPainel.hidden = true;
+    revisaoSessao.hidden = false;
+    totalSessaoRevisao = calcularFilaRevisao().length;
+    revisadosNaSessao = 0;
     renderizarAreaRevisao();
 }
 
-function tratarModoVesperaDeProva() {
+function tratarModoRevisaoRapida() {
+    limparMensagem();
+    metodoRevisao = "revisaoRapida";
+    iniciarSessaoDeRevisao();
+}
+
+function tratarEscolherVesperaDeProva() {
+    limparMensagem();
+    vesperaMateriaPainel.hidden = false;
+}
+
+function tratarConfirmarVesperaDeProva() {
     if (!selectMateriaVespera.value) {
         mostrarMensagem("Escolha uma matéria antes de iniciar a véspera de prova.");
         return;
     }
 
     limparMensagem();
-    modoAtivo = "vesperaDeProva";
+    metodoRevisao = "vesperaDeProva";
     materiaSelecionada = selectMateriaVespera.value;
-    renderizarAreaRevisao();
-}
-
-function tratarModoPadrao() {
-    modoAtivo = "padrao";
-    renderizarAreaRevisao();
+    iniciarSessaoDeRevisao();
 }
 
 async function tratarImportarAnki() {
@@ -318,28 +351,60 @@ async function tratarRevisao(acertou) {
 
     try {
         await marcarRevisao(flashcardEmRevisao, acertou);
+        revisadosNaSessao += 1;
         await carregarFlashcards();
     } catch (erro) {
         mostrarMensagem(erro.message);
     }
 }
 
+function tratarFiltroDeMateriaNaLista() {
+    materiaFiltroLista = filtroMateriaLista.value;
+    renderizarListaFlashcards();
+}
+
+// --- navegação entre telas ---
+
+function irParaEscolha() {
+    limparMensagem();
+    mostrarTela(TELAS.ESCOLHA);
+}
+
+function irParaRevisao() {
+    limparMensagem();
+    metodoRevisao = "padrao";
+    revisaoEscolhaMetodo.hidden = false;
+    vesperaMateriaPainel.hidden = true;
+    revisaoSessao.hidden = true;
+    mostrarTela(TELAS.REVISAO);
+}
+
+function irParaCriacao() {
+    limparMensagem();
+    mostrarTela(TELAS.CRIACAO);
+}
+
+function irParaLista() {
+    limparMensagem();
+    mostrarTela(TELAS.LISTA);
+}
+
+botaoIrRevisar.addEventListener("click", irParaRevisao);
+botaoIrCriar.addEventListener("click", irParaCriacao);
+botaoIrLista.addEventListener("click", irParaLista);
+botaoCriarPrimeiroFlashcard.addEventListener("click", irParaCriacao);
+botoesVoltar.forEach((botao) => botao.addEventListener("click", irParaEscolha));
+
 formNovoFlashcard.addEventListener("submit", tratarNovoFlashcard);
 campoArquivoAnki.addEventListener("change", atualizarNomeArquivoAnki);
 botaoImportarAnki.addEventListener("click", tratarImportarAnki);
-botaoRevisaoRapida.addEventListener("click", tratarModoRevisaoRapida);
-botaoVesperaProva.addEventListener("click", tratarModoVesperaDeProva);
-botaoModoPadrao.addEventListener("click", tratarModoPadrao);
+botaoMetodoRapida.addEventListener("click", tratarModoRevisaoRapida);
+botaoMetodoVespera.addEventListener("click", tratarEscolherVesperaDeProva);
+botaoConfirmarVespera.addEventListener("click", tratarConfirmarVesperaDeProva);
 botaoMostrarResposta.addEventListener("click", tratarMostrarResposta);
 botaoAcertei.addEventListener("click", () => tratarRevisao(true));
 botaoErrei.addEventListener("click", () => tratarRevisao(false));
-
-function abrirModoConformeParametroDeUrl() {
-    const parametros = new URLSearchParams(window.location.search);
-    if (parametros.get("modo") === "revisaoRapida") {
-        tratarModoRevisaoRapida();
-    }
-}
+filtroMateriaLista.addEventListener("change", tratarFiltroDeMateriaNaLista);
 
 async function iniciar() {
     const sessao = await protegerRota();
@@ -349,7 +414,14 @@ async function iniciar() {
     inicializarUsuarioMenu();
     melhorarSelect(selectMateriaVespera);
     await carregarFlashcards();
-    abrirModoConformeParametroDeUrl();
+
+    const { tela, iniciarRevisaoRapida } = calcularTelaInicial(new URLSearchParams(window.location.search));
+    if (tela === TELAS.REVISAO) {
+        irParaRevisao();
+        if (iniciarRevisaoRapida) tratarModoRevisaoRapida();
+    } else {
+        mostrarTela(tela);
+    }
 }
 
 iniciar();
