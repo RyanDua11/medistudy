@@ -19,6 +19,7 @@ const mensagemCasos = document.getElementById("mensagem-casos");
 const casosCarregando = document.getElementById("casos-carregando");
 const listaCasos = document.getElementById("lista-casos-clinicos");
 const casosVazio = document.getElementById("casos-vazio");
+const botaoFocarMateriaCaso = document.getElementById("botao-focar-materia-caso");
 
 const resolucaoVazia = document.getElementById("resolucao-vazia");
 const resolucaoCaso = document.getElementById("resolucao-caso");
@@ -179,6 +180,7 @@ async function iniciar() {
     if (!sessao) return;
 
     botaoGerarCaso.addEventListener("click", tratarGerarCaso);
+    botaoFocarMateriaCaso.addEventListener("click", () => selectMateria.focus());
     inicializarUsuarioMenu();
     await carregarCasos();
 }

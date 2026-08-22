@@ -16,6 +16,7 @@ const campoValorNota = document.getElementById("campo-valor-nota");
 const mensagemNotas = document.getElementById("mensagem-notas");
 const listaNotas = document.getElementById("lista-notas");
 const notasVazio = document.getElementById("notas-vazio");
+const botaoFocarMateriaNota = document.getElementById("botao-focar-materia-nota");
 const notasCarregando = document.getElementById("notas-carregando");
 const tituloFormNota = document.getElementById("titulo-form-nota");
 const botaoSalvarNota = document.getElementById("botao-salvar-nota");
@@ -174,6 +175,7 @@ function tratarCalcularNota() {
 
 formNota.addEventListener("submit", tratarSalvarNota);
 botaoCancelarEdicao.addEventListener("click", sairDoModoEdicao);
+botaoFocarMateriaNota.addEventListener("click", () => campoMateria.focus());
 botaoCalcularNota.addEventListener("click", tratarCalcularNota);
 
 async function iniciar() {

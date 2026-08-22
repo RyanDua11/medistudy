@@ -118,10 +118,11 @@
 
         <div class="flashcards-coluna">
             <h2>Resolver</h2>
-            <div id="resolucao-vazia" class="estado-vazio">
+            <div id="resolucao-vazia" class="estado-vazio" data-cor="roxo">
                 <span class="estado-vazio-icone" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
                 </span>
+                <strong class="estado-vazio-titulo">Nenhum caso em resolução</strong>
                 <p>Escolha um caso na lista ao lado para resolver.</p>
             </div>
             <div id="resolucao-caso" hidden>
@@ -144,11 +145,13 @@
                 <span class="skeleton-barra skeleton-barra-media"></span>
             </div>
             <ul id="lista-casos-clinicos"></ul>
-            <div id="casos-vazio" class="estado-vazio" hidden>
+            <div id="casos-vazio" class="estado-vazio" data-cor="roxo" hidden>
                 <span class="estado-vazio-icone" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </span>
-                <p>Nenhum caso clínico gerado ainda.</p>
+                <strong class="estado-vazio-titulo">Nenhum caso clínico gerado ainda</strong>
+                <p>Gere seu primeiro caso clínico escolhendo uma matéria ao lado.</p>
+                <button id="botao-focar-materia-caso" type="button" class="estado-vazio-cta">Escolher matéria</button>
             </div>
         </div>
     </section>

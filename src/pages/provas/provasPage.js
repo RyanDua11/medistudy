@@ -14,6 +14,7 @@ const campoNotaNecessaria = document.getElementById("campo-nota-necessaria-prova
 const mensagemProvas = document.getElementById("mensagem-provas");
 const listaProvas = document.getElementById("lista-provas");
 const provasVazio = document.getElementById("provas-vazio");
+const botaoFocarMateriaProva = document.getElementById("botao-focar-materia-prova");
 const provasCarregando = document.getElementById("provas-carregando");
 const tituloFormProva = document.getElementById("titulo-form-prova");
 const botaoSalvarProva = document.getElementById("botao-salvar-prova");
@@ -115,6 +116,7 @@ async function tratarRemover(id) {
 
 formProva.addEventListener("submit", tratarSalvarProva);
 botaoCancelarEdicao.addEventListener("click", sairDoModoEdicao);
+botaoFocarMateriaProva.addEventListener("click", () => campoMateria.focus());
 
 async function iniciar() {
     const sessao = await protegerRota();
