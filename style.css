@@ -1011,6 +1011,10 @@ main {
     box-shadow: 0 0 26px -14px rgba(201, 168, 76, 0.4);
 }
 
+.flashcards-coluna[hidden] {
+    display: none;
+}
+
 /* dica de rodapé — vive dentro da coluna "Novo flashcard", layout em linha */
 .dica-medistudy {
     display: flex;
@@ -1548,14 +1552,21 @@ button:focus-visible {
     width: 56px;
     height: 56px;
     border-radius: 16px;
-    color: var(--terciary-color);
-    background-color: rgba(201, 168, 76, 0.08);
-    box-shadow: 0 0 18px rgba(201, 168, 76, 0.18), inset 0 0 0 1px rgba(201, 168, 76, 0.25);
+    color: rgb(var(--cor-categoria, 201, 168, 76));
+    background-color: rgba(var(--cor-categoria, 201, 168, 76), 0.08);
+    box-shadow: 0 0 18px rgba(var(--cor-categoria, 201, 168, 76), 0.18), inset 0 0 0 1px rgba(var(--cor-categoria, 201, 168, 76), 0.25);
 }
 
 .estado-vazio-icone svg {
     width: 26px;
     height: 26px;
+}
+
+.estado-vazio-titulo {
+    color: var(--color-text);
+    font-family: 'Cinzel', serif;
+    font-size: var(--text-md);
+    font-weight: 700;
 }
 
 .estado-vazio p {
@@ -1566,6 +1577,29 @@ button:focus-visible {
 
 .estado-vazio p a {
     color: var(--terciary-color);
+}
+
+.estado-vazio-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    margin-top: 4px;
+    padding: 8px 18px;
+    border: 1px solid rgb(var(--cor-categoria, 201, 168, 76));
+    border-radius: var(--radius-pill);
+    background: none;
+    color: rgb(var(--cor-categoria, 201, 168, 76));
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.estado-vazio-cta:hover {
+    background-color: rgba(var(--cor-categoria, 201, 168, 76), 0.14);
+    box-shadow: none;
 }
 
 .estado-carregando {
@@ -2451,11 +2485,11 @@ button:focus-visible {
 
 /* flashcards — telas de baixa carga cognitiva (uma tela, uma decisão) */
 
-.tela-flashcards {
+.tela-modo {
     margin-top: 40px;
 }
 
-.tela-flashcards[hidden] {
+.tela-modo[hidden] {
     display: none;
 }
 

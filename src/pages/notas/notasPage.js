@@ -8,13 +8,24 @@ import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincip
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 import { calcularMateriasComNotas } from "../../services/estatisticas.js";
+import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
+
+const TELAS = Object.freeze({ ESCOLHA: "escolha", LANCAR: "lancar", LISTA: "lista", CALCULAR: "calcular" });
+
+const telas = document.querySelectorAll(".tela-modo");
+const botoesVoltar = document.querySelectorAll("[data-voltar]");
+const botaoIrLancar = document.getElementById("botao-ir-lancar");
+const botaoIrCalcular = document.getElementById("botao-ir-calcular");
+const botaoIrLista = document.getElementById("botao-ir-lista");
+const botaoIrLancarVazio = document.getElementById("botao-ir-lancar-vazio");
+
+const mensagemNotas = document.getElementById("mensagem-notas");
 
 const formNota = document.getElementById("form-nota");
 const campoMateria = document.getElementById("campo-materia-nota");
 const campoAvaliacao = document.getElementById("campo-avaliacao-nota");
 const campoPeso = document.getElementById("campo-peso-nota");
 const campoValorNota = document.getElementById("campo-valor-nota");
-const mensagemNotas = document.getElementById("mensagem-notas");
 const listaNotas = document.getElementById("lista-notas");
 const notasVazio = document.getElementById("notas-vazio");
 const notasCarregando = document.getElementById("notas-carregando");
@@ -32,6 +43,12 @@ const statMateriasComNotas = document.getElementById("stat-materias-com-notas");
 
 let notas = [];
 let notaEmEdicaoId = null;
+
+function mostrarTela(tela) {
+    telas.forEach((secao) => {
+        secao.hidden = secao.dataset.tela !== tela;
+    });
+}
 
 function mostrarMensagem(texto) {
     mensagemNotas.textContent = texto;
@@ -52,6 +69,7 @@ function entrarEmModoEdicao(nota) {
     tituloFormNota.textContent = "Editar nota";
     botaoSalvarNota.textContent = "Salvar alterações";
     botaoCancelarEdicao.hidden = false;
+    mostrarTela(TELAS.LANCAR);
 }
 
 function sairDoModoEdicao() {
@@ -89,6 +107,7 @@ function renderizarOpcoesDeMateria() {
         selectMateriaCalculo.appendChild(opcao);
     });
     selectMateriaCalculo.value = materias.includes(materiaAtual) ? materiaAtual : "";
+    sincronizarSelectPersonalizado(selectMateriaCalculo);
 }
 
 function renderizarEstatisticas() {
@@ -173,8 +192,41 @@ function tratarCalcularNota() {
     }
 }
 
+// --- navegação entre telas ---
+
+function irParaEscolha() {
+    limparMensagem();
+    sairDoModoEdicao();
+    mostrarTela(TELAS.ESCOLHA);
+}
+
+function irParaLancar() {
+    limparMensagem();
+    mostrarTela(TELAS.LANCAR);
+}
+
+function irParaLista() {
+    limparMensagem();
+    mostrarTela(TELAS.LISTA);
+}
+
+function irParaCalcular() {
+    limparMensagem();
+    resultadoCalculo.textContent = "";
+    mostrarTela(TELAS.CALCULAR);
+}
+
+botaoIrLancar.addEventListener("click", irParaLancar);
+botaoIrCalcular.addEventListener("click", irParaCalcular);
+botaoIrLista.addEventListener("click", irParaLista);
+botaoIrLancarVazio.addEventListener("click", irParaLancar);
+botoesVoltar.forEach((botao) => botao.addEventListener("click", irParaEscolha));
+
 formNota.addEventListener("submit", tratarSalvarNota);
-botaoCancelarEdicao.addEventListener("click", sairDoModoEdicao);
+botaoCancelarEdicao.addEventListener("click", () => {
+    sairDoModoEdicao();
+    irParaLista();
+});
 botaoCalcularNota.addEventListener("click", tratarCalcularNota);
 
 async function iniciar() {
@@ -184,6 +236,8 @@ async function iniciar() {
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
     inicializarNavegacaoPrincipal();
+    melhorarSelect(selectMateriaCalculo);
+    mostrarTela(TELAS.ESCOLHA);
     await carregarNotas();
 }
 
