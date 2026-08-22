@@ -8,11 +8,20 @@ import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js"
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 import { calcularProvasProximos7Dias } from "../../services/estatisticas.js";
 
+const TELAS = Object.freeze({ ESCOLHA: "escolha", CADASTRAR: "cadastrar", LISTA: "lista" });
+
+const telas = document.querySelectorAll(".tela-modo");
+const botoesVoltar = document.querySelectorAll("[data-voltar]");
+const botaoIrCadastrar = document.getElementById("botao-ir-cadastrar");
+const botaoIrCadastrarVazio = document.getElementById("botao-ir-cadastrar-vazio");
+const botaoIrLista = document.getElementById("botao-ir-lista");
+
+const mensagemProvas = document.getElementById("mensagem-provas");
+
 const formProva = document.getElementById("form-prova");
 const campoMateria = document.getElementById("campo-materia-prova");
 const campoData = document.getElementById("campo-data-prova");
 const campoNotaNecessaria = document.getElementById("campo-nota-necessaria-prova");
-const mensagemProvas = document.getElementById("mensagem-provas");
 const listaProvas = document.getElementById("lista-provas");
 const provasVazio = document.getElementById("provas-vazio");
 const provasCarregando = document.getElementById("provas-carregando");
@@ -23,6 +32,12 @@ const statTotalProvas = document.getElementById("stat-total-provas");
 const statProvasSemana = document.getElementById("stat-provas-semana");
 
 let provaEmEdicaoId = null;
+
+function mostrarTela(tela) {
+    telas.forEach((secao) => {
+        secao.hidden = secao.dataset.tela !== tela;
+    });
+}
 
 function mostrarMensagem(texto) {
     mensagemProvas.textContent = texto;
@@ -42,6 +57,7 @@ function entrarEmModoEdicao(prova) {
     tituloFormProva.textContent = "Editar prova";
     botaoSalvarProva.textContent = "Salvar alterações";
     botaoCancelarEdicao.hidden = false;
+    mostrarTela(TELAS.CADASTRAR);
 }
 
 function sairDoModoEdicao() {
@@ -114,8 +130,34 @@ async function tratarRemover(id) {
     }
 }
 
+// --- navegação entre telas ---
+
+function irParaEscolha() {
+    limparMensagem();
+    sairDoModoEdicao();
+    mostrarTela(TELAS.ESCOLHA);
+}
+
+function irParaCadastrar() {
+    limparMensagem();
+    mostrarTela(TELAS.CADASTRAR);
+}
+
+function irParaLista() {
+    limparMensagem();
+    mostrarTela(TELAS.LISTA);
+}
+
+botaoIrCadastrar.addEventListener("click", irParaCadastrar);
+botaoIrCadastrarVazio.addEventListener("click", irParaCadastrar);
+botaoIrLista.addEventListener("click", irParaLista);
+botoesVoltar.forEach((botao) => botao.addEventListener("click", irParaEscolha));
+
 formProva.addEventListener("submit", tratarSalvarProva);
-botaoCancelarEdicao.addEventListener("click", sairDoModoEdicao);
+botaoCancelarEdicao.addEventListener("click", () => {
+    sairDoModoEdicao();
+    irParaLista();
+});
 
 async function iniciar() {
     const sessao = await protegerRota();
@@ -124,6 +166,7 @@ async function iniciar() {
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
     inicializarNavegacaoPrincipal();
+    mostrarTela(TELAS.ESCOLHA);
     await carregarProvas();
 }
 
