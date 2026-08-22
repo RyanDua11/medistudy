@@ -96,77 +96,102 @@
 
     <h1 class="titulo-pagina">Casos Clínicos</h1>
 
-    <div class="stat-cards-grid">
-        <div class="stat-card" data-cor="dourado">
-            <span class="stat-card-icone" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
-            </span>
-            <span class="stat-card-info">
-                <span class="estatistica-valor" id="stat-total-casos">0</span>
-                <span class="estatistica-rotulo">Casos disponíveis</span>
-            </span>
-        </div>
-        <div class="stat-card" data-cor="verde">
-            <span class="stat-card-icone" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </span>
-            <span class="stat-card-info">
-                <span class="estatistica-valor" id="stat-casos-resolvidos">0</span>
-                <span class="estatistica-rotulo">Resolvidos por você</span>
-            </span>
-        </div>
-        <div class="stat-card" data-cor="roxo">
-            <span class="stat-card-icone" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
-            </span>
-            <span class="stat-card-info">
-                <span class="estatistica-valor" id="stat-taxa-acerto-casos">0%</span>
-                <span class="estatistica-rotulo">Taxa de acerto</span>
-            </span>
-        </div>
-    </div>
+    <p id="mensagem-casos" class="mensagem-erro" hidden></p>
 
-    <section id="casos-clinicos">
-        <div class="flashcards-coluna">
-            <h2>Gerar novo caso</h2>
-            <div class="input-group-simples">
-                <label for="select-materia-caso">Matéria</label>
-                <select id="select-materia-caso" aria-label="Escolher matéria">
-                    <option value="">Escolha a matéria...</option>
-                    <option value="Farmacologia II">Farmacologia II</option>
-                    <option value="Patologia Clínica">Patologia Clínica</option>
-                    <option value="Semiologia IV">Semiologia IV</option>
-                    <option value="Microbiologia">Microbiologia</option>
-                    <option value="Parasitologia">Parasitologia</option>
-                    <option value="Humanidades">Humanidades</option>
-                </select>
-            </div>
-            <button id="botao-gerar-caso" type="button">Gerar novo caso</button>
-            <p id="caso-gerando" class="estado-carregando" hidden>Gerando caso clínico…</p>
-            <p id="mensagem-casos" class="mensagem-erro" hidden></p>
-        </div>
+    <!-- TELA 1 — ESCOLHA -->
+    <section id="tela-escolha" class="tela-modo" data-tela="escolha">
 
-        <div class="flashcards-coluna">
-            <h2>Resolver</h2>
-            <div id="resolucao-vazia" class="estado-vazio">
-                <span class="estado-vazio-icone" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
+        <div class="stat-cards-grid">
+            <div class="stat-card" data-cor="dourado">
+                <span class="stat-card-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
                 </span>
-                <p>Escolha um caso na lista ao lado para resolver.</p>
+                <span class="stat-card-info">
+                    <span class="estatistica-valor" id="stat-total-casos">0</span>
+                    <span class="estatistica-rotulo">Casos disponíveis</span>
+                </span>
             </div>
-            <div id="resolucao-caso" hidden>
-                <p id="resolucao-enunciado" class="resolucao-enunciado"></p>
-                <p id="resolucao-pergunta" class="resolucao-pergunta"></p>
-                <ul id="resolucao-alternativas"></ul>
-                <div id="resolucao-feedback" hidden>
-                    <p id="resolucao-resultado"></p>
-                    <p id="resolucao-explicacao"></p>
+            <div class="stat-card" data-cor="verde">
+                <span class="stat-card-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </span>
+                <span class="stat-card-info">
+                    <span class="estatistica-valor" id="stat-casos-resolvidos">0</span>
+                    <span class="estatistica-rotulo">Resolvidos por você</span>
+                </span>
+            </div>
+            <div class="stat-card" data-cor="roxo">
+                <span class="stat-card-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+                </span>
+                <span class="stat-card-info">
+                    <span class="estatistica-valor" id="stat-taxa-acerto-casos">0%</span>
+                    <span class="estatistica-rotulo">Taxa de acerto</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="escolha-acoes">
+            <button id="botao-ir-resolver" type="button" class="botao-escolha botao-escolha-primario">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+                Resolver caso
+            </button>
+            <button id="botao-ir-gerar" type="button" class="botao-escolha botao-escolha-secundario">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Gerar novo caso
+            </button>
+        </div>
+    </section>
+
+    <!-- TELA 2 — GERAR -->
+    <section id="tela-gerar" class="tela-modo" data-tela="gerar" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div class="flashcards-coluna flashcards-coluna-criacao">
+            <h2>Gerar novo caso</h2>
+            <div id="gerar-formulario">
+                <div class="input-group-simples">
+                    <label for="select-materia-caso">Matéria</label>
+                    <select id="select-materia-caso" aria-label="Escolher matéria">
+                        <option value="">Escolha a matéria...</option>
+                        <option value="Farmacologia II">Farmacologia II</option>
+                        <option value="Patologia Clínica">Patologia Clínica</option>
+                        <option value="Semiologia IV">Semiologia IV</option>
+                        <option value="Microbiologia">Microbiologia</option>
+                        <option value="Parasitologia">Parasitologia</option>
+                        <option value="Humanidades">Humanidades</option>
+                    </select>
+                </div>
+                <button id="botao-gerar-caso" type="button">Gerar novo caso</button>
+                <p id="caso-gerando" class="estado-carregando" hidden>Gerando caso clínico…</p>
+            </div>
+
+            <div id="gerar-sucesso" class="estado-vazio" data-cor="roxo" hidden>
+                <span class="estado-vazio-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                </span>
+                <strong class="estado-vazio-titulo">Caso gerado!</strong>
+                <p id="gerar-sucesso-pergunta"></p>
+                <div class="escolha-acoes escolha-acoes-inline">
+                    <button id="botao-resolver-caso-gerado" type="button">Resolver agora</button>
+                    <button id="botao-gerar-outro-caso" type="button" class="botao-outline">Gerar outro</button>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="flashcards-coluna">
-            <h2>Casos existentes</h2>
+    <!-- TELA 3 — RESOLVER -->
+    <section id="tela-resolver" class="tela-modo" data-tela="resolver" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div id="resolver-escolha-caso" class="flashcards-coluna flashcards-coluna-lista">
+            <h2>Escolha um caso</h2>
             <div id="casos-carregando" class="skeleton-carregando" role="status">
                 <span class="sr-only">Carregando…</span>
                 <span class="skeleton-barra"></span>
@@ -174,11 +199,24 @@
                 <span class="skeleton-barra skeleton-barra-media"></span>
             </div>
             <ul id="lista-casos-clinicos"></ul>
-            <div id="casos-vazio" class="estado-vazio" hidden>
+            <div id="casos-vazio" class="estado-vazio" data-cor="roxo" hidden>
                 <span class="estado-vazio-icone" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </span>
-                <p>Nenhum caso clínico gerado ainda.</p>
+                <strong class="estado-vazio-titulo">Nenhum caso clínico gerado ainda</strong>
+                <p>Gere seu primeiro caso clínico para começar a resolver.</p>
+                <button id="botao-ir-gerar-vazio" type="button" class="estado-vazio-cta">Gerar novo caso</button>
+            </div>
+        </div>
+
+        <div id="resolucao-caso" class="flashcards-coluna flashcards-coluna-criacao" hidden>
+            <button type="button" id="botao-escolher-outro-caso" class="link-modo-padrao">← Escolher outro caso</button>
+            <p id="resolucao-enunciado" class="resolucao-enunciado"></p>
+            <p id="resolucao-pergunta" class="resolucao-pergunta"></p>
+            <ul id="resolucao-alternativas"></ul>
+            <div id="resolucao-feedback" hidden>
+                <p id="resolucao-resultado"></p>
+                <p id="resolucao-explicacao"></p>
             </div>
         </div>
     </section>
