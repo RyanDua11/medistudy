@@ -139,7 +139,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100dvh;
     position: relative;
     overflow: hidden;
 }
@@ -172,6 +172,10 @@ body.ativo::before {
     box-sizing: border-box;
     box-shadow: 0px 0px 15px rgba(201, 168, 76, 0.3);
     transition: box-shadow 0.6s ease, transform 0.3s ease;
+    /* o logo flutua acima da borda via margem negativa (.logo-container); sem essa
+       margem o box do card fica geometricamente centralizado mas o conjunto visual
+       (logo + card) fica puxado para cima, já que o logo não conta na altura do flex */
+    margin-top: 40px;
 }
 
 #login-container.ativo {
