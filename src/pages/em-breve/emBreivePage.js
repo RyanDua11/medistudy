@@ -1,25 +1,23 @@
 import { protegerRota } from "../../services/routeGuard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { resolverFerramentaEmBreve } from "../../services/ferramentasEmBreve.js";
 import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
 
+const secaoEmBreve = document.getElementById("em-breve");
+const iconeEmBreve = document.getElementById("em-breve-icone");
 const tituloFerramenta = document.getElementById("em-breve-titulo");
+const fraseFerramenta = document.getElementById("em-breve-frase");
 
-const FERRAMENTAS_VALIDAS = [
-    "Configurações",
-    "Mapas Mentais",
-    "Questões",
-    "Simulador de Anamnese",
-    "Explique pro Professor",
-];
-
-function exibirNomeFerramenta() {
+function exibirFerramenta() {
     const parametros = new URLSearchParams(window.location.search);
-    const nomeFerramenta = parametros.get("ferramenta");
+    const ferramenta = resolverFerramentaEmBreve(parametros.get("ferramenta"));
+    if (!ferramenta) return;
 
-    if (nomeFerramenta && FERRAMENTAS_VALIDAS.includes(nomeFerramenta)) {
-        tituloFerramenta.textContent = `${nomeFerramenta}: em breve`;
-    }
+    secaoEmBreve.dataset.cor = ferramenta.cor;
+    iconeEmBreve.innerHTML = ferramenta.icone;
+    tituloFerramenta.textContent = `${ferramenta.nome}: em breve`;
+    fraseFerramenta.textContent = ferramenta.frase;
 }
 
 async function iniciar() {
@@ -29,7 +27,7 @@ async function iniciar() {
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
     inicializarNavegacaoPrincipal();
-    exibirNomeFerramenta();
+    exibirFerramenta();
 }
 
 iniciar();

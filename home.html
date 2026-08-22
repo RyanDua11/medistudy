@@ -90,7 +90,7 @@
         <a href="notas.html" class="sidebar-link" data-pagina="notas" aria-label="Notas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
         </a>
-        <a href="em-breve.html?ferramenta=Configura%C3%A7%C3%B5es" class="sidebar-link" data-pagina="configuracoes" aria-label="Configurações">
+        <a href="em-breve.html?ferramenta=configuracoes" class="sidebar-link" data-pagina="configuracoes" aria-label="Configurações">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </a>
     </nav>
@@ -116,7 +116,7 @@
             <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg></span>
             <span class="bottom-nav-label">Notas</span>
         </a>
-        <a href="em-breve.html?ferramenta=Configura%C3%A7%C3%B5es" class="bottom-nav-link" data-pagina="configuracoes">
+        <a href="em-breve.html?ferramenta=configuracoes" class="bottom-nav-link" data-pagina="configuracoes">
             <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
             <span class="bottom-nav-label">Config</span>
         </a>
@@ -169,9 +169,14 @@
         <h2 class="titulo-secao">Próximas provas</h2>
 
         <div id="carrossel-provas" class="carrossel-provas" hidden></div>
-        <p id="carrossel-provas-vazio" class="carrossel-provas-vazio" hidden>
-            Nenhuma prova cadastrada. <a href="provas.html">Cadastrar prova</a>
-        </p>
+        <div id="carrossel-provas-vazio" class="estado-vazio" data-cor="azul" hidden>
+            <span class="estado-vazio-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            </span>
+            <strong class="estado-vazio-titulo">Nenhuma prova cadastrada</strong>
+            <p>Suas próximas provas vão aparecer aqui.</p>
+            <a href="provas.html" class="estado-vazio-cta">Cadastrar prova →</a>
+        </div>
     </section>
 
     <section id="ferramentas-de-estudo">
@@ -208,7 +213,7 @@
                 </span>
             </a>
 
-            <a class="ferramenta-card" href="em-breve.html?ferramenta=Mapas+Mentais" data-cor="verde">
+            <a class="ferramenta-card" href="em-breve.html?ferramenta=mapas-mentais" data-cor="verde">
                 <span class="ferramenta-icone">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 3a4 4 0 0 0-4 4c-2 0-3.5 1.6-3.5 3.5S6 14 6 14s-1.5.9-1.5 2.5S6 20 8 20"/>
@@ -223,7 +228,7 @@
                 </span>
             </a>
 
-            <a class="ferramenta-card" href="em-breve.html?ferramenta=Quest%C3%B5es" data-cor="roxo">
+            <a class="ferramenta-card" href="em-breve.html?ferramenta=questoes" data-cor="azul">
                 <span class="ferramenta-icone">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M8 4h8a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/>
@@ -237,7 +242,7 @@
                 </span>
             </a>
 
-            <a class="ferramenta-card" href="em-breve.html?ferramenta=Simulador+de+Anamnese" data-cor="ciano">
+            <a class="ferramenta-card" href="em-breve.html?ferramenta=anamnese" data-cor="roxo">
                 <span class="ferramenta-icone">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 4v6a4 4 0 0 0 8 0V4"/>
@@ -252,7 +257,7 @@
                 </span>
             </a>
 
-            <a class="ferramenta-card" href="em-breve.html?ferramenta=Explique+pro+Professor" data-cor="dourado">
+            <a class="ferramenta-card" href="em-breve.html?ferramenta=feynman" data-cor="dourado">
                 <span class="ferramenta-icone">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12a7 7 0 0 1-7 7H8l-5 3 1.5-4.5A7 7 0 1 1 21 12z"/>
@@ -355,11 +360,13 @@
             <div class="grafico-card">
                 <h3 class="grafico-card-titulo">Notas por matéria</h3>
                 <div id="grafico-notas" class="grafico-linha-container" hidden></div>
-                <div id="grafico-notas-vazio" class="estado-vazio" hidden>
+                <div id="grafico-notas-vazio" class="estado-vazio" data-cor="verde" hidden>
                     <span class="estado-vazio-icone" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
                     </span>
-                    <p>Lance notas em <a href="notas.html">Notas</a> para ver a evolução aqui.</p>
+                    <strong class="estado-vazio-titulo">Sem notas ainda</strong>
+                    <p>Lance notas para ver sua evolução por matéria aqui.</p>
+                    <a href="notas.html" class="estado-vazio-cta">Ir para Notas →</a>
                 </div>
             </div>
 
@@ -370,7 +377,9 @@
                     <span class="estado-vazio-icone" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="15" rx="2"/><path d="M3 3h13a2 2 0 0 1 2 2v13"/></svg>
                     </span>
-                    <p>Crie flashcards em <a href="flashcards.html">Flashcards</a> para ver a evolução aqui.</p>
+                    <strong class="estado-vazio-titulo">Sem flashcards ainda</strong>
+                    <p>Crie flashcards para ver seu acumulado ao longo do tempo.</p>
+                    <a href="flashcards.html" class="estado-vazio-cta">Ir para Flashcards →</a>
                 </div>
             </div>
         </div>

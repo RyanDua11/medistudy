@@ -1066,6 +1066,23 @@ main {
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .ferramentas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .estatisticas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .continuar-card {
+        flex-wrap: wrap;
+    }
+
+    .lista-flashcards-cabecalho {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 .flashcards-coluna h2 {
@@ -1792,6 +1809,22 @@ button:focus-visible {
         padding-left: 0;
     }
 
+    .ferramentas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .estatisticas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .evolucao-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
     main {
         padding-bottom: 64px;
     }
@@ -2259,19 +2292,6 @@ button:focus-visible {
     font-weight: 700;
 }
 
-.carrossel-provas-vazio {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-}
-
-.carrossel-provas-vazio[hidden] {
-    display: none;
-}
-
-.carrossel-provas-vazio a {
-    color: var(--terciary-color);
-}
-
 .grafico-linha-container {
     width: 100%;
 }
@@ -2364,38 +2384,6 @@ button:focus-visible {
     color: var(--terciary-color);
 }
 
-@media (max-width: 900px) {
-    .ferramentas-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .estatisticas-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .evolucao-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-cards-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .ferramentas-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .estatisticas-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .continuar-card {
-        flex-wrap: wrap;
-    }
-}
-
 /* paginas internas (flashcards, em-breve) */
 .link-voltar {
     display: inline-flex;
@@ -2434,15 +2422,16 @@ button:focus-visible {
     gap: 14px;
     color: var(--text-color);
     background:
-        radial-gradient(140% 100% at 15% 0%, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0.02) 35%, var(--secondary-color) 70%),
+        radial-gradient(140% 100% at 15% 0%, rgba(var(--cor-categoria, 201, 168, 76), 0.08) 0%, rgba(var(--cor-categoria, 201, 168, 76), 0.02) 35%, var(--secondary-color) 70%),
         var(--secondary-color);
-    border: 1px solid var(--terciary-color);
+    border: 1px solid rgb(var(--cor-categoria, 201, 168, 76));
     border-radius: 18px;
-    box-shadow: 0 0 26px -14px rgba(201, 168, 76, 0.4);
+    box-shadow: 0 0 26px -14px rgba(var(--cor-categoria, 201, 168, 76), 0.4);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .em-breve-icone {
-    color: var(--terciary-color);
+    color: rgb(var(--cor-categoria, 201, 168, 76));
     margin-bottom: 6px;
 }
 
@@ -2453,7 +2442,7 @@ button:focus-visible {
 
 #em-breve h1 {
     font-family: 'Cinzel', serif;
-    color: var(--terciary-color);
+    color: rgb(var(--cor-categoria, 201, 168, 76));
     font-size: 24px;
     margin: 0;
 }
@@ -2470,9 +2459,9 @@ button:focus-visible {
     justify-content: center;
     padding: 12px 26px;
     margin-top: 8px;
-    border: 1px solid var(--terciary-color);
+    border: 1px solid rgb(var(--cor-categoria, 201, 168, 76));
     border-radius: 18px;
-    background-color: var(--terciary-color);
+    background-color: rgb(var(--cor-categoria, 201, 168, 76));
     color: var(--primary-color);
     text-decoration: none;
     font-weight: 600;
@@ -2480,7 +2469,7 @@ button:focus-visible {
 }
 
 .em-breve-cta:hover {
-    box-shadow: 0px 0px 10px rgb(216, 163, 14);
+    box-shadow: 0px 0px 10px rgba(var(--cor-categoria, 201, 168, 76), 0.7);
 }
 
 /* telas de baixa carga cognitiva (uma tela, uma decisão) — compartilhado por
@@ -2638,11 +2627,6 @@ button:focus-visible {
     display: none;
 }
 
-.botao-criar-primeiro {
-    width: auto;
-    margin-top: 4px;
-}
-
 /* modo 3 — criação */
 .flashcards-coluna-criacao {
     max-width: 480px;
@@ -2717,10 +2701,6 @@ button:focus-visible {
 .ia-preview-acoes {
     display: flex;
     gap: 10px;
-}
-
-#ia-erro .botao-criar-primeiro {
-    width: auto;
 }
 
 .criacao-manual {

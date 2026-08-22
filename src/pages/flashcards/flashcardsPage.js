@@ -67,9 +67,11 @@ const botaoConfirmarVespera = document.getElementById("botao-confirmar-vespera")
 const badgeProgressoRevisao = document.getElementById("badge-progresso-revisao");
 const revisaoCarregando = document.getElementById("revisao-carregando");
 const revisaoVazia = document.getElementById("revisao-vazia");
+const revisaoVaziaTitulo = document.getElementById("revisao-vazia-titulo");
 const revisaoVaziaTexto = document.getElementById("revisao-vazia-texto");
 const botaoCriarPrimeiroFlashcard = document.getElementById("botao-criar-primeiro-flashcard");
 const flashcardsVazio = document.getElementById("flashcards-vazio");
+const botaoIrCriarVazio = document.getElementById("botao-ir-criar-vazio");
 const cartaoRevisao = document.getElementById("cartao-revisao");
 const cartaoRevisaoFrente = document.querySelector(".cartao-revisao-frente");
 const cartaoRevisaoVerso = document.querySelector(".cartao-revisao-verso");
@@ -87,6 +89,10 @@ const NOME_ARQUIVO_ANKI_PADRAO = "Nenhum ficheiro selecionado";
 const MENSAGEM_VAZIA_PADRAO = "Nenhum flashcard para revisar ainda. Crie o primeiro ao lado!";
 const MENSAGEM_VAZIA_VESPERA = "Nenhum flashcard cadastrado para essa matéria ainda.";
 const MENSAGEM_VAZIA_REVISAO_RAPIDA = "Nenhum flashcard vencido agora. Volte mais tarde!";
+
+const TITULO_VAZIO_PADRAO = "Nada para revisar agora";
+const TITULO_VAZIO_VESPERA = "Sem flashcards nessa matéria";
+const TITULO_VAZIO_REVISAO_RAPIDA = "Tudo revisado por hoje";
 
 let flashcards = [];
 let logs = [];
@@ -194,6 +200,12 @@ function obterMensagemVazia() {
     return MENSAGEM_VAZIA_PADRAO;
 }
 
+function obterTituloVazio() {
+    if (metodoRevisao === "vesperaDeProva") return TITULO_VAZIO_VESPERA;
+    if (metodoRevisao === "revisaoRapida") return TITULO_VAZIO_REVISAO_RAPIDA;
+    return TITULO_VAZIO_PADRAO;
+}
+
 function sessaoDeRevisaoRapidaConcluidaHoje() {
     return metodoRevisao === "revisaoRapida" && flashcards.length > 0 && calcularRevisadosHoje(logs) > 0;
 }
@@ -219,6 +231,7 @@ function renderizarAreaRevisao() {
 
     if (!flashcardEmRevisao) {
         const concluida = sessaoDeRevisaoRapidaConcluidaHoje();
+        revisaoVaziaTitulo.textContent = concluida ? "Sequência concluída!" : obterTituloVazio();
         revisaoVaziaTexto.textContent = concluida
             ? "Sequência concluída hoje! Você revisou tudo o que estava pendente."
             : obterMensagemVazia();
@@ -501,6 +514,7 @@ botaoIrRevisar.addEventListener("click", irParaRevisao);
 botaoIrCriar.addEventListener("click", irParaCriacao);
 botaoIrLista.addEventListener("click", irParaLista);
 botaoCriarPrimeiroFlashcard.addEventListener("click", irParaCriacao);
+botaoIrCriarVazio.addEventListener("click", irParaCriacao);
 botoesVoltar.forEach((botao) => botao.addEventListener("click", irParaEscolha));
 
 botaoGerarIA.addEventListener("click", iniciarFluxoIA);
