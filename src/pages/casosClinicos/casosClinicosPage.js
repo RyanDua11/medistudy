@@ -8,6 +8,8 @@ import {
 import { calcularCasosResolvidos, calcularTaxaAcertoCasos } from "../../services/estatisticas.js";
 import { criarElementoCasoClinico } from "../../components/casoClinicoCard.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
@@ -180,6 +182,8 @@ async function iniciar() {
 
     botaoGerarCaso.addEventListener("click", tratarGerarCaso);
     inicializarUsuarioMenu();
+    inicializarNotificacaoRevisao();
+    inicializarNavegacaoPrincipal();
     await carregarCasos();
 }
 

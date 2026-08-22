@@ -680,6 +680,12 @@ body.pagina-home::before {
     box-shadow: 0 0 12px rgba(201, 168, 76, 0.25);
 }
 
+/* bottom nav — substitui a sidebar abaixo de 900px, onde ela some sem deixar
+   nenhum jeito de navegar entre as ferramentas */
+.bottom-nav {
+    display: none;
+}
+
 main {
     max-width: 1280px;
     margin: 90px auto 0;
@@ -1746,6 +1752,64 @@ button:focus-visible {
 
     body.pagina-home {
         padding-left: 0;
+    }
+
+    main {
+        padding-bottom: 64px;
+    }
+
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        height: 64px;
+        background: var(--color-surface-2);
+        border-top: 1px solid rgba(201, 168, 76, 0.18);
+    }
+
+    .bottom-nav-link {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        color: var(--color-text-muted);
+        font-size: 10px;
+        text-align: center;
+        transition: color 0.2s ease;
+    }
+
+    .bottom-nav-icone {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 24px;
+        border-radius: 999px;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .bottom-nav-icone svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bottom-nav-link:hover,
+    .bottom-nav-link:focus-visible {
+        color: var(--terciary-color);
+    }
+
+    .bottom-nav-link.ativo {
+        color: var(--terciary-color);
+    }
+
+    .bottom-nav-link.ativo .bottom-nav-icone {
+        background-color: rgba(201, 168, 76, 0.16);
+        box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.45);
     }
 }
 

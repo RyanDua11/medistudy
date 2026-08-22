@@ -1,6 +1,7 @@
 import { protegerRota } from "../../services/routeGuard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
 
 const tituloFerramenta = document.getElementById("em-breve-titulo");
 
@@ -27,6 +28,7 @@ async function iniciar() {
 
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    inicializarNavegacaoPrincipal();
     exibirNomeFerramenta();
 }
 
