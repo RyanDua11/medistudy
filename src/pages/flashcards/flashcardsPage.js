@@ -7,6 +7,7 @@ import {
     removerFlashcard,
 } from "../../services/flashcardsService.js";
 import { parsearArquivoAnki } from "../../services/importadorAnki.js";
+import { gerarFlashcardIA } from "../../services/flashcardIA.js";
 import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "../../services/selecaoRevisao.js";
 import { calcularStreakDias, calcularRevisadosHoje } from "../../services/estatisticas.js";
 import { TELAS, calcularTelaInicial, filtrarFlashcardsPorMateria } from "../../services/telaFlashcards.js";
@@ -33,6 +34,25 @@ const filtroMateriaLista = document.getElementById("filtro-materia-lista");
 const campoArquivoAnki = document.getElementById("campo-arquivo-anki");
 const botaoImportarAnki = document.getElementById("botao-importar-anki");
 const nomeArquivoAnki = document.getElementById("nome-arquivo-anki");
+const criacaoManual = document.getElementById("criacao-manual");
+
+const criacaoIaEscolha = document.getElementById("criacao-ia-escolha");
+const botaoGerarIA = document.getElementById("botao-gerar-ia");
+const criacaoIaFluxo = document.getElementById("criacao-ia-fluxo");
+const iaPassoTema = document.getElementById("ia-passo-tema");
+const campoTemaIA = document.getElementById("campo-tema-ia");
+const botaoGerarFlashcardIA = document.getElementById("botao-gerar-flashcard-ia");
+const botaoCancelarIA = document.getElementById("botao-cancelar-ia");
+const iaCarregando = document.getElementById("ia-carregando");
+const iaPreview = document.getElementById("ia-preview");
+const previewPerguntaIA = document.getElementById("preview-pergunta-ia");
+const previewRespostaIA = document.getElementById("preview-resposta-ia");
+const previewMateriaIA = document.getElementById("preview-materia-ia");
+const botaoSalvarIA = document.getElementById("botao-salvar-ia");
+const botaoGerarOutroIA = document.getElementById("botao-gerar-outro-ia");
+const iaErro = document.getElementById("ia-erro");
+const iaErroTexto = document.getElementById("ia-erro-texto");
+const botaoTentarManualmente = document.getElementById("botao-tentar-manualmente");
 
 const revisaoEscolhaMetodo = document.getElementById("revisao-escolha-metodo");
 const revisaoSessao = document.getElementById("revisao-sessao");
@@ -266,6 +286,90 @@ function iniciarSessaoDeRevisao() {
     renderizarAreaRevisao();
 }
 
+// --- geração de flashcard por IA (modo 3) ---
+
+function mostrarEscolhaCriacao() {
+    criacaoIaEscolha.hidden = false;
+    criacaoIaFluxo.hidden = true;
+    criacaoManual.open = false;
+}
+
+function mostrarPassoTemaIA() {
+    iaPassoTema.hidden = false;
+    iaCarregando.hidden = true;
+    iaPreview.hidden = true;
+    iaErro.hidden = true;
+}
+
+function iniciarFluxoIA() {
+    limparMensagem();
+    criacaoIaEscolha.hidden = true;
+    criacaoIaFluxo.hidden = false;
+    mostrarPassoTemaIA();
+    campoTemaIA.focus();
+}
+
+function cancelarFluxoIA() {
+    campoTemaIA.value = "";
+    mostrarEscolhaCriacao();
+}
+
+function preencherPreviewIA(flashcard) {
+    previewPerguntaIA.value = flashcard.pergunta;
+    previewRespostaIA.value = flashcard.resposta;
+    previewMateriaIA.value = flashcard.materia;
+
+    iaPassoTema.hidden = true;
+    iaCarregando.hidden = true;
+    iaErro.hidden = true;
+    iaPreview.hidden = false;
+}
+
+function mostrarErroIA(mensagem) {
+    iaErroTexto.textContent = mensagem;
+    iaPassoTema.hidden = true;
+    iaCarregando.hidden = true;
+    iaPreview.hidden = true;
+    iaErro.hidden = false;
+}
+
+async function tratarGerarFlashcardIA() {
+    const tema = campoTemaIA.value;
+
+    iaPassoTema.hidden = true;
+    iaCarregando.hidden = false;
+    iaErro.hidden = true;
+
+    try {
+        const flashcard = await gerarFlashcardIA(tema);
+        preencherPreviewIA(flashcard);
+    } catch (erro) {
+        mostrarErroIA(erro.message);
+    }
+}
+
+async function tratarSalvarFlashcardIA() {
+    try {
+        await criarFlashcard(previewPerguntaIA.value, previewRespostaIA.value, previewMateriaIA.value || null);
+        pulsarSucesso(botaoSalvarIA);
+        await carregarFlashcards();
+        cancelarFluxoIA();
+    } catch (erro) {
+        mostrarMensagem(erro.message);
+    }
+}
+
+function tratarGerarOutroIA() {
+    mostrarPassoTemaIA();
+    campoTemaIA.focus();
+}
+
+function tratarTentarManualmente() {
+    criacaoIaFluxo.hidden = true;
+    criacaoManual.open = true;
+    campoPergunta.focus();
+}
+
 function tratarModoRevisaoRapida() {
     limparMensagem();
     metodoRevisao = "revisaoRapida";
@@ -381,6 +485,8 @@ function irParaRevisao() {
 
 function irParaCriacao() {
     limparMensagem();
+    mostrarEscolhaCriacao();
+    campoTemaIA.value = "";
     mostrarTela(TELAS.CRIACAO);
 }
 
@@ -394,6 +500,13 @@ botaoIrCriar.addEventListener("click", irParaCriacao);
 botaoIrLista.addEventListener("click", irParaLista);
 botaoCriarPrimeiroFlashcard.addEventListener("click", irParaCriacao);
 botoesVoltar.forEach((botao) => botao.addEventListener("click", irParaEscolha));
+
+botaoGerarIA.addEventListener("click", iniciarFluxoIA);
+botaoCancelarIA.addEventListener("click", cancelarFluxoIA);
+botaoGerarFlashcardIA.addEventListener("click", tratarGerarFlashcardIA);
+botaoSalvarIA.addEventListener("click", tratarSalvarFlashcardIA);
+botaoGerarOutroIA.addEventListener("click", tratarGerarOutroIA);
+botaoTentarManualmente.addEventListener("click", tratarTentarManualmente);
 
 formNovoFlashcard.addEventListener("submit", tratarNovoFlashcard);
 campoArquivoAnki.addEventListener("change", atualizarNomeArquivoAnki);
