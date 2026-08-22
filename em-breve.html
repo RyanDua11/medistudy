@@ -40,23 +40,50 @@
     </header>
 
     <nav class="sidebar" aria-label="Navegação principal">
-        <a href="home.html" class="sidebar-link" aria-label="Painel">
+        <a href="home.html" class="sidebar-link" data-pagina="home" aria-label="Painel">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
         </a>
-        <a href="flashcards.html" class="sidebar-link" aria-label="Flashcards">
+        <a href="flashcards.html" class="sidebar-link" data-pagina="flashcards" aria-label="Flashcards">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="15" rx="2"/><path d="M3 3h13a2 2 0 0 1 2 2v13"/></svg>
         </a>
-        <a href="casos-clinicos.html" class="sidebar-link" aria-label="Casos Clínicos">
+        <a href="casos-clinicos.html" class="sidebar-link" data-pagina="casos-clinicos" aria-label="Casos Clínicos">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
         </a>
-        <a href="provas.html" class="sidebar-link" aria-label="Agenda de provas">
+        <a href="provas.html" class="sidebar-link" data-pagina="provas" aria-label="Agenda de provas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
         </a>
-        <a href="notas.html" class="sidebar-link" aria-label="Notas">
+        <a href="notas.html" class="sidebar-link" data-pagina="notas" aria-label="Notas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
         </a>
-        <a href="em-breve.html?ferramenta=configuracoes" class="sidebar-link ativo" aria-label="Configurações">
+        <a href="em-breve.html?ferramenta=configuracoes" class="sidebar-link" data-pagina="configuracoes" aria-label="Configurações">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </a>
+    </nav>
+
+    <nav class="bottom-nav" aria-label="Navegação principal (mobile)">
+        <a href="home.html" class="bottom-nav-link" data-pagina="home">
+            <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></span>
+            <span class="bottom-nav-label">Painel</span>
+        </a>
+        <a href="flashcards.html" class="bottom-nav-link" data-pagina="flashcards">
+            <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="13" height="15" rx="2"/><path d="M3 3h13a2 2 0 0 1 2 2v13"/></svg></span>
+            <span class="bottom-nav-label">Flashcards</span>
+        </a>
+        <a href="casos-clinicos.html" class="bottom-nav-link" data-pagina="casos-clinicos">
+            <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg></span>
+            <span class="bottom-nav-label">Casos</span>
+        </a>
+        <a href="provas.html" class="bottom-nav-link" data-pagina="provas">
+            <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+            <span class="bottom-nav-label">Provas</span>
+        </a>
+        <a href="notas.html" class="bottom-nav-link" data-pagina="notas">
+            <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg></span>
+            <span class="bottom-nav-label">Notas</span>
+        </a>
+        <a href="em-breve.html?ferramenta=configuracoes" class="bottom-nav-link" data-pagina="configuracoes">
+            <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            <span class="bottom-nav-label">Config</span>
         </a>
     </nav>
 

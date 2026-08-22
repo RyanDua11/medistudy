@@ -13,6 +13,8 @@ import {
 import { criarGraficoLinha } from "../../components/graficoLinha.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
+import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { inicializarCarrosselProvas } from "../../components/carrosselProvas.js";
 
 const spanNomeUsuario = document.getElementById("nome-usuario-saudacao");
@@ -73,6 +75,8 @@ async function iniciar() {
     exibirSaudacao(sessao.user.email);
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    inicializarNavegacaoPrincipal();
+    inicializarPomodoroWidget();
     await carregarEstatisticas();
     await carregarEvolucao();
     await inicializarCarrosselProvas();

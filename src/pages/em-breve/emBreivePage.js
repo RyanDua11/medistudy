@@ -2,6 +2,7 @@ import { protegerRota } from "../../services/routeGuard.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
 import { resolverFerramentaEmBreve } from "../../services/ferramentasEmBreve.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
 
 const secaoEmBreve = document.getElementById("em-breve");
 const iconeEmBreve = document.getElementById("em-breve-icone");
@@ -25,6 +26,7 @@ async function iniciar() {
 
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    inicializarNavegacaoPrincipal();
     exibirFerramenta();
 }
 

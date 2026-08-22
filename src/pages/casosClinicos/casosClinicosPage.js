@@ -8,20 +8,37 @@ import {
 import { calcularCasosResolvidos, calcularTaxaAcertoCasos } from "../../services/estatisticas.js";
 import { criarElementoCasoClinico } from "../../components/casoClinicoCard.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
+import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
+import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
+
+const TELAS = Object.freeze({ ESCOLHA: "escolha", GERAR: "gerar", RESOLVER: "resolver" });
+
+const telas = document.querySelectorAll(".tela-modo");
+const botoesVoltar = document.querySelectorAll("[data-voltar]");
+const botaoIrResolver = document.getElementById("botao-ir-resolver");
+const botaoIrGerar = document.getElementById("botao-ir-gerar");
+
+const mensagemCasos = document.getElementById("mensagem-casos");
 
 const selectMateria = document.getElementById("select-materia-caso");
 const botaoGerarCaso = document.getElementById("botao-gerar-caso");
 const casoGerando = document.getElementById("caso-gerando");
-const mensagemCasos = document.getElementById("mensagem-casos");
+const gerarFormulario = document.getElementById("gerar-formulario");
+const gerarSucesso = document.getElementById("gerar-sucesso");
+const gerarSucessoPergunta = document.getElementById("gerar-sucesso-pergunta");
+const botaoResolverCasoGerado = document.getElementById("botao-resolver-caso-gerado");
+const botaoGerarOutroCaso = document.getElementById("botao-gerar-outro-caso");
 
+const resolverEscolhaCaso = document.getElementById("resolver-escolha-caso");
 const casosCarregando = document.getElementById("casos-carregando");
 const listaCasos = document.getElementById("lista-casos-clinicos");
 const casosVazio = document.getElementById("casos-vazio");
-const botaoFocarMateriaCaso = document.getElementById("botao-focar-materia-caso");
+const botaoIrGerarVazio = document.getElementById("botao-ir-gerar-vazio");
 
-const resolucaoVazia = document.getElementById("resolucao-vazia");
 const resolucaoCaso = document.getElementById("resolucao-caso");
 const resolucaoEnunciado = document.getElementById("resolucao-enunciado");
 const resolucaoPergunta = document.getElementById("resolucao-pergunta");
@@ -29,6 +46,7 @@ const resolucaoAlternativas = document.getElementById("resolucao-alternativas");
 const resolucaoFeedback = document.getElementById("resolucao-feedback");
 const resolucaoResultado = document.getElementById("resolucao-resultado");
 const resolucaoExplicacao = document.getElementById("resolucao-explicacao");
+const botaoEscolherOutroCaso = document.getElementById("botao-escolher-outro-caso");
 
 const statTotalCasos = document.getElementById("stat-total-casos");
 const statCasosResolvidos = document.getElementById("stat-casos-resolvidos");
@@ -36,6 +54,13 @@ const statTaxaAcertoCasos = document.getElementById("stat-taxa-acerto-casos");
 
 let casos = [];
 let logsResolucoes = [];
+let casoGeradoRecente = null;
+
+function mostrarTela(tela) {
+    telas.forEach((secao) => {
+        secao.hidden = secao.dataset.tela !== tela;
+    });
+}
 
 function mostrarMensagem(texto) {
     mensagemCasos.textContent = texto;
@@ -66,7 +91,7 @@ function renderizarListaCasos() {
 
     casos.forEach((caso) => {
         const item = criarElementoCasoClinico(caso, {
-            aoAbrir: renderizarResolucao,
+            aoAbrir: selecionarCasoParaResolver,
             ultimaResolucao: ultimaResolucaoPorCaso.get(caso.id) ?? null,
         });
         listaCasos.appendChild(item);
@@ -81,8 +106,13 @@ function renderizarEstatisticas() {
     statTaxaAcertoCasos.textContent = `${calcularTaxaAcertoCasos(logsResolucoes)}%`;
 }
 
-function renderizarResolucao(caso) {
-    resolucaoVazia.hidden = true;
+function mostrarEscolhaDeCaso() {
+    resolucaoCaso.hidden = true;
+    resolverEscolhaCaso.hidden = false;
+}
+
+function selecionarCasoParaResolver(caso) {
+    resolverEscolhaCaso.hidden = true;
     resolucaoCaso.hidden = false;
     resolucaoFeedback.hidden = true;
 
@@ -167,6 +197,11 @@ async function tratarGerarCaso() {
         renderizarListaCasos();
         renderizarEstatisticas();
         pulsarSucesso(botaoGerarCaso);
+
+        casoGeradoRecente = novoCaso;
+        gerarSucessoPergunta.textContent = novoCaso.pergunta;
+        gerarFormulario.hidden = true;
+        gerarSucesso.hidden = false;
     } catch (erro) {
         mostrarMensagem(erro.message);
     } finally {
@@ -175,13 +210,54 @@ async function tratarGerarCaso() {
     }
 }
 
+// --- navegação entre telas ---
+
+function irParaEscolha() {
+    limparMensagem();
+    mostrarTela(TELAS.ESCOLHA);
+}
+
+function irParaGerar() {
+    limparMensagem();
+    gerarFormulario.hidden = false;
+    gerarSucesso.hidden = true;
+    selectMateria.value = "";
+    sincronizarSelectPersonalizado(selectMateria);
+    mostrarTela(TELAS.GERAR);
+}
+
+function irParaResolver() {
+    limparMensagem();
+    mostrarEscolhaDeCaso();
+    mostrarTela(TELAS.RESOLVER);
+}
+
+function tratarResolverCasoGerado() {
+    if (!casoGeradoRecente) return;
+    mostrarTela(TELAS.RESOLVER);
+    selecionarCasoParaResolver(casoGeradoRecente);
+}
+
+botaoIrResolver.addEventListener("click", irParaResolver);
+botaoIrGerar.addEventListener("click", irParaGerar);
+botaoIrGerarVazio.addEventListener("click", irParaGerar);
+botoesVoltar.forEach((botao) => botao.addEventListener("click", irParaEscolha));
+
+botaoGerarCaso.addEventListener("click", tratarGerarCaso);
+botaoResolverCasoGerado.addEventListener("click", tratarResolverCasoGerado);
+botaoGerarOutroCaso.addEventListener("click", irParaGerar);
+botaoEscolherOutroCaso.addEventListener("click", mostrarEscolhaDeCaso);
+
 async function iniciar() {
     const sessao = await protegerRota();
     if (!sessao) return;
 
-    botaoGerarCaso.addEventListener("click", tratarGerarCaso);
-    botaoFocarMateriaCaso.addEventListener("click", () => selectMateria.focus());
     inicializarUsuarioMenu();
+    inicializarNotificacaoRevisao();
+    inicializarNavegacaoPrincipal();
+    inicializarPomodoroWidget();
+    melhorarSelect(selectMateria);
+    mostrarTela(TELAS.ESCOLHA);
     await carregarCasos();
 }
 

@@ -15,10 +15,12 @@ import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
 import { inicializarUsuarioMenu } from "../../components/usuarioMenu.js";
+import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincipal.js";
+import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { melhorarSelect, sincronizarSelectPersonalizado } from "../../components/selectPersonalizado.js";
 import { pulsarSucesso } from "../../components/feedbackAcao.js";
 
-const telas = document.querySelectorAll(".tela-flashcards");
+const telas = document.querySelectorAll(".tela-modo");
 const botoesVoltar = document.querySelectorAll("[data-voltar]");
 const botaoIrRevisar = document.getElementById("botao-ir-revisar");
 const botaoIrCriar = document.getElementById("botao-ir-criar");
@@ -539,6 +541,8 @@ async function iniciar() {
 
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
+    inicializarNavegacaoPrincipal();
+    inicializarPomodoroWidget();
     melhorarSelect(selectMateriaVespera);
     await carregarFlashcards();
 
