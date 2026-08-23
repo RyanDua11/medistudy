@@ -6,3 +6,5 @@ dist/
 *.log
 .impeccable/config.local.json
 .impeccable/hook.cache.json
+
+supabase/.temp/
