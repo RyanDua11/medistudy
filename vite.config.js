@@ -12,6 +12,7 @@ export default defineConfig({
                 emBreve: resolve(__dirname, "em-breve.html"),
                 provas: resolve(__dirname, "provas.html"),
                 notas: resolve(__dirname, "notas.html"),
+                chat: resolve(__dirname, "chat.html"),
             },
         },
     },
