@@ -28,6 +28,7 @@ vi.mock("./supabaseClient.js", () => ({
 
 const {
     criarFlashcard,
+    criarFlashcardComReverso,
     listarFlashcards,
     marcarRevisao,
     listarLogRevisoes,
@@ -93,6 +94,58 @@ describe("criarFlashcard", () => {
         await expect(criarFlashcard("pergunta", "resposta")).rejects.toThrow(
             "Falha ao criar flashcard"
         );
+    });
+});
+
+describe("criarFlashcardComReverso", () => {
+    it("cria apenas o card principal quando gerarReverso é falso", async () => {
+        const builder = criarQueryBuilderMock({ data: { id: "1" }, error: null });
+        mockFrom.mockReturnValue(builder);
+
+        const resultado = await criarFlashcardComReverso("pergunta", "resposta", "Farmacologia II", {
+            gerarReverso: false,
+        });
+
+        expect(builder.insert).toHaveBeenCalledTimes(1);
+        expect(resultado.cardReverso).toBeNull();
+    });
+
+    it("cria o card principal e o reverso com pergunta/resposta invertidas quando gerarReverso é true", async () => {
+        const builder = criarQueryBuilderMock({ data: { id: "1" }, error: null });
+        mockFrom.mockReturnValue(builder);
+
+        await criarFlashcardComReverso("pergunta", "resposta", "Farmacologia II", { gerarReverso: true });
+
+        expect(builder.insert).toHaveBeenCalledTimes(2);
+        expect(builder.insert).toHaveBeenNthCalledWith(1, {
+            user_id: "usuario-1",
+            pergunta: "pergunta",
+            resposta: "resposta",
+            materia: "Farmacologia II",
+        });
+        expect(builder.insert).toHaveBeenNthCalledWith(2, {
+            user_id: "usuario-1",
+            pergunta: "resposta",
+            resposta: "pergunta",
+            materia: "Farmacologia II",
+            eh_reverso: true,
+        });
+    });
+
+    it("retorna os dois cards criados", async () => {
+        const cards = [{ id: "1" }, { id: "2" }];
+        let chamada = 0;
+        const builder = {
+            insert: vi.fn(() => builder),
+            select: vi.fn(() => builder),
+            single: vi.fn(() => Promise.resolve({ data: cards[chamada++], error: null })),
+        };
+        mockFrom.mockReturnValue(builder);
+
+        const resultado = await criarFlashcardComReverso("pergunta", "resposta", null, { gerarReverso: true });
+
+        expect(resultado.cardPrincipal).toEqual(cards[0]);
+        expect(resultado.cardReverso).toEqual(cards[1]);
     });
 });
 

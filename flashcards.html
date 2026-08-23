@@ -182,6 +182,36 @@
         </div>
     </section>
 
+    <!-- MODO 1b — ESCOLHA DE TIPO -->
+    <section id="tela-tipo" class="tela-modo" data-tela="tipo" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+        <div class="tela-centralizada-corpo">
+
+        <div class="tipo-cabecalho">
+            <h2>Que tipo de card você quer criar?</h2>
+            <p class="tipo-subtitulo">Escolha o formato ideal para o que deseja estudar.</p>
+        </div>
+
+        <div class="tipo-cards-grid">
+            <button type="button" id="botao-tipo-basico" class="tipo-card">
+                <span class="tipo-card-icone" aria-hidden="true">?</span>
+                <strong class="tipo-card-titulo">Básico</strong>
+                <span class="tipo-card-descricao">Pergunta e resposta simples.</span>
+            </button>
+            <button type="button" id="botao-tipo-cloze" class="tipo-card">
+                <span class="tipo-card-icone" aria-hidden="true">A__</span>
+                <strong class="tipo-card-titulo">Cloze</strong>
+                <span class="tipo-card-descricao">Texto com lacunas para completar.</span>
+            </button>
+        </div>
+
+        <button type="button" id="botao-tipo-ia" class="link-modo-padrao link-tipo-ia">✨ Gerar com IA</button>
+        </div>
+    </section>
+
     <!-- MODO 2 — REVISÃO -->
     <section id="tela-revisao" class="tela-modo" data-tela="revisao" hidden>
         <button type="button" class="botao-voltar-tela" data-voltar>
@@ -195,6 +225,7 @@
             <div class="escolha-metodo-botoes">
                 <button id="botao-metodo-rapida" type="button">Revisão rápida (5 min)</button>
                 <button id="botao-metodo-vespera" type="button" class="botao-outline">Véspera de prova</button>
+                <button id="botao-metodo-baralho" type="button" class="botao-outline">Escolher baralho</button>
             </div>
             <div id="vespera-materia-painel" class="vespera-materia-painel" hidden>
                 <select id="select-materia-vespera" aria-label="Escolher matéria">
@@ -257,6 +288,28 @@
         </div>
     </section>
 
+    <!-- MODO 2b — ESCOLHER BARALHO (navegação hierárquica Matéria > Subtópico > Detalhe) -->
+    <section id="tela-baralhos" class="tela-modo" data-tela="baralhos" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div class="flashcards-coluna flashcards-coluna-baralhos tela-centralizada-corpo">
+            <button type="button" id="botao-baralho-nivel-voltar" class="link-modo-padrao baralho-nivel-voltar" hidden>← Nível anterior</button>
+            <nav class="baralho-breadcrumb" id="baralho-breadcrumb" aria-label="Caminho do baralho">Escolha sua matéria</nav>
+
+            <ul class="baralho-lista" id="baralho-lista"></ul>
+
+            <div id="baralho-vazio" class="estado-vazio" hidden>
+                <strong class="estado-vazio-titulo">Nenhum baralho ainda</strong>
+                <p>Crie flashcards com uma matéria definida para navegar por aqui.</p>
+            </div>
+
+            <button type="button" id="botao-iniciar-revisao-baralho" class="botao-iniciar-baralho" hidden></button>
+        </div>
+    </section>
+
     <!-- MODO 3 — CRIAÇÃO -->
     <section id="tela-criacao" class="tela-modo" data-tela="criacao" hidden>
         <button type="button" class="botao-voltar-tela" data-voltar>
@@ -265,14 +318,7 @@
         </button>
 
         <div class="flashcards-coluna flashcards-coluna-criacao tela-centralizada-corpo">
-            <h2>Novo flashcard</h2>
-
-            <div id="criacao-ia-escolha" class="criacao-ia-escolha">
-                <button id="botao-gerar-ia" type="button" class="botao-escolha botao-escolha-primario">
-                    <span aria-hidden="true">✨</span> Gerar com IA
-                </button>
-                <div class="criacao-ia-divisor" role="presentation"><span>ou</span></div>
-            </div>
+            <h2>Novo flashcard básico</h2>
 
             <div id="criacao-ia-fluxo" class="criacao-ia-fluxo" hidden>
                 <div id="ia-passo-tema" class="ia-passo">
@@ -314,8 +360,7 @@
                 </div>
             </div>
 
-            <details id="criacao-manual" class="criacao-manual">
-                <summary class="link-modo-padrao criacao-manual-resumo">Criar manualmente</summary>
+            <div id="criacao-manual" class="criacao-manual">
                 <form id="form-novo-flashcard">
                     <div class="input-group-simples">
                         <label for="campo-pergunta">Pergunta</label>
@@ -327,8 +372,23 @@
                     </div>
                     <div class="input-group-simples">
                         <label for="campo-materia">Matéria (opcional)</label>
-                        <input type="text" id="campo-materia" placeholder="Ex: Farmacologia II" maxlength="60">
+                        <input type="text" id="campo-materia" list="lista-materias-basico" placeholder="Ex: Farmacologia II" maxlength="60">
+                        <datalist id="lista-materias-basico"></datalist>
                     </div>
+                    <div class="input-group-simples">
+                        <label for="campo-subtopico">Subtópico (opcional)</label>
+                        <input type="text" id="campo-subtopico" list="lista-subtopicos-basico" placeholder="Ex: AINEs" maxlength="60">
+                        <datalist id="lista-subtopicos-basico"></datalist>
+                    </div>
+                    <div class="input-group-simples">
+                        <label for="campo-detalhe">Detalhe (opcional)</label>
+                        <input type="text" id="campo-detalhe" list="lista-detalhes-basico" placeholder="Ex: Mecanismo de ação" maxlength="60">
+                        <datalist id="lista-detalhes-basico"></datalist>
+                    </div>
+                    <label class="toggle-label" for="campo-gerar-reverso">
+                        <input type="checkbox" id="campo-gerar-reverso">
+                        <span>Gerar card reverso automaticamente</span>
+                    </label>
                     <button type="submit">Adicionar flashcard</button>
                 </form>
 
@@ -343,7 +403,56 @@
                         <button id="botao-importar-anki" type="button">Importar do Anki</button>
                     </div>
                 </details>
-            </details>
+                <button type="button" id="botao-gerar-ia" class="link-modo-padrao">✨ Gerar com IA em vez disso</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODO 3b — CRIAÇÃO DE CARD CLOZE -->
+    <section id="tela-criacao-cloze" class="tela-modo" data-tela="criacao-cloze" hidden>
+        <button type="button" class="botao-voltar-tela" data-voltar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            Voltar
+        </button>
+
+        <div class="flashcards-coluna flashcards-coluna-criacao tela-centralizada-corpo">
+            <h2>Novo card Cloze</h2>
+            <p class="cloze-dica-sintaxe">Dica: use <code>{{...}}</code> para criar lacunas. Ex: A bactéria mais comum na PAC é <code>{{Streptococcus pneumoniae}}</code>.</p>
+
+            <form id="form-novo-cloze">
+                <div class="input-group-simples">
+                    <label for="campo-cloze-texto">Frente (com lacuna)</label>
+                    <textarea id="campo-cloze-texto" placeholder="Ex: A bactéria mais comum na PAC é {{Streptococcus pneumoniae}}." maxlength="500" required></textarea>
+                    <span class="contador-caracteres" id="contador-cloze-texto">0/500</span>
+                </div>
+                <div class="input-group-simples">
+                    <label for="campo-cloze-dica">Dica (opcional)</label>
+                    <input type="text" id="campo-cloze-dica" placeholder="Escreva uma dica para te ajudar a lembrar..." maxlength="120">
+                    <span class="contador-caracteres" id="contador-cloze-dica">0/120</span>
+                </div>
+                <div class="input-group-simples">
+                    <label for="campo-cloze-contexto">Contexto (opcional)</label>
+                    <textarea id="campo-cloze-contexto" placeholder="Adicione contexto, detalhes importantes..." maxlength="200"></textarea>
+                    <span class="contador-caracteres" id="contador-cloze-contexto">0/200</span>
+                </div>
+                <div class="input-group-simples">
+                    <label for="campo-cloze-materia">Matéria (opcional)</label>
+                    <input type="text" id="campo-cloze-materia" list="lista-materias-cloze" placeholder="Ex: Farmacologia II" maxlength="60">
+                    <datalist id="lista-materias-cloze"></datalist>
+                </div>
+                <div class="input-group-simples">
+                    <label for="campo-cloze-subtopico">Subtópico (opcional)</label>
+                    <input type="text" id="campo-cloze-subtopico" list="lista-subtopicos-cloze" placeholder="Ex: AINEs" maxlength="60">
+                    <datalist id="lista-subtopicos-cloze"></datalist>
+                </div>
+
+                <p id="cloze-erro" class="mensagem-erro" hidden></p>
+
+                <div class="cloze-form-acoes">
+                    <button type="button" id="botao-cloze-cancelar" class="botao-outline">Cancelar</button>
+                    <button type="submit" id="botao-cloze-proximo">Próximo →</button>
+                </div>
+            </form>
         </div>
     </section>
 
@@ -355,6 +464,12 @@
         </button>
 
         <div class="flashcards-coluna flashcards-coluna-lista">
+            <section id="pontos-fracos" class="pontos-fracos" hidden>
+                <h2 class="pontos-fracos-titulo">Pontos fracos</h2>
+                <p class="pontos-fracos-subtitulo">Cards que você errou 3+ vezes nos últimos 30 dias. Foque neles para evoluir.</p>
+                <ul id="pontos-fracos-lista" class="pontos-fracos-lista"></ul>
+            </section>
+
             <div class="lista-flashcards-cabecalho">
                 <h2>Meus flashcards</h2>
                 <select id="filtro-materia-lista" aria-label="Filtrar por matéria">

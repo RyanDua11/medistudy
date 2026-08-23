@@ -2684,6 +2684,7 @@ button:focus-visible {
 
 .revisao-sessao {
     position: relative;
+    width: 100%;
     max-width: 480px;
     margin: 0 auto;
 }
@@ -2706,43 +2707,9 @@ button:focus-visible {
 
 /* modo 3 — criação */
 .flashcards-coluna-criacao {
+    width: 100%;
     max-width: 480px;
     margin: 0 auto;
-}
-
-.criacao-ia-escolha {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.criacao-ia-escolha[hidden] {
-    display: none;
-}
-
-.botao-gerar-ia {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.criacao-ia-divisor {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--color-text-muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-}
-
-.criacao-ia-divisor::before,
-.criacao-ia-divisor::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background-color: rgba(201, 168, 76, 0.25);
 }
 
 .criacao-ia-fluxo {
@@ -2784,20 +2751,6 @@ button:focus-visible {
     margin-top: 4px;
 }
 
-.criacao-manual-resumo {
-    cursor: pointer;
-    list-style: none;
-    text-decoration: underline;
-}
-
-.criacao-manual-resumo::-webkit-details-marker {
-    display: none;
-}
-
-.criacao-manual form {
-    margin-top: 16px;
-}
-
 .importador-anki summary {
     cursor: pointer;
     list-style: none;
@@ -2827,6 +2780,7 @@ button:focus-visible {
 
 /* modo 4 — ver todos */
 .flashcards-coluna-lista {
+    width: 100%;
     max-width: 640px;
     margin: 0 auto;
 }
@@ -3044,6 +2998,306 @@ button:focus-visible {
 .pomodoro-modo-botao:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+}
+
+/* ===== FLASHCARDS FASE 2 ===== */
+
+/* tela de escolha de tipo de card */
+.tipo-cabecalho {
+    text-align: center;
+}
+
+.tipo-cabecalho h2 {
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 20px;
+    margin: 0 0 6px;
+}
+
+.tipo-subtitulo {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+}
+
+.tipo-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 24px;
+    width: 100%;
+    max-width: 520px;
+}
+
+.tipo-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    background-color: var(--secondary-color);
+    border: 1px solid var(--terciary-color);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: left;
+    color: var(--text-color);
+}
+
+.tipo-card:hover {
+    border-color: var(--color-gold-bright);
+    box-shadow: 0 0 20px -8px rgba(201, 168, 76, 0.5);
+}
+
+.tipo-card-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    color: var(--terciary-color);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.tipo-card-titulo {
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 15px;
+}
+
+.tipo-card-descricao {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.link-tipo-ia {
+    margin-top: 20px;
+}
+
+/* toggle de card reverso na criação Básico */
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color);
+    font-size: var(--text-sm);
+    cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--terciary-color);
+    cursor: pointer;
+}
+
+/* criação de card Cloze */
+.cloze-dica-sintaxe {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+}
+
+.cloze-dica-sintaxe code {
+    background-color: rgba(201, 168, 76, 0.12);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--terciary-color);
+    font-family: monospace;
+}
+
+#form-novo-cloze {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.contador-caracteres {
+    align-self: flex-end;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.cloze-form-acoes {
+    display: flex;
+    gap: 10px;
+}
+
+.cloze-form-acoes .botao-outline {
+    flex: 1;
+}
+
+.cloze-form-acoes button[type="submit"] {
+    flex: 2;
+}
+
+/* revisão de card Cloze — palavra revelada em destaque dourado */
+.cloze-destaque {
+    color: var(--color-gold-bright);
+    font-weight: 600;
+}
+
+/* escolher baralho — navegação hierárquica Matéria > Subtópico > Detalhe */
+.flashcards-coluna-baralhos {
+    max-width: 520px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.baralho-nivel-voltar[hidden] {
+    display: none;
+}
+
+.baralho-breadcrumb {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+.baralho-breadcrumb strong {
+    color: var(--terciary-color);
+}
+
+.baralho-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.baralho-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 14px;
+    background-color: transparent;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 12px;
+    color: var(--text-color);
+    text-align: left;
+}
+
+.baralho-item:hover {
+    border-color: var(--terciary-color);
+    background-color: rgba(201, 168, 76, 0.06);
+}
+
+.baralho-item-contagem {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.botao-iniciar-baralho {
+    margin-top: 4px;
+}
+
+.botao-iniciar-baralho[hidden] {
+    display: none;
+}
+
+/* diário de erros — seção "Pontos fracos" dentro de "Ver todos" */
+.pontos-fracos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+}
+
+.pontos-fracos[hidden] {
+    display: none;
+}
+
+.pontos-fracos-titulo {
+    font-family: 'Cinzel', serif;
+    color: var(--color-danger);
+    font-size: 16px;
+    margin: 0;
+}
+
+.pontos-fracos-subtitulo {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    margin: 0;
+}
+
+.pontos-fracos-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ponto-fraco-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-danger-bg);
+    border: 1px solid rgba(255, 128, 128, 0.4);
+    border-radius: 12px;
+    text-align: left;
+    color: var(--text-color);
+}
+
+.ponto-fraco-item:hover {
+    border-color: var(--color-danger);
+}
+
+.ponto-fraco-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--color-danger);
+    background-color: rgba(255, 128, 128, 0.18);
+}
+
+.ponto-fraco-detalhes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.ponto-fraco-erros {
+    color: var(--color-danger);
+    font-weight: 600;
+}
+
+/* badges de tipo de card na lista */
+.flashcard-linha-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag-tipo-card {
+    align-self: flex-start;
+    width: fit-content;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 @media (prefers-reduced-motion: reduce) {
