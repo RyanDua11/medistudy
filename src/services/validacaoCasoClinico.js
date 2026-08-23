@@ -1,7 +1,7 @@
 const MIN_ALTERNATIVAS = 4;
 const MAX_ALTERNATIVAS = 5;
 
-function extrairJson(texto) {
+export function extrairJson(texto) {
     const semCercaMarkdown = texto.replace(/```json\s*|```/g, "").trim();
 
     try {
