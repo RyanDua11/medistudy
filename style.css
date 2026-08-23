@@ -1782,15 +1782,65 @@ button:focus-visible {
     color: var(--terciary-color);
 }
 
+.botoes-revisao-titulo {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: 0;
+}
+
 #botoes-revisao {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 
-#botao-errei {
+@media (max-width: 520px) {
+    #botoes-revisao {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.botao-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     background-color: transparent;
+    border-color: var(--color-border-muted);
+    color: var(--color-text);
+}
+
+.botao-rating:hover {
+    background-color: var(--color-surface-focus);
+    box-shadow: none;
+}
+
+.botao-rating-rotulo {
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.botao-rating-intervalo {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.botao-rating-nao-lembrei {
     color: var(--color-danger);
     border-color: var(--color-danger);
+}
+
+.botao-rating-nao-lembrei .botao-rating-intervalo {
+    color: var(--color-danger);
+}
+
+.botao-rating-facil {
+    border-color: var(--color-gold);
+}
+
+.botao-rating-facil .botao-rating-intervalo {
+    color: var(--color-gold-soft);
 }
 
 @media (max-width: 900px) {

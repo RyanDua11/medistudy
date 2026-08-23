@@ -16,5 +16,5 @@ export function selecionarRevisaoRapida(flashcards, opcoes = {}) {
 export function selecionarVesperaDeProva(flashcards, materia) {
     return flashcards
         .filter((flashcard) => flashcard.materia === materia)
-        .sort((a, b) => a.fator_facilidade - b.fator_facilidade);
+        .sort((a, b) => (b.dificuldade ?? 0) - (a.dificuldade ?? 0));
 }

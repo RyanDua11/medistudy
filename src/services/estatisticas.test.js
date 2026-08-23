@@ -249,7 +249,7 @@ describe("categorizarFlashcards", () => {
 
     it("classifica como Revisar flashcards já revisados com proxima_revisao vencida", () => {
         const flashcards = [
-            { id: "1", proxima_revisao: horas(-2), fator_facilidade: 1.5 },
+            { id: "1", proxima_revisao: horas(-2), estado: "reaprendizado" },
         ];
         const logs = [{ flashcard_id: "1" }];
 
@@ -269,11 +269,11 @@ describe("categorizarFlashcards", () => {
         expect(revisar).toEqual([]);
     });
 
-    it("classifica como Aprendidos flashcards com fator_facilidade >= 2.5", () => {
+    it("classifica como Aprendidos flashcards com estado FSRS 'revisao'", () => {
         const flashcards = [
-            { id: "1", fator_facilidade: 2.5, proxima_revisao: horas(5) },
-            { id: "2", fator_facilidade: 2.8, proxima_revisao: horas(5) },
-            { id: "3", fator_facilidade: 1.8, proxima_revisao: horas(5) },
+            { id: "1", estado: "revisao", proxima_revisao: horas(5) },
+            { id: "2", estado: "revisao", proxima_revisao: horas(5) },
+            { id: "3", estado: "reaprendizado", proxima_revisao: horas(5) },
         ];
         const logs = [{ flashcard_id: "1" }, { flashcard_id: "2" }, { flashcard_id: "3" }];
 
@@ -284,7 +284,7 @@ describe("categorizarFlashcards", () => {
 
     it("um flashcard pode ser simultaneamente Revisar e Aprendidos", () => {
         const flashcards = [
-            { id: "1", fator_facilidade: 2.7, proxima_revisao: horas(-1) },
+            { id: "1", estado: "revisao", proxima_revisao: horas(-1) },
         ];
         const logs = [{ flashcard_id: "1" }];
 
@@ -302,10 +302,10 @@ describe("categorizarFlashcards", () => {
 describe("calcularProgressoGeral", () => {
     it("calcula a porcentagem de flashcards aprendidos sobre o total", () => {
         const flashcards = [
-            { id: "1", fator_facilidade: 2.6 },
-            { id: "2", fator_facilidade: 2.5 },
-            { id: "3", fator_facilidade: 1.5 },
-            { id: "4", fator_facilidade: 1.5 },
+            { id: "1", estado: "revisao" },
+            { id: "2", estado: "revisao" },
+            { id: "3", estado: "reaprendizado" },
+            { id: "4", estado: "reaprendizado" },
         ];
         const logs = flashcards.map((f) => ({ flashcard_id: f.id }));
 
@@ -317,7 +317,7 @@ describe("calcularProgressoGeral", () => {
     });
 
     it("retorna 0 quando nenhum flashcard está aprendido ainda", () => {
-        const flashcards = [{ id: "1", fator_facilidade: 1.5 }];
+        const flashcards = [{ id: "1", estado: "reaprendizado" }];
         const logs = [{ flashcard_id: "1" }];
 
         expect(calcularProgressoGeral(flashcards, logs)).toBe(0);

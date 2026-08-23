@@ -4,7 +4,7 @@ import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "./selecaoRevi
 const AGORA = new Date("2026-08-08T12:00:00.000Z");
 
 function flashcard(id, proximaRevisao, extras = {}) {
-    return { id, proxima_revisao: proximaRevisao, fator_facilidade: 2.5, materia: null, ...extras };
+    return { id, proxima_revisao: proximaRevisao, dificuldade: 5, materia: null, ...extras };
 }
 
 function horasAtras(horas) {
@@ -64,12 +64,12 @@ describe("selecionarRevisaoRapida", () => {
 });
 
 describe("selecionarVesperaDeProva", () => {
-    it("filtra por matéria e ordena do mais difícil (fator_facilidade menor) pro mais fácil", () => {
+    it("filtra por matéria e ordena do mais difícil (dificuldade maior) pro mais fácil", () => {
         const flashcards = [
-            flashcard("1", horasAtras(1), { materia: "Farmacologia II", fator_facilidade: 2.5 }),
-            flashcard("2", horasAtras(1), { materia: "Farmacologia II", fator_facilidade: 1.4 }),
-            flashcard("3", horasAtras(1), { materia: "Farmacologia II", fator_facilidade: 2.1 }),
-            flashcard("4", horasAtras(1), { materia: "Microbiologia", fator_facilidade: 1.3 }),
+            flashcard("1", horasAtras(1), { materia: "Farmacologia II", dificuldade: 4 }),
+            flashcard("2", horasAtras(1), { materia: "Farmacologia II", dificuldade: 9 }),
+            flashcard("3", horasAtras(1), { materia: "Farmacologia II", dificuldade: 6 }),
+            flashcard("4", horasAtras(1), { materia: "Microbiologia", dificuldade: 8 }),
         ];
 
         const resultado = selecionarVesperaDeProva(flashcards, "Farmacologia II");
