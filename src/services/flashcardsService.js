@@ -6,17 +6,36 @@ import { traduzErroSupabase } from "./erroAmigavel.js";
 const TABELA_FLASHCARDS = "flashcards";
 const TABELA_LOG_REVISOES = "log_revisoes";
 
-export async function criarFlashcard(pergunta, resposta, materia = null) {
+export async function criarFlashcard(pergunta, resposta, materia = null, extras = {}) {
     const userId = await obterIdUsuarioLogado();
 
     const { data, error } = await supabase
         .from(TABELA_FLASHCARDS)
-        .insert({ user_id: userId, pergunta, resposta, materia })
+        .insert({ user_id: userId, pergunta, resposta, materia, ...extras })
         .select()
         .single();
 
     if (error) throw new Error(traduzErroSupabase(error));
     return data;
+}
+
+/**
+ * Cria um flashcard básico e, se `gerarReverso` for true, também cria
+ * automaticamente o card com pergunta/resposta invertidas (B→A), vinculado
+ * pela mesma matéria/subtópico/detalhe e marcado com `eh_reverso`.
+ */
+export async function criarFlashcardComReverso(pergunta, resposta, materia = null, extras = {}) {
+    const { gerarReverso, ...extrasCard } = extras;
+
+    const cardPrincipal = await criarFlashcard(pergunta, resposta, materia, extrasCard);
+    if (!gerarReverso) return { cardPrincipal, cardReverso: null };
+
+    const cardReverso = await criarFlashcard(resposta, pergunta, materia, {
+        ...extrasCard,
+        eh_reverso: true,
+    });
+
+    return { cardPrincipal, cardReverso };
 }
 
 export async function listarFlashcards() {

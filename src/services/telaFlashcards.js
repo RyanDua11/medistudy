@@ -1,8 +1,11 @@
 export const TELAS = Object.freeze({
     ESCOLHA: "escolha",
     REVISAO: "revisao",
+    TIPO: "tipo",
     CRIACAO: "criacao",
+    CRIACAO_CLOZE: "criacao-cloze",
     LISTA: "lista",
+    BARALHOS: "baralhos",
 });
 
 /**

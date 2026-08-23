@@ -1,5 +1,6 @@
 import { corPorMateria } from "../services/corMateria.js";
 import { formatarDataRelativa } from "../services/formatacaoData.js";
+import { ocultarLacunas } from "../services/cloze.js";
 
 function fecharMenu(botaoMenu, opcoes) {
     opcoes.hidden = true;
@@ -41,7 +42,7 @@ export function criarElementoFlashcard(flashcard, { aoRemover, ultimaRevisao = n
 
     const pergunta = document.createElement("p");
     pergunta.className = "flashcard-pergunta";
-    pergunta.textContent = flashcard.pergunta;
+    pergunta.textContent = flashcard.tipo === "cloze" ? ocultarLacunas(flashcard.pergunta) : flashcard.pergunta;
 
     const menu = document.createElement("div");
     menu.className = "flashcard-menu";
@@ -73,17 +74,34 @@ export function criarElementoFlashcard(flashcard, { aoRemover, ultimaRevisao = n
     opcoes.appendChild(botaoRemover);
     menu.append(botaoMenu, opcoes);
     cabecalho.append(pergunta, menu);
+    item.appendChild(cabecalho);
+
+    const linhaTags = document.createElement("div");
+    linhaTags.className = "flashcard-linha-tags";
 
     if (flashcard.materia) {
         const tag = document.createElement("span");
         tag.className = "tag-materia";
         tag.dataset.cor = corPorMateria(flashcard.materia);
-        tag.textContent = flashcard.materia;
-        item.appendChild(cabecalho);
-        item.appendChild(tag);
-    } else {
-        item.appendChild(cabecalho);
+        tag.textContent = [flashcard.materia, flashcard.subtopico, flashcard.detalhe].filter(Boolean).join(" › ");
+        linhaTags.appendChild(tag);
     }
+
+    if (flashcard.tipo === "cloze") {
+        const tagTipo = document.createElement("span");
+        tagTipo.className = "tag-tipo-card";
+        tagTipo.textContent = "Cloze";
+        linhaTags.appendChild(tagTipo);
+    }
+
+    if (flashcard.eh_reverso) {
+        const tagReverso = document.createElement("span");
+        tagReverso.className = "tag-tipo-card";
+        tagReverso.textContent = "Reverso";
+        linhaTags.appendChild(tagReverso);
+    }
+
+    if (linhaTags.childElementCount > 0) item.appendChild(linhaTags);
 
     const estatisticas = document.createElement("span");
     estatisticas.className = "flashcard-estatisticas";
