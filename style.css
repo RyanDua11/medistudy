@@ -692,10 +692,37 @@ body.pagina-home::before {
 
 main {
     max-width: 1280px;
+    min-height: calc(100dvh - 90px);
     margin: 90px auto 0;
     padding: 30px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     animation: pagina-entrada 0.4s ease-out;
+}
+
+/* telas trocadas via [hidden] preenchem o espaço restante do main; por padrão
+   o conteúdo flui no topo (listas/históricos). .tela-centralizada-corpo
+   centraliza verticalmente o conteúdo quando ele é curto (telas de escolha,
+   formulários, sessão de revisão) — sem isso, sobra espaço abaixo e o scroll
+   fica com folga morta em vez do conteúdo caber inteiro na viewport. O botão
+   "Voltar", quando existe, fica fora desse wrapper para continuar ancorado
+   perto do título em vez de ser puxado para o centro junto com o resto. */
+.tela-modo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.tela-modo[hidden] {
+    display: none;
+}
+
+.tela-centralizada-corpo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 @keyframes pagina-entrada {
