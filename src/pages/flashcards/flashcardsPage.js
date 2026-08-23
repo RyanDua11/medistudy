@@ -10,6 +10,7 @@ import { parsearArquivoAnki } from "../../services/importadorAnki.js";
 import { gerarFlashcardIA } from "../../services/flashcardIA.js";
 import { selecionarRevisaoRapida, selecionarVesperaDeProva } from "../../services/selecaoRevisao.js";
 import { calcularStreakDias, calcularRevisadosHoje } from "../../services/estatisticas.js";
+import { preverIntervalosFSRS, formatarIntervaloFSRS } from "../../services/fsrs.js";
 import { TELAS, calcularTelaInicial, filtrarFlashcardsPorMateria } from "../../services/telaFlashcards.js";
 import { criarElementoFlashcard } from "../../components/flashcardCard.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
@@ -78,8 +79,7 @@ const cartaoRevisaoVerso = document.querySelector(".cartao-revisao-verso");
 const revisaoPergunta = document.getElementById("revisao-pergunta");
 const revisaoResposta = document.getElementById("revisao-resposta");
 const botaoMostrarResposta = document.getElementById("botao-mostrar-resposta");
-const botaoAcertei = document.getElementById("botao-acertei");
-const botaoErrei = document.getElementById("botao-errei");
+const botoesRating = document.querySelectorAll(".botao-rating");
 
 const statTotalFlashcards = document.getElementById("stat-total-flashcards");
 const statRevisadosHoje = document.getElementById("stat-revisados-hoje");
@@ -250,6 +250,17 @@ function renderizarAreaRevisao() {
     revisaoResposta.textContent = flashcardEmRevisao.resposta;
     definirEstadoFlip(false);
     atualizarBadgeProgresso();
+    atualizarIntervalosRating();
+}
+
+function atualizarIntervalosRating() {
+    if (!flashcardEmRevisao) return;
+    const intervalos = preverIntervalosFSRS(flashcardEmRevisao);
+    botoesRating.forEach((botao) => {
+        const rating = Number(botao.dataset.rating);
+        const intervaloEl = document.getElementById(`intervalo-rating-${rating}`);
+        intervaloEl.textContent = formatarIntervaloFSRS(intervalos[rating]);
+    });
 }
 
 async function carregarFlashcards() {
@@ -462,14 +473,14 @@ async function tratarRemover(id) {
 
 function tratarMostrarResposta() {
     definirEstadoFlip(true);
-    botaoAcertei.focus();
+    botoesRating[0].focus();
 }
 
-async function tratarRevisao(acertou) {
+async function tratarRevisao(rating) {
     if (!flashcardEmRevisao) return;
 
     try {
-        await marcarRevisao(flashcardEmRevisao, acertou);
+        await marcarRevisao(flashcardEmRevisao, rating);
         revisadosNaSessao += 1;
         await carregarFlashcards();
     } catch (erro) {
@@ -531,8 +542,9 @@ botaoMetodoRapida.addEventListener("click", tratarModoRevisaoRapida);
 botaoMetodoVespera.addEventListener("click", tratarEscolherVesperaDeProva);
 botaoConfirmarVespera.addEventListener("click", tratarConfirmarVesperaDeProva);
 botaoMostrarResposta.addEventListener("click", tratarMostrarResposta);
-botaoAcertei.addEventListener("click", () => tratarRevisao(true));
-botaoErrei.addEventListener("click", () => tratarRevisao(false));
+botoesRating.forEach((botao) => {
+    botao.addEventListener("click", () => tratarRevisao(Number(botao.dataset.rating)));
+});
 filtroMateriaLista.addEventListener("change", tratarFiltroDeMateriaNaLista);
 
 async function iniciar() {

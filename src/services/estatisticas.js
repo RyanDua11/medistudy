@@ -1,11 +1,7 @@
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 const UM_DIA_MS = 24 * 60 * 60 * 1000;
 
-// Fator de facilidade parte de 2.5 (repeticaoEspacada.js) e só sobe com acertos
-// consecutivos; >= 2.5 significa que o card nunca caiu abaixo do padrão inicial,
-// um proxy melhor de domínio consolidado do que intervalo_dias (que cresce
-// multiplicativamente e infla rápido demais para servir de limiar).
-const LIMIAR_FATOR_FACILIDADE_APRENDIDO = 2.5;
+import { ESTADO } from "./fsrs.js";
 
 function chaveDiaLocal(data) {
     const d = new Date(data);
@@ -68,13 +64,13 @@ export function categorizarFlashcards(flashcards, logs) {
         (f) => idsComLog.has(f.id) && new Date(f.proxima_revisao).getTime() <= agora
     );
     const aprendidos = flashcards.filter(
-        (f) => idsComLog.has(f.id) && f.fator_facilidade >= LIMIAR_FATOR_FACILIDADE_APRENDIDO
+        (f) => idsComLog.has(f.id) && f.estado === ESTADO.REVISAO
     );
 
     return { novos, revisar, aprendidos };
 }
 
-// Progresso geral = proporção de flashcards "Aprendidos" (fator_facilidade >= 2.5,
+// Progresso geral = proporção de flashcards "Aprendidos" (estado FSRS "revisao",
 // ver categorizarFlashcards) sobre o total de flashcards, em porcentagem inteira.
 export function calcularProgressoGeral(flashcards, logs) {
     if (flashcards.length === 0) return 0;

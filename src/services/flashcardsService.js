@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient.js";
 import { obterIdUsuarioLogado } from "./authService.js";
-import { calcularRepeticaoEspacada } from "./repeticaoEspacada.js";
+import { calcularFSRS, RATING } from "./fsrs.js";
 import { traduzErroSupabase } from "./erroAmigavel.js";
 
 const TABELA_FLASHCARDS = "flashcards";
@@ -29,14 +29,15 @@ export async function listarFlashcards() {
     return data;
 }
 
-export async function marcarRevisao(flashcard, acertou) {
+export async function marcarRevisao(flashcard, rating) {
+    const acertou = rating !== RATING.NAO_LEMBREI;
     const contadores = acertou
         ? { acertos: flashcard.acertos + 1, erros: flashcard.erros }
         : { acertos: flashcard.acertos, erros: flashcard.erros + 1 };
 
     const atualizacao = {
         ...contadores,
-        ...calcularRepeticaoEspacada(flashcard, acertou),
+        ...calcularFSRS(flashcard, rating),
     };
 
     const { data, error } = await supabase
@@ -53,6 +54,7 @@ export async function marcarRevisao(flashcard, acertou) {
         flashcard_id: flashcard.id,
         usuario_id: userId,
         acertou,
+        rating,
     });
 
     if (erroLog) throw new Error(traduzErroSupabase(erroLog));

@@ -33,6 +33,7 @@ const {
     listarLogRevisoes,
     removerFlashcard,
 } = await import("./flashcardsService.js");
+const { RATING } = await import("./fsrs.js");
 
 beforeEach(() => {
     mockFrom.mockReset();
@@ -134,41 +135,42 @@ describe("marcarRevisao", () => {
         return { builderFlashcards, builderLog };
     }
 
-    it("incrementa acertos e avança a repetição espaçada quando o usuário acerta", async () => {
+    it("incrementa acertos e avança o agendamento FSRS quando o usuário acerta (Bom)", async () => {
         const { builderFlashcards } = mockTabelas({
             flashcardResultado: { data: { id: "1", acertos: 3, erros: 1 }, error: null },
         });
 
         const resultado = await marcarRevisao(
-            { id: "1", acertos: 2, erros: 1, intervalo_dias: 1, fator_facilidade: 2.5 },
-            true
+            { id: "1", acertos: 2, erros: 1 },
+            RATING.BOM
         );
 
         const atualizacao = builderFlashcards.update.mock.calls[0][0];
         expect(atualizacao.acertos).toBe(3);
         expect(atualizacao.erros).toBe(1);
-        expect(atualizacao.intervalo_dias).toBe(3);
-        expect(atualizacao.fator_facilidade).toBeCloseTo(2.6);
+        expect(atualizacao.dificuldade).toEqual(expect.any(Number));
+        expect(atualizacao.estabilidade).toEqual(expect.any(Number));
+        expect(atualizacao.intervalo_dias).toBeGreaterThan(0);
         expect(atualizacao.proxima_revisao).toEqual(expect.any(String));
         expect(builderFlashcards.eq).toHaveBeenCalledWith("id", "1");
         expect(resultado.acertos).toBe(3);
     });
 
-    it("incrementa erros e reseta a repetição espaçada quando o usuário erra", async () => {
+    it("incrementa erros e reagenda para hoje quando o usuário não lembra", async () => {
         const { builderFlashcards } = mockTabelas({
             flashcardResultado: { data: { id: "1", acertos: 2, erros: 2 }, error: null },
         });
 
         await marcarRevisao(
-            { id: "1", acertos: 2, erros: 1, intervalo_dias: 8, fator_facilidade: 2.7 },
-            false
+            { id: "1", acertos: 2, erros: 1, dificuldade: 6, estabilidade: 20, ultima_revisao: new Date().toISOString() },
+            RATING.NAO_LEMBREI
         );
 
         const atualizacao = builderFlashcards.update.mock.calls[0][0];
         expect(atualizacao.acertos).toBe(2);
         expect(atualizacao.erros).toBe(2);
-        expect(atualizacao.intervalo_dias).toBe(1);
-        expect(atualizacao.fator_facilidade).toBeCloseTo(2.5);
+        expect(atualizacao.intervalo_dias).toBe(0);
+        expect(atualizacao.estado).toBe("reaprendizado");
     });
 
     it("insere um log de revisão associado ao flashcard e ao usuário logado quando acerta", async () => {
@@ -176,33 +178,29 @@ describe("marcarRevisao", () => {
             flashcardResultado: { data: { id: "1", acertos: 1, erros: 0 }, error: null },
         });
 
-        await marcarRevisao(
-            { id: "1", acertos: 0, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
-            true
-        );
+        await marcarRevisao({ id: "1", acertos: 0, erros: 0 }, RATING.BOM);
 
         expect(mockFrom).toHaveBeenCalledWith("log_revisoes");
         expect(builderLog.insert).toHaveBeenCalledWith({
             flashcard_id: "1",
             usuario_id: "usuario-1",
             acertou: true,
+            rating: RATING.BOM,
         });
     });
 
-    it("insere um log de revisão com acertou=false quando erra", async () => {
+    it("insere um log de revisão com acertou=false quando não lembra", async () => {
         const { builderLog } = mockTabelas({
             flashcardResultado: { data: { id: "1", acertos: 0, erros: 1 }, error: null },
         });
 
-        await marcarRevisao(
-            { id: "1", acertos: 0, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
-            false
-        );
+        await marcarRevisao({ id: "1", acertos: 0, erros: 0 }, RATING.NAO_LEMBREI);
 
         expect(builderLog.insert).toHaveBeenCalledWith({
             flashcard_id: "1",
             usuario_id: "usuario-1",
             acertou: false,
+            rating: RATING.NAO_LEMBREI,
         });
     });
 
@@ -211,10 +209,7 @@ describe("marcarRevisao", () => {
             flashcardResultado: { data: { id: "1", acertos: 5, erros: 0 }, error: null },
         });
 
-        const resultado = await marcarRevisao(
-            { id: "1", acertos: 4, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
-            true
-        );
+        const resultado = await marcarRevisao({ id: "1", acertos: 4, erros: 0 }, RATING.BOM);
 
         expect(resultado).toEqual({ id: "1", acertos: 5, erros: 0 });
     });
@@ -226,10 +221,7 @@ describe("marcarRevisao", () => {
         });
 
         await expect(
-            marcarRevisao(
-                { id: "1", acertos: 0, erros: 0, intervalo_dias: 1, fator_facilidade: 2.5 },
-                true
-            )
+            marcarRevisao({ id: "1", acertos: 0, erros: 0 }, RATING.BOM)
         ).rejects.toThrow("Falha ao registrar log");
     });
 });

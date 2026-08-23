@@ -227,9 +227,24 @@
                         </div>
                         <div class="cartao-revisao-face cartao-revisao-verso">
                             <p id="revisao-resposta"></p>
-                            <div id="botoes-revisao">
-                                <button id="botao-acertei" type="button">Acertei</button>
-                                <button id="botao-errei" type="button">Errei</button>
+                            <p class="botoes-revisao-titulo">Como foi sua lembrança?</p>
+                            <div id="botoes-revisao" role="group" aria-label="Como foi sua lembrança?">
+                                <button id="botao-rating-1" type="button" class="botao-rating botao-rating-nao-lembrei" data-rating="1">
+                                    <span class="botao-rating-rotulo">Não lembrei</span>
+                                    <span id="intervalo-rating-1" class="botao-rating-intervalo"></span>
+                                </button>
+                                <button id="botao-rating-2" type="button" class="botao-rating botao-rating-dificil" data-rating="2">
+                                    <span class="botao-rating-rotulo">Difícil</span>
+                                    <span id="intervalo-rating-2" class="botao-rating-intervalo"></span>
+                                </button>
+                                <button id="botao-rating-3" type="button" class="botao-rating botao-rating-bom" data-rating="3">
+                                    <span class="botao-rating-rotulo">Bom</span>
+                                    <span id="intervalo-rating-3" class="botao-rating-intervalo"></span>
+                                </button>
+                                <button id="botao-rating-4" type="button" class="botao-rating botao-rating-facil" data-rating="4">
+                                    <span class="botao-rating-rotulo">Fácil</span>
+                                    <span id="intervalo-rating-4" class="botao-rating-intervalo"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
