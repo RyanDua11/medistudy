@@ -4184,6 +4184,7 @@ button:focus-visible {
     .pomodoro-anel-progresso { transition: none; }
     .chat-loading span { animation: none; }
     .avatar-dra-mah-wrap--pensando::after { animation: none; }
+    .modal-overlay, .modal-confirmacao { animation: none; }
     .ferramentas-grid { transition: none; }
     .progresso-semanal-anel-progresso { transition: none; }
 }
@@ -4203,7 +4204,15 @@ button:focus-visible {
 body.pagina-chat {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    /* precisa ser height, não min-height: min-height só define um piso, sem
+       teto — sem altura DEFINIDA aqui, flex-shrink não tem contra o que
+       encolher os filhos, e o body inteiro cresce pra caber o conteúdo em
+       vez de deixar só .chat-mensagens/.chat-lista rolarem por dentro
+       (era exatamente o scroll "tudo junto" reportado). Com height fixa, a
+       cadeia min-height:0 (chat-layout -> chat-sidebar/chat-area ->
+       chat-lista/chat-mensagens) passa a valer de verdade. overflow-y:auto
+       continua como rede de segurança pro caso extremo de nada caber. */
+    height: 100vh;
     overflow-y: auto;
 }
 
@@ -4230,6 +4239,7 @@ body.pagina-chat {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     border-right: 1px solid var(--color-border-muted);
     background: linear-gradient(180deg, var(--color-surface-2-alt) 0%, var(--color-surface-3) 100%);
 }
@@ -4306,6 +4316,7 @@ body.pagina-chat {
 
 .chat-lista {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: var(--space-2);
     display: flex;
@@ -4399,6 +4410,7 @@ body.pagina-chat {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     background-color: var(--color-surface-3);
 }
 
@@ -4421,8 +4433,8 @@ body.pagina-chat {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 96px;
-    height: 96px;
+    width: 84px;
+    height: 84px;
 }
 
 .chat-boas-vindas-avatar::before {
@@ -4436,8 +4448,8 @@ body.pagina-chat {
 
 .chat-boas-vindas-avatar-img {
     position: relative;
-    width: 96px;
-    height: 96px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.45), 0 8px 28px rgba(0, 0, 0, 0.45);
@@ -4454,15 +4466,15 @@ body.pagina-chat {
 .chat-boas-vindas h1 {
     font-family: 'Cinzel', serif;
     color: var(--color-gold-bright);
-    font-size: 26px;
+    font-size: 23px;
     margin: 0;
-    max-width: 520px;
+    max-width: 480px;
 }
 
 .chat-boas-vindas p {
     color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    max-width: 460px;
+    font-size: 13.5px;
+    max-width: 420px;
     margin: 0;
     line-height: 1.5;
 }
@@ -4518,7 +4530,7 @@ body.pagina-chat {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
+    padding: 10px var(--space-5);
     border-bottom: 1px solid var(--color-border-muted);
 }
 
@@ -4532,8 +4544,8 @@ body.pagina-chat {
 /* avatar fixo da Dra. Mah no cabeçalho — identidade persistente, não só no
    card de boas-vindas: a aluna sempre vê com quem está conversando */
 .chat-header-avatar {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -4560,7 +4572,7 @@ body.pagina-chat {
 .chat-titulo-conversa {
     margin: 0;
     font-family: 'Cinzel', serif;
-    font-size: 18px;
+    font-size: 17px;
     color: var(--color-gold-bright);
     white-space: nowrap;
     overflow: hidden;
@@ -4578,7 +4590,7 @@ body.pagina-chat {
 
 .chat-titulo-conversa-input {
     font-family: 'Cinzel', serif;
-    font-size: 18px;
+    font-size: 17px;
     color: var(--color-gold-bright);
     background-color: var(--color-surface-2);
     border: 1px solid var(--color-gold-focus);
@@ -4665,6 +4677,7 @@ body.pagina-chat {
 
 .chat-mensagens {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -4676,9 +4689,9 @@ body.pagina-chat {
 .chat-mensagens-coluna {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-6);
     width: 100%;
-    max-width: 860px;
+    max-width: 840px;
     padding: var(--space-5) var(--space-6);
     box-sizing: border-box;
 }
@@ -4687,7 +4700,7 @@ body.pagina-chat {
     display: flex;
     align-items: flex-start;
     gap: var(--space-2);
-    max-width: 72%;
+    max-width: 66%;
 }
 
 .chat-mensagem--user {
@@ -4711,8 +4724,8 @@ body.pagina-chat {
 /* avatar da Dra. Mah — maior que o padrão de .chat-mensagem-avatar (40px),
    usado tanto nas mensagens do assistente quanto na bolha de "pensando" */
 .avatar-dra-mah {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -4724,8 +4737,8 @@ body.pagina-chat {
    em chatPage.js. */
 .avatar-dra-mah-wrap {
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
 }
 
@@ -4790,10 +4803,10 @@ body.pagina-chat {
 }
 
 .chat-mensagem-conteudo {
-    padding: 10px var(--space-4);
+    padding: 12px 16px;
     border-radius: var(--radius-md);
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: 15px;
+    line-height: 1.65;
     word-wrap: break-word;
 }
 
@@ -4947,17 +4960,17 @@ body.pagina-chat {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-2);
+    gap: 6px;
     width: 100%;
     box-sizing: border-box;
-    padding: var(--space-4) var(--space-6) var(--space-5);
+    padding: 10px var(--space-6) 12px;
     border-top: 1px solid var(--color-border-muted);
 }
 
 .chat-input-wrapper,
 .chat-input-rodape {
     width: 100%;
-    max-width: 860px;
+    max-width: 840px;
 }
 
 .chat-input-wrapper {
@@ -4982,7 +4995,7 @@ body.pagina-chat {
     background: none;
     color: var(--color-text);
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 22px;
     max-height: 110px;
     padding: 8px 0;
@@ -5094,6 +5107,106 @@ body.pagina-chat {
 
 .chat-materia-opcoes button:hover {
     background-color: rgba(201, 168, 76, 0.1);
+}
+
+/* modal de confirmação (limpar/excluir conversa) — substitui o
+   window.confirm() nativo do navegador, que aparece em branco sem
+   nenhuma identidade visual do MediStudy */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 200;
+    animation: modal-overlay-entrada 0.15s ease-out;
+}
+
+@keyframes modal-overlay-entrada {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-confirmacao {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border-muted);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: modal-entrada 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes modal-entrada {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-confirmacao h3 {
+    margin: 0 0 var(--space-2);
+    font-family: 'Cinzel', serif;
+    color: var(--color-gold-bright);
+    font-size: 18px;
+}
+
+.modal-confirmacao p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+.modal-confirmacao-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}
+
+.modal-confirmacao-cancelar,
+.modal-confirmacao-ok,
+.modal-confirmacao-perigo {
+    padding: 9px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.modal-confirmacao-cancelar {
+    border: 1px solid var(--color-border-muted);
+    background: none;
+    color: var(--color-text-soft);
+}
+
+.modal-confirmacao-cancelar:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.modal-confirmacao-ok {
+    border: none;
+    background: linear-gradient(180deg, var(--color-gold-brightest) 0%, var(--color-gold-muted) 52%, var(--color-gold-deep) 100%);
+    color: var(--color-bg);
+}
+
+.modal-confirmacao-perigo {
+    border: 1px solid var(--color-danger);
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.modal-confirmacao-perigo:hover {
+    background-color: rgba(255, 128, 128, 0.22);
+}
+
+.modal-confirmacao-ok:hover,
+.modal-confirmacao-perigo:hover {
+    transform: translateY(-1px);
 }
 
 @media (max-width: 900px) {

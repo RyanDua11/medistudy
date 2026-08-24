@@ -18,6 +18,18 @@ import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincip
 import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { aplicarEntradaEscalonada } from "../../components/entradaEscalonada.js";
 
+// fallback pra qualquer <img> do avatar da Dra. Mah que falhar ao carregar
+// (cache antigo, deploy incompleto etc.) — nunca deixa o ícone de "imagem
+// quebrada" do navegador aparecer. Global porque é usada tanto no
+// onerror inline do HTML quanto nos avatares criados dinamicamente aqui.
+window.corrigirAvatarQuebrado = function corrigirAvatarQuebrado(img) {
+    if (img.src.includes("DraMah-small.png")) {
+        img.src = "/DraMah.png";
+    } else if (img.src.includes("DraMah.png")) {
+        img.src = "caduceu.png";
+    }
+};
+
 const MATERIAS = [
     "Farmacologia II",
     "Patologia Clínica",
@@ -167,6 +179,7 @@ function criarElementoMensagem(mensagem, { conteudoEl } = {}) {
         avatar.src = "/DraMah-small.png";
         avatar.alt = "Dra. Mah";
         avatar.className = "chat-mensagem-avatar avatar-dra-mah";
+        avatar.onerror = () => corrigirAvatarQuebrado(avatar);
         wrapper.appendChild(avatar);
     }
 
@@ -254,6 +267,7 @@ function criarElementoLoading() {
     avatar.src = "/DraMah-small.png";
     avatar.alt = "Dra. Mah pensando";
     avatar.className = "chat-mensagem-avatar avatar-dra-mah";
+    avatar.onerror = () => corrigirAvatarQuebrado(avatar);
     avatarWrap.appendChild(avatar);
 
     const corpo = document.createElement("div");
@@ -572,6 +586,64 @@ document.addEventListener("keydown", (evento) => {
     materiaOpcoesEl.hidden = true;
 });
 
+// modal de confirmação com a cara do MediStudy, em vez do window.confirm()
+// nativo do navegador (que aparece em branco, sem nenhuma identidade visual
+// do app). Promise-based: resolve true (confirmou) ou false (cancelou/Esc/
+// clicou fora).
+function confirmarAcao({ titulo, mensagem, textoConfirmar = "Confirmar", perigo = false }) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+
+        const modal = document.createElement("div");
+        modal.className = "modal-confirmacao";
+        modal.setAttribute("role", "alertdialog");
+        modal.setAttribute("aria-modal", "true");
+
+        const h3 = document.createElement("h3");
+        h3.textContent = titulo;
+
+        const p = document.createElement("p");
+        p.textContent = mensagem;
+
+        const acoes = document.createElement("div");
+        acoes.className = "modal-confirmacao-acoes";
+
+        const botaoCancelar = document.createElement("button");
+        botaoCancelar.type = "button";
+        botaoCancelar.className = "modal-confirmacao-cancelar";
+        botaoCancelar.textContent = "Cancelar";
+
+        const botaoConfirmar = document.createElement("button");
+        botaoConfirmar.type = "button";
+        botaoConfirmar.className = perigo ? "modal-confirmacao-perigo" : "modal-confirmacao-ok";
+        botaoConfirmar.textContent = textoConfirmar;
+
+        function fechar(resultado) {
+            document.removeEventListener("keydown", aoTeclar);
+            overlay.remove();
+            resolve(resultado);
+        }
+
+        function aoTeclar(evento) {
+            if (evento.key === "Escape") fechar(false);
+        }
+
+        botaoCancelar.addEventListener("click", () => fechar(false));
+        botaoConfirmar.addEventListener("click", () => fechar(true));
+        overlay.addEventListener("click", (evento) => {
+            if (evento.target === overlay) fechar(false);
+        });
+        document.addEventListener("keydown", aoTeclar);
+
+        acoes.append(botaoCancelar, botaoConfirmar);
+        modal.append(h3, p, acoes);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        botaoConfirmar.focus();
+    });
+}
+
 menuOpcoes.addEventListener("click", async (evento) => {
     const acao = evento.target?.dataset?.acao;
     if (!acao || !conversaAtualId) return;
@@ -580,12 +652,24 @@ menuOpcoes.addEventListener("click", async (evento) => {
     if (acao === "renomear") {
         iniciarEdicaoTitulo();
     } else if (acao === "limpar") {
-        if (window.confirm("Limpar todas as mensagens desta conversa?")) {
+        const confirmou = await confirmarAcao({
+            titulo: "Limpar conversa",
+            mensagem: "Todas as mensagens desta conversa serão apagadas. Essa ação não pode ser desfeita.",
+            textoConfirmar: "Limpar conversa",
+            perigo: true,
+        });
+        if (confirmou) {
             await limparMensagensConversa(conversaAtualId);
             mensagensColunaEl.innerHTML = "";
         }
     } else if (acao === "excluir") {
-        if (window.confirm("Excluir esta conversa permanentemente?")) {
+        const confirmou = await confirmarAcao({
+            titulo: "Excluir conversa",
+            mensagem: "Essa conversa será excluída permanentemente, junto com todas as mensagens. Essa ação não pode ser desfeita.",
+            textoConfirmar: "Excluir conversa",
+            perigo: true,
+        });
+        if (confirmou) {
             await excluirConversa(conversaAtualId);
             conversas = conversas.filter((c) => c.id !== conversaAtualId);
             mostrarBoasVindas();
