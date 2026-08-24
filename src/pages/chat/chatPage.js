@@ -42,6 +42,7 @@ const conversaAtivaEl = document.getElementById("chat-conversa-ativa");
 const tituloConversaEl = document.getElementById("chat-titulo-conversa");
 const materiaBadgeEl = document.getElementById("chat-materia-badge");
 const mensagensEl = document.getElementById("chat-mensagens");
+const mensagensColunaEl = document.getElementById("chat-mensagens-coluna");
 
 const menuBtn = document.getElementById("chat-menu-btn");
 const menuOpcoes = document.getElementById("chat-menu-opcoes");
@@ -132,13 +133,38 @@ function renderizarListaConversas() {
     aplicarEntradaEscalonada(listaConversasEl);
 }
 
-function criarElementoMensagem(mensagem) {
+function criarBotaoCopiar(texto) {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "chat-mensagem-copiar";
+    botao.setAttribute("aria-label", "Copiar resposta");
+    botao.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>';
+
+    botao.addEventListener("click", async () => {
+        try {
+            await navigator.clipboard.writeText(texto);
+            botao.classList.add("chat-mensagem-copiar--feito");
+            botao.setAttribute("aria-label", "Copiado!");
+            setTimeout(() => {
+                botao.classList.remove("chat-mensagem-copiar--feito");
+                botao.setAttribute("aria-label", "Copiar resposta");
+            }, 1500);
+        } catch (erro) {
+            console.error("Não foi possível copiar:", erro);
+        }
+    });
+
+    return botao;
+}
+
+function criarElementoMensagem(mensagem, { conteudoEl } = {}) {
     const wrapper = document.createElement("div");
     wrapper.className = `chat-mensagem chat-mensagem--${mensagem.role === "user" ? "user" : "assistant"}`;
 
     if (mensagem.role === "assistant") {
         const avatar = document.createElement("img");
-        avatar.src = "/DraMah.png";
+        avatar.src = "/DraMah-small.png";
         avatar.alt = "Dra. Mah";
         avatar.className = "chat-mensagem-avatar avatar-dra-mah";
         wrapper.appendChild(avatar);
@@ -147,21 +173,69 @@ function criarElementoMensagem(mensagem) {
     const corpo = document.createElement("div");
     corpo.className = "chat-mensagem-corpo";
 
-    const conteudo = document.createElement("div");
+    // conteudoEl injetado permite ao chamador controlar o preenchimento (ver
+    // revelarComEfeitoDigitacao) em vez de já nascer com o texto final —
+    // usado só na resposta recém-chegada, pra dar o efeito de "digitando".
+    const conteudo = conteudoEl ?? document.createElement("div");
     conteudo.className = "chat-mensagem-conteudo";
-    if (mensagem.role === "assistant") {
-        conteudo.innerHTML = renderizarMarkdown(mensagem.conteudo);
-    } else {
-        conteudo.textContent = mensagem.conteudo;
+    if (!conteudoEl) {
+        if (mensagem.role === "assistant") {
+            conteudo.innerHTML = renderizarMarkdown(mensagem.conteudo);
+        } else {
+            conteudo.textContent = mensagem.conteudo;
+        }
     }
+
+    const rodapeMensagem = document.createElement("div");
+    rodapeMensagem.className = "chat-mensagem-rodape";
 
     const timestamp = document.createElement("span");
     timestamp.className = "chat-mensagem-timestamp";
     timestamp.textContent = formatarTimestampRelativo(mensagem.criado_em ?? new Date().toISOString());
+    rodapeMensagem.appendChild(timestamp);
 
-    corpo.append(conteudo, timestamp);
+    if (mensagem.role === "assistant") {
+        rodapeMensagem.appendChild(criarBotaoCopiar(mensagem.conteudo));
+    }
+
+    corpo.append(conteudo, rodapeMensagem);
     wrapper.appendChild(corpo);
     return wrapper;
+}
+
+const REDUZIR_MOVIMENTO = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// efeito de "digitando" (streaming simulado no cliente): a Edge Function
+// ainda responde de uma vez só, mas revelar o texto progressivamente é o
+// que faz a Dra. Mah parecer um chat de IA de verdade em vez de um texto
+// que só aparece pronto do nada. A velocidade escala com o tamanho da
+// resposta pra nunca levar mais que ~1.5s, mesmo em respostas longas.
+function revelarComEfeitoDigitacao(el, textoFinal) {
+    const htmlFinal = renderizarMarkdown(textoFinal);
+
+    if (REDUZIR_MOVIMENTO || !textoFinal) {
+        el.innerHTML = htmlFinal;
+        return Promise.resolve();
+    }
+
+    return new Promise((resolve) => {
+        const caracteresPorPasso = Math.max(2, Math.ceil(textoFinal.length / 120));
+        let indice = 0;
+
+        function passo() {
+            indice += caracteresPorPasso;
+            if (indice >= textoFinal.length) {
+                el.innerHTML = htmlFinal;
+                resolve();
+                return;
+            }
+            el.textContent = textoFinal.slice(0, indice);
+            scrollParaFinal();
+            setTimeout(passo, 12);
+        }
+
+        passo();
+    });
 }
 
 function scrollParaFinal() {
@@ -177,7 +251,7 @@ function criarElementoLoading() {
     avatarWrap.className = "avatar-dra-mah-wrap avatar-dra-mah-wrap--pensando";
 
     const avatar = document.createElement("img");
-    avatar.src = "/DraMah.png";
+    avatar.src = "/DraMah-small.png";
     avatar.alt = "Dra. Mah pensando";
     avatar.className = "chat-mensagem-avatar avatar-dra-mah";
     avatarWrap.appendChild(avatar);
@@ -186,7 +260,9 @@ function criarElementoLoading() {
     corpo.className = "chat-mensagem-corpo";
     const loading = document.createElement("div");
     loading.className = "chat-loading";
-    loading.innerHTML = "<span></span><span></span><span></span>";
+    loading.innerHTML =
+        '<span class="chat-loading-texto">Dra. Mah está digitando</span>' +
+        '<span class="chat-loading-dots"><span></span><span></span><span></span></span>';
     corpo.appendChild(loading);
 
     wrapper.append(avatarWrap, corpo);
@@ -252,10 +328,10 @@ async function abrirConversa(id) {
     atualizarBadgeMateria();
     renderizarListaConversas();
 
-    mensagensEl.innerHTML = '<p class="estado-carregando">Carregando mensagens...</p>';
+    mensagensColunaEl.innerHTML = '<p class="estado-carregando">Carregando mensagens...</p>';
     const mensagens = await buscarMensagens(id);
-    mensagensEl.innerHTML = "";
-    mensagens.forEach((mensagem) => mensagensEl.appendChild(criarElementoMensagem(mensagem)));
+    mensagensColunaEl.innerHTML = "";
+    mensagens.forEach((mensagem) => mensagensColunaEl.appendChild(criarElementoMensagem(mensagem)));
     historicoMensagens = mensagens.map((m) => ({ role: m.role, content: m.conteudo }));
     scrollParaFinal();
     textarea.focus();
@@ -275,52 +351,87 @@ async function enviarMensagem(texto) {
             const novaConversa = await criarConversa(usuarioId, textoLimpo);
             conversas = [novaConversa, ...conversas];
             conversaAtualId = novaConversa.id;
-            conversaAtualMateria = null;
             historicoMensagens = [];
+
+            // se a aluna já tinha escolhido uma matéria pelo dropdown antes de
+            // mandar a primeira mensagem (o composer agora fica visível desde
+            // a tela de boas-vindas), persiste em vez de descartar
+            if (conversaAtualMateria) {
+                await atualizarMateriaConversa(conversaAtualId, conversaAtualMateria);
+                atualizarConversaLocal(conversaAtualId, { materia: conversaAtualMateria });
+            }
 
             boasVindasEl.hidden = true;
             conversaAtivaEl.hidden = false;
             tituloConversaEl.textContent = novaConversa.titulo;
             atualizarBadgeMateria();
-            mensagensEl.innerHTML = "";
+            mensagensColunaEl.innerHTML = "";
         }
 
         const mensagemUsuario = await salvarMensagem(conversaAtualId, "user", textoLimpo);
-        mensagensEl.appendChild(criarElementoMensagem(mensagemUsuario));
+        mensagensColunaEl.appendChild(criarElementoMensagem(mensagemUsuario));
         scrollParaFinal();
 
         atualizarConversaLocal(conversaAtualId, { atualizado_em: new Date().toISOString() });
         renderizarListaConversas();
 
-        const loadingEl = criarElementoLoading();
-        mensagensEl.appendChild(loadingEl);
-        scrollParaFinal();
-
-        try {
-            const resposta = await gerarResposta(textoLimpo, historicoMensagens);
-
-            await removerLoadingComFadeout(loadingEl);
-            const mensagemAssistente = await salvarMensagem(conversaAtualId, "assistant", resposta);
-            mensagensEl.appendChild(criarElementoMensagem(mensagemAssistente));
-            scrollParaFinal();
-
-            historicoMensagens = [
-                ...historicoMensagens,
-                { role: "user", content: textoLimpo },
-                { role: "assistant", content: resposta },
-            ];
-        } catch (erro) {
-            console.error("Falha ao obter resposta da Dra. Mah:", erro);
-            await removerLoadingComFadeout(loadingEl);
-            const erroEl = document.createElement("p");
-            erroEl.className = "chat-erro-resposta";
-            erroEl.textContent = "Não consegui responder agora. Tente de novo em instantes.";
-            mensagensEl.appendChild(erroEl);
-            scrollParaFinal();
-        }
+        await obterErenderizarResposta(textoLimpo);
     } finally {
         enviandoMensagem = false;
         atualizarEstadoBotaoEnviar();
+    }
+}
+
+// isolado do resto de enviarMensagem pra poder ser chamado de novo pelo
+// botão "Tentar novamente" sem duplicar a mensagem do usuário nem recriar
+// a conversa
+async function obterErenderizarResposta(textoUsuario) {
+    const loadingEl = criarElementoLoading();
+    mensagensColunaEl.appendChild(loadingEl);
+    scrollParaFinal();
+
+    try {
+        const resposta = await gerarResposta(textoUsuario, historicoMensagens);
+
+        await removerLoadingComFadeout(loadingEl);
+        const mensagemAssistente = await salvarMensagem(conversaAtualId, "assistant", resposta);
+        const conteudoEl = document.createElement("div");
+        mensagensColunaEl.appendChild(criarElementoMensagem(mensagemAssistente, { conteudoEl }));
+        scrollParaFinal();
+        await revelarComEfeitoDigitacao(conteudoEl, resposta);
+
+        historicoMensagens = [
+            ...historicoMensagens,
+            { role: "user", content: textoUsuario },
+            { role: "assistant", content: resposta },
+        ];
+    } catch (erro) {
+        console.error("Falha ao obter resposta da Dra. Mah:", erro);
+        await removerLoadingComFadeout(loadingEl);
+
+        const erroEl = document.createElement("div");
+        erroEl.className = "chat-erro-resposta";
+
+        const texto = document.createElement("span");
+        texto.textContent = "Não consegui responder agora. Tente de novo em instantes.";
+
+        const botaoRetry = document.createElement("button");
+        botaoRetry.type = "button";
+        botaoRetry.className = "chat-erro-retry";
+        botaoRetry.textContent = "Tentar novamente";
+        botaoRetry.addEventListener("click", async () => {
+            if (enviandoMensagem) return;
+            enviandoMensagem = true;
+            atualizarEstadoBotaoEnviar();
+            erroEl.remove();
+            await obterErenderizarResposta(textoUsuario);
+            enviandoMensagem = false;
+            atualizarEstadoBotaoEnviar();
+        });
+
+        erroEl.append(texto, botaoRetry);
+        mensagensColunaEl.appendChild(erroEl);
+        scrollParaFinal();
     }
 }
 
@@ -374,7 +485,7 @@ document.querySelectorAll(".chat-sugestao-chip").forEach((chip) => {
     chip.addEventListener("click", async () => {
         boasVindasEl.hidden = true;
         conversaAtivaEl.hidden = false;
-        await enviarMensagem(chip.textContent);
+        await enviarMensagem(chip.dataset.pergunta);
     });
 });
 
@@ -471,7 +582,7 @@ menuOpcoes.addEventListener("click", async (evento) => {
     } else if (acao === "limpar") {
         if (window.confirm("Limpar todas as mensagens desta conversa?")) {
             await limparMensagensConversa(conversaAtualId);
-            mensagensEl.innerHTML = "";
+            mensagensColunaEl.innerHTML = "";
         }
     } else if (acao === "excluir") {
         if (window.confirm("Excluir esta conversa permanentemente?")) {

@@ -161,36 +161,39 @@
             <strong class="estado-vazio-titulo">Nada encontrado</strong>
             <p>Tente buscar por outro termo.</p>
         </div>
+
+        <div class="chat-sidebar-footer">
+            <img src="/DraMah-small.png" alt="" class="chat-sidebar-footer-avatar">
+            <span>Dra. Mah está sempre por aqui pra tirar dúvidas.</span>
+        </div>
     </aside>
 
     <section class="chat-area" aria-label="Conversa">
 
         <div id="chat-boas-vindas" class="chat-boas-vindas">
-            <span class="chat-boas-vindas-icone" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 4v4a3 3 0 0 0 6 0V4"/>
-                    <path d="M12 14v6M9 20h6"/>
-                    <circle cx="18" cy="8" r="2"/>
-                    <path d="M12 14a6 6 0 0 0 6-6"/>
-                    <path d="M12 14a6 6 0 0 1-6-6"/>
-                </svg>
-            </span>
+            <div class="chat-boas-vindas-avatar" aria-hidden="true">
+                <img src="/DraMah-small.png" alt="" class="chat-boas-vindas-avatar-img">
+            </div>
+            <span class="chat-boas-vindas-assinatura">Dra. Mah</span>
             <h1 id="chat-boas-vindas-titulo">Olá! Como posso te ajudar hoje?</h1>
-            <p>Pergunte sobre qualquer conteúdo de medicina. Explico de forma clara e adaptada ao seu nível.</p>
+            <p>Pergunte sobre qualquer conteúdo de medicina. Explico de forma clara, direto ao ponto e sem enrolação.</p>
 
             <div class="chat-sugestoes">
-                <button type="button" class="chat-sugestao-chip">Explique o mecanismo de ação dos AINEs</button>
-                <button type="button" class="chat-sugestao-chip">Qual a diferença entre sepse e choque séptico?</button>
-                <button type="button" class="chat-sugestao-chip">Como funciona o ciclo de Krebs?</button>
-                <button type="button" class="chat-sugestao-chip">Me ajude a revisar os critérios de SIRS</button>
+                <button type="button" class="chat-sugestao-chip" data-pergunta="Explique o mecanismo de ação dos AINEs"><span aria-hidden="true">💊</span><span>Explique o mecanismo de ação dos AINEs</span></button>
+                <button type="button" class="chat-sugestao-chip" data-pergunta="Qual a diferença entre sepse e choque séptico?"><span aria-hidden="true">🩺</span><span>Qual a diferença entre sepse e choque séptico?</span></button>
+                <button type="button" class="chat-sugestao-chip" data-pergunta="Como funciona o ciclo de Krebs?"><span aria-hidden="true">🧬</span><span>Como funciona o ciclo de Krebs?</span></button>
+                <button type="button" class="chat-sugestao-chip" data-pergunta="Me ajude a revisar os critérios de SIRS"><span aria-hidden="true">📋</span><span>Me ajude a revisar os critérios de SIRS</span></button>
             </div>
         </div>
 
         <div id="chat-conversa-ativa" class="chat-conversa-ativa" hidden>
             <div class="chat-header-conversa">
                 <div class="chat-header-conversa-info">
-                    <h2 id="chat-titulo-conversa" class="chat-titulo-conversa" tabindex="0" title="Clique duas vezes para renomear">Nova conversa</h2>
-                    <span id="chat-materia-badge" class="chat-materia-badge" hidden></span>
+                    <img src="/DraMah-small.png" alt="" class="chat-header-avatar">
+                    <div class="chat-header-conversa-textos">
+                        <h2 id="chat-titulo-conversa" class="chat-titulo-conversa" tabindex="0" title="Clique duas vezes para renomear">Nova conversa</h2>
+                        <span class="chat-header-assinatura">Dra. Mah<span id="chat-materia-badge" class="chat-materia-badge" hidden></span></span>
+                    </div>
                 </div>
 
                 <div class="chat-menu-conversa">
@@ -203,23 +206,26 @@
                 </div>
             </div>
 
-            <div id="chat-mensagens" class="chat-mensagens"></div>
-
-            <form id="chat-input-area" class="chat-input-area">
-                <div class="chat-input-wrapper">
-                    <textarea id="chat-textarea" class="chat-textarea" rows="1" maxlength="4000" placeholder="Pergunte sobre qualquer conteúdo de medicina..."></textarea>
-                    <button type="submit" id="chat-enviar-btn" class="chat-enviar-btn" disabled aria-label="Enviar mensagem">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                    </button>
-                </div>
-                <div class="chat-input-rodape">
-                    <div class="chat-materia-dropdown">
-                        <button type="button" id="chat-materia-btn" class="chat-materia-btn">📚 Matéria</button>
-                        <div id="chat-materia-opcoes" class="chat-materia-opcoes" hidden></div>
-                    </div>
-                </div>
-            </form>
+            <div id="chat-mensagens" class="chat-mensagens">
+                <div id="chat-mensagens-coluna" class="chat-mensagens-coluna"></div>
+            </div>
         </div>
+
+        <form id="chat-input-area" class="chat-input-area">
+            <div class="chat-input-wrapper">
+                <textarea id="chat-textarea" class="chat-textarea" rows="1" maxlength="4000" placeholder="Pergunte sobre qualquer conteúdo de medicina..."></textarea>
+                <button type="submit" id="chat-enviar-btn" class="chat-enviar-btn" disabled aria-label="Enviar mensagem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+            </div>
+            <div class="chat-input-rodape">
+                <div class="chat-materia-dropdown">
+                    <button type="button" id="chat-materia-btn" class="chat-materia-btn">📚 Matéria</button>
+                    <div id="chat-materia-opcoes" class="chat-materia-opcoes" hidden></div>
+                </div>
+                <span class="chat-disclaimer">Dra. Mah pode cometer erros. Considere verificar informações importantes.</span>
+            </div>
+        </form>
     </section>
 
 </main>
