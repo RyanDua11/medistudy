@@ -4277,6 +4277,13 @@ body.pagina-chat .bottom-nav {
     grid-template-columns: 280px 1fr;
     gap: 0;
     width: 100%;
+    /* .chat-layout é a tag <main> — sem isso, o max-width:1280px genérico
+       de "main {}" (usado por todas as outras páginas) vazava pra cá por
+       cascata, já que nenhuma regra mais específica sobrescrevia essa
+       propriedade em particular (margin/padding sim, max-width não).
+       Era a causa real do espaço sobrando à direita — inclusive o menu
+       de "⋮" no cabeçalho não chegava na borda de verdade da tela. */
+    max-width: none;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -4729,7 +4736,7 @@ body.pagina-chat .bottom-nav {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
 }
 
 /* coluna de leitura confortável centralizada dentro da área full-bleed —
@@ -4737,9 +4744,9 @@ body.pagina-chat .bottom-nav {
 .chat-mensagens-coluna {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-4);
     width: 100%;
-    max-width: 840px;
+    max-width: 1100px;
     padding: var(--space-5) var(--space-6);
     box-sizing: border-box;
 }
@@ -5007,7 +5014,7 @@ body.pagina-chat .bottom-nav {
 .chat-input-area {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     width: 100%;
     box-sizing: border-box;
@@ -5018,7 +5025,7 @@ body.pagina-chat .bottom-nav {
 .chat-input-wrapper,
 .chat-input-rodape {
     width: 100%;
-    max-width: 840px;
+    max-width: 1100px;
 }
 
 .chat-input-wrapper {
