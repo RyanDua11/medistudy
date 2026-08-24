@@ -2,6 +2,12 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 
 export default defineConfig({
+    test: {
+        // supabase/functions/**/*.test.ts são testes Deno (Edge Functions,
+        // rodados com `deno test`, não com vitest — importam módulos via URL
+        // https://, que o loader ESM do Node/vitest não suporta).
+        exclude: ["**/node_modules/**", "**/dist/**", "supabase/functions/**"],
+    },
     build: {
         rollupOptions: {
             input: {

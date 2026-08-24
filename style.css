@@ -4229,6 +4229,7 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     /* momentos autorais do hero */
     .coracao, .glow-ring, .ecg-c, .sparkle, .badge, .estado-vazio.revisao-concluida .estado-vazio-icone { animation: none; }
+    .chat-boas-vindas-avatar::before { animation: none; }
     .ecg-c1 { stroke-dasharray: none; }
     .ecg-c2, .ecg-c3, .ecg-c4 { display: none; }
     main { animation: none; }
@@ -4244,26 +4245,46 @@ button:focus-visible {
     .pulso-sucesso { animation: none; }
     .pomodoro-anel-progresso { transition: none; }
     .chat-loading span { animation: none; }
+    .avatar-dra-mah-wrap--pensando::after { animation: none; }
     .ferramentas-grid { transition: none; }
     .progresso-semanal-anel-progresso { transition: none; }
 }
 
 /* ===== CHAT ===== */
 
+/* body.pagina-home é display:block (rolagem de página normal, sidebar via
+   padding-left). O chat precisa que .chat-layout PREENCHA a altura
+   disponível de verdade em vez de adivinhar um calc(100dvh - Npx) — dois
+   números mágicos (a margem que compensa o header fixo + a altura do
+   layout) tinham que ficar manualmente sincronizados, e bastava divergir
+   1px em alguma tela real (zoom, chrome do navegador, barra de tarefas)
+   pra sobrar conteúdo cortado e inalcançável, sem scroll nenhum pra
+   resgatar. Virando body num flex column, .chat-layout com flex:1 deriva
+   sua altura do próprio layout em vez de um cálculo paralelo — não tem
+   como os dois números discordarem, porque só existe um número. */
+body.pagina-chat {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+/* full-bleed: preenche a tela toda abaixo do header, em vez de um card
+   flutuando com max-width:1280px sobrando espaço morto nas laterais em
+   monitores grandes — a mesma abordagem do ChatGPT/Claude/Gemini (o app
+   ocupa a janela inteira; quem fica numa coluna de leitura confortável é
+   só o conteúdo — mensagens, composer — não o app inteiro). */
 .chat-layout {
     flex: 1;
+    min-height: 0;
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 0;
-    max-width: 1280px;
     width: 100%;
-    height: calc(100dvh - 130px);
-    margin: 90px auto 0;
+    margin: 70px 0 0;
     padding: 0;
     box-sizing: border-box;
-    border: 1px solid var(--color-border-muted);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+    border-top: 1px solid var(--color-border-muted);
     background-color: var(--color-surface-3);
 }
 
@@ -4416,6 +4437,26 @@ button:focus-visible {
     display: none;
 }
 
+.chat-sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: var(--space-4);
+    border-top: 1px solid var(--color-border-muted);
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+    line-height: 1.4;
+}
+
+.chat-sidebar-footer-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.35);
+}
+
 .chat-area {
     display: flex;
     flex-direction: column;
@@ -4434,21 +4475,42 @@ button:focus-visible {
     padding: var(--space-6);
 }
 
-.chat-boas-vindas-icone {
+/* avatar de boas-vindas — a Dra. Mah em pessoa, não um ícone genérico de
+   estetoscópio. Mesmo tratamento de glow radial do coração da home, pra
+   reforçar que é a mesma identidade visual do app. */
+.chat-boas-vindas-avatar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
-    color: var(--terciary-color);
-    background-color: rgba(201, 168, 76, 0.1);
-    box-shadow: 0 0 24px rgba(201, 168, 76, 0.22), inset 0 0 0 1px rgba(201, 168, 76, 0.3);
+    width: 96px;
+    height: 96px;
 }
 
-.chat-boas-vindas-icone svg {
-    width: 30px;
-    height: 30px;
+.chat-boas-vindas-avatar::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.28) 0%, rgba(201, 168, 76, 0.08) 55%, transparent 75%);
+    animation: anel-pulso 2.6s ease-in-out infinite;
+}
+
+.chat-boas-vindas-avatar-img {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.45), 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.chat-boas-vindas-assinatura {
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
 .chat-boas-vindas h1 {
@@ -4475,6 +4537,9 @@ button:focus-visible {
 }
 
 .chat-sugestao-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 12px var(--space-4);
     border: 1px solid var(--color-border-muted);
     border-radius: var(--radius-md);
@@ -4485,6 +4550,11 @@ button:focus-visible {
     line-height: 1.4;
     cursor: pointer;
     transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.chat-sugestao-chip span:first-child {
+    flex-shrink: 0;
+    font-size: 16px;
 }
 
 .chat-sugestao-chip:hover {
@@ -4519,6 +4589,34 @@ button:focus-visible {
     align-items: center;
     gap: var(--space-3);
     min-width: 0;
+}
+
+/* avatar fixo da Dra. Mah no cabeçalho — identidade persistente, não só no
+   card de boas-vindas: a aluna sempre vê com quem está conversando */
+.chat-header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.4);
+}
+
+.chat-header-conversa-textos {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.chat-header-assinatura {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-gold-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .chat-titulo-conversa {
@@ -4630,10 +4728,21 @@ button:focus-visible {
 .chat-mensagens {
     flex: 1;
     overflow-y: auto;
-    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* coluna de leitura confortável centralizada dentro da área full-bleed —
+   mesmo padrão do ChatGPT/Claude: o app ocupa a tela toda, o texto não */
+.chat-mensagens-coluna {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+    width: 100%;
+    max-width: 860px;
+    padding: var(--space-5) var(--space-6);
+    box-sizing: border-box;
 }
 
 .chat-mensagem {
@@ -4661,6 +4770,80 @@ button:focus-visible {
     box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.4);
 }
 
+/* avatar da Dra. Mah — maior que o padrão de .chat-mensagem-avatar (40px),
+   usado tanto nas mensagens do assistente quanto na bolha de "pensando" */
+.avatar-dra-mah {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* wrapper do avatar na bolha de "pensando": o anel dourado gira em volta
+   via ::after (CSS puro, sem lib) enquanto aguarda a Edge Function
+   responder. Ao chegar a resposta, a classe --pensando é removida e o
+   anel esmaece (fadeout) antes da bolha sumir — ver removerLoadingComFadeout
+   em chatPage.js. */
+.avatar-dra-mah-wrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.avatar-dra-mah-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.avatar-dra-mah-wrap--pensando::after {
+    border-top-color: var(--color-gold);
+    opacity: 1;
+    animation: girar 1s linear infinite;
+}
+
+@keyframes girar {
+    to { transform: rotate(360deg); }
+}
+
+.chat-erro-resposta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-self: flex-start;
+    max-width: 72%;
+    margin: 0;
+    padding: 10px var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-danger);
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger);
+    font-size: 13px;
+}
+
+.chat-erro-retry {
+    padding: 5px 12px;
+    border: 1px solid var(--color-danger);
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--color-danger);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.chat-erro-retry:hover {
+    background-color: rgba(255, 128, 128, 0.15);
+}
+
 .chat-mensagem-corpo {
     display: flex;
     flex-direction: column;
@@ -4685,6 +4868,7 @@ button:focus-visible {
 .chat-mensagem--assistant .chat-mensagem-conteudo {
     background-color: var(--color-surface-2);
     color: var(--color-text);
+    border-left: 2px solid rgba(201, 168, 76, 0.4);
     border-bottom-left-radius: 4px;
 }
 
@@ -4731,25 +4915,78 @@ button:focus-visible {
     padding-left: 20px;
 }
 
-.chat-mensagem-timestamp {
-    font-size: 10.5px;
-    color: var(--color-text-muted);
+.chat-mensagem-rodape {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 0 4px;
 }
 
-.chat-mensagem--user .chat-mensagem-timestamp {
-    text-align: right;
+.chat-mensagem--user .chat-mensagem-rodape {
+    justify-content: flex-end;
+}
+
+.chat-mensagem-timestamp {
+    font-size: 10.5px;
+    color: var(--color-text-muted);
+}
+
+.chat-mensagem-copiar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.chat-mensagem-copiar svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+
+.chat-mensagem--assistant:hover .chat-mensagem-copiar {
+    opacity: 1;
+}
+
+.chat-mensagem-copiar:hover {
+    color: var(--color-gold-bright);
+    background-color: rgba(201, 168, 76, 0.1);
+}
+
+.chat-mensagem-copiar--feito {
+    opacity: 1 !important;
+    color: #5fbf87 !important;
 }
 
 .chat-loading {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     padding: 14px var(--space-4);
     border-radius: var(--radius-md);
     border-bottom-left-radius: 4px;
+    border-left: 2px solid rgba(201, 168, 76, 0.4);
     background-color: var(--color-surface-2);
     width: fit-content;
+}
+
+.chat-loading-texto {
+    color: var(--color-text-muted);
+    font-size: 12.5px;
+    font-style: italic;
+}
+
+.chat-loading-dots {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .chat-loading span {
@@ -4771,9 +5008,18 @@ button:focus-visible {
 .chat-input-area {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: var(--space-2);
-    padding: var(--space-4) var(--space-5) var(--space-5);
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--space-4) var(--space-6) var(--space-5);
     border-top: 1px solid var(--color-border-muted);
+}
+
+.chat-input-wrapper,
+.chat-input-rodape {
+    width: 100%;
+    max-width: 860px;
 }
 
 .chat-input-wrapper {
@@ -4852,6 +5098,12 @@ button:focus-visible {
     gap: var(--space-3);
 }
 
+.chat-disclaimer {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    opacity: 0.75;
+}
+
 .chat-materia-dropdown {
     position: relative;
 }
@@ -4906,18 +5158,9 @@ button:focus-visible {
     background-color: rgba(201, 168, 76, 0.1);
 }
 
-.chat-token-count {
-    font-size: 11px;
-    color: var(--color-text-muted);
-    white-space: nowrap;
-}
-
 @media (max-width: 900px) {
     .chat-layout {
         grid-template-columns: 1fr;
-        height: calc(100dvh - 130px);
-        border-radius: 0;
-        border: none;
     }
 
     .chat-sidebar {
