@@ -835,8 +835,9 @@ main {
 
 #missao-do-dia {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(205, 163, 73, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    box-shadow: 0 0 40px rgba(201, 168, 76, 0.08);
     border-radius: 16px;
     padding: 40px;
     width: 100%;
@@ -1901,7 +1902,7 @@ button:focus-visible {
         padding-left: 0;
     }
 
-    .carrossel-ferramentas .carrossel-ferramentas-viewport .ferramenta-card {
+    .carrossel-ferramentas .carrossel-ferramentas-viewport .card-ferramenta {
         flex: 0 0 calc((100% - 18px) / 2);
     }
 
@@ -2099,13 +2100,25 @@ button:focus-visible {
     line-height: 1.5;
 }
 
-.ferramenta-card {
+/* .card-ferramenta é a classe única de tamanho/padding compartilhada por
+   TODO card no formato "ferramenta" (carrossel de estudo + Organização) —
+   qualquer ajuste de altura/padding feito aqui vale pros dois ao mesmo
+   tempo, então não tem como divergir por regra separada. .ferramenta-card
+   continua existindo à parte pra estilo (cor, glow, ícone etc.). */
+/* height fixa (não min-height): a largura do card muda MUITO entre o
+   carrossel (~198px, 5 por linha) e a Organização (2 por linha, bem mais
+   largo), e isso faz a descrição quebrar em mais ou menos linhas — com
+   min-height os dois card iam parar em alturas diferentes mesmo com o
+   mesmo padding. Altura fixa (medida a partir do card mais estreito, que é
+   o que precisa de mais altura pra descrição não estourar) garante que
+   Organização e carrossel fiquem sempre com a mesma altura, ponto. */
+.card-ferramenta {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
     gap: 14px;
-    min-height: 240px;
+    height: 313px;
     padding: 28px 26px;
     box-sizing: border-box;
     text-decoration: none;
@@ -2114,7 +2127,7 @@ button:focus-visible {
 
 /* dentro do carrossel, cada card ocupa 1/5 da largura do viewport (6 cards
    no trilho, 5 visíveis por vez) */
-.carrossel-ferramentas-viewport .ferramenta-card {
+.carrossel-ferramentas-viewport .card-ferramenta {
     flex: 0 0 calc((100% - 4 * 18px) / 5);
     min-width: 0;
 }
