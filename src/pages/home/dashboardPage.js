@@ -15,7 +15,8 @@ import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { inicializarCarrosselProvas } from "../../components/carrosselProvas.js";
 import { inicializarCarrosselFerramentas } from "../../components/carrosselFerramentas.js";
 
-const spanNomeUsuario = document.getElementById("nome-usuario-saudacao");
+const CHAVE_NOME_USUARIO = "medistudy_nome_usuario";
+const elSaudacao = document.getElementById("saudacao-texto");
 const elTaxaAcerto = document.getElementById("estatistica-taxa-acerto");
 const elRevisoes = document.getElementById("estatistica-revisoes");
 const elARevisar = document.getElementById("estatistica-a-revisar");
@@ -25,22 +26,15 @@ const elProgressoAnel = document.getElementById("progresso-semanal-anel-valor");
 const elProgressoPercentual = document.getElementById("progresso-semanal-percentual");
 const CIRCUNFERENCIA_ANEL = 163.4; // 2 * PI * r(26), ver .progresso-semanal-anel-progresso
 
-// nome vem do user_metadata.full_name do Supabase Auth; sem esse campo, cai
-// pra parte antes do primeiro "." ou "@" do email (o que vier primeiro —
-// ex: "teste.medistudy@gmail.com" -> "teste"), nunca o email completo
-function primeiroNome(usuario) {
-    const bruto = usuario.user_metadata?.full_name
-        ? usuario.user_metadata.full_name.trim().split(/\s+/)[0]
-        : usuario.email?.split(/[@.]/)[0] || "";
+// o Supabase Auth não tem full_name preenchido pras contas atuais (nem a de
+// teste), então o nome de exibição por enquanto vem do localStorage — a
+// página de perfil (tarefa futura) é quem vai pedir e salvar esse valor.
+// Sem nome salvo ainda, mostra só "Olá" (nunca email ou prefixo de email).
+function exibirSaudacao() {
+    if (!elSaudacao) return;
 
-    if (!bruto) return "";
-    return bruto.charAt(0).toUpperCase() + bruto.slice(1);
-}
-
-function exibirSaudacao(usuario) {
-    if (spanNomeUsuario) {
-        spanNomeUsuario.textContent = primeiroNome(usuario);
-    }
+    const nome = localStorage.getItem(CHAVE_NOME_USUARIO);
+    elSaudacao.textContent = nome ? `Boa noite, ${nome} 🌙` : "Olá";
 }
 
 async function carregarEstatisticas() {
@@ -71,7 +65,7 @@ async function iniciar() {
     const sessao = await protegerRota();
     if (!sessao) return;
 
-    exibirSaudacao(sessao.user);
+    exibirSaudacao();
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
     inicializarNavegacaoPrincipal();
