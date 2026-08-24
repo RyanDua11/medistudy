@@ -835,8 +835,8 @@ main {
 
 #missao-do-dia {
     position: relative;
-    background-color: var(--color-surface-2);
-    border: 1px solid var(--color-border-muted);
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(205, 163, 73, 0.3);
     border-radius: 16px;
     padding: 40px;
     max-width: 1040px;
@@ -846,6 +846,19 @@ main {
     justify-content: space-between;
     gap: 24px;
     overflow: hidden;
+}
+
+.proxima-prova-linha {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    color: var(--color-gold-muted);
+    font-size: 13px;
+}
+
+.proxima-prova-linha[hidden] {
+    display: none;
 }
 
 .missao-ilustracao {
@@ -1886,12 +1899,17 @@ button:focus-visible {
         padding-left: 0;
     }
 
-    .ferramentas-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .carrossel-ferramentas-viewport .ferramenta-card {
+        flex: 0 0 calc((100% - 18px) / 2);
     }
 
-    .estatisticas-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .progresso-faixa {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .progresso-faixa-divisor {
+        display: none;
     }
 
     .evolucao-grid {
@@ -1972,13 +1990,55 @@ button:focus-visible {
     margin: 40px auto 18px;
 }
 
-/* grid de ferramentas de estudo */
-.ferramentas-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    max-width: 900px;
+/* carrossel de ferramentas de estudo — 6 cards, 5 visíveis por vez */
+.carrossel-ferramentas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 1160px;
     margin: 0 auto;
+}
+
+.carrossel-ferramentas-viewport {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.ferramentas-grid {
+    display: flex;
+    gap: 18px;
+    transition: transform 0.35s ease;
+}
+
+.carrossel-ferramentas-seta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(205, 163, 73, 0.35);
+    background-color: var(--color-surface-2);
+    color: var(--color-gold-muted);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.carrossel-ferramentas-seta svg {
+    width: 18px;
+    height: 18px;
+}
+
+.carrossel-ferramentas-seta:hover:not(:disabled) {
+    border-color: var(--color-gold-muted);
+    color: var(--color-gold-bright);
+}
+
+.carrossel-ferramentas-seta:disabled {
+    opacity: 0.3;
+    cursor: default;
 }
 
 /* glow por categoria compartilhado por toda a família de cards do dashboard —
@@ -2020,11 +2080,19 @@ button:focus-visible {
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 14px;
-    min-height: 216px;
-    padding: 30px 24px;
+    gap: 10px;
+    min-height: 150px;
+    padding: 18px 18px;
+    box-sizing: border-box;
     text-decoration: none;
     transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* dentro do carrossel, cada card ocupa 1/5 da largura do viewport (6 cards
+   no trilho, 5 visíveis por vez) */
+.carrossel-ferramentas-viewport .ferramenta-card {
+    flex: 0 0 calc((100% - 4 * 18px) / 5);
+    min-width: 0;
 }
 
 .ferramenta-card:hover {
@@ -2303,6 +2371,101 @@ button:focus-visible {
 .estatistica-rotulo {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
+}
+
+/* faixa compacta de progresso (rodapé da home) */
+.progresso-faixa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    max-width: 1160px;
+    margin: 24px auto 0;
+    padding: 18px 28px;
+    background:
+        radial-gradient(120% 90% at 20% 0%, rgba(205, 163, 73, 0.1) 0%, rgba(205, 163, 73, 0.03) 35%, var(--color-surface-2) 70%),
+        var(--color-surface-2);
+    border: 1px solid rgba(205, 163, 73, 0.2);
+    border-radius: 16px;
+}
+
+.progresso-metrica {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.progresso-metrica-valor {
+    font-family: 'Cinzel', serif;
+    color: var(--terciary-color);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.progresso-metrica-rotulo {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.progresso-faixa-divisor {
+    width: 1px;
+    align-self: stretch;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.progresso-semanal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progresso-semanal-anel-container {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+}
+
+.progresso-semanal-anel {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progresso-semanal-anel-fundo {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 5;
+}
+
+.progresso-semanal-anel-progresso {
+    fill: none;
+    stroke: var(--terciary-color);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 163.4;
+    stroke-dashoffset: 163.4;
+    transition: stroke-dashoffset 0.6s ease;
+}
+
+.progresso-semanal-percentual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    color: var(--color-gold-bright);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.progresso-semanal-rotulo {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 /* evolucao */
@@ -4019,6 +4182,8 @@ button:focus-visible {
     .pulso-sucesso { animation: none; }
     .pomodoro-anel-progresso { transition: none; }
     .chat-loading span { animation: none; }
+    .ferramentas-grid { transition: none; }
+    .progresso-semanal-anel-progresso { transition: none; }
 }
 
 /* ===== CHAT ===== */
