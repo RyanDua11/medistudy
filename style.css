@@ -835,17 +835,20 @@ main {
 
 #missao-do-dia {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(205, 163, 73, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    box-shadow: 0 0 40px rgba(201, 168, 76, 0.08);
     border-radius: 16px;
     padding: 40px;
-    max-width: 1040px;
+    width: 100%;
+    max-width: 1160px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .proxima-prova-linha {
@@ -1899,8 +1902,12 @@ button:focus-visible {
         padding-left: 0;
     }
 
-    .carrossel-ferramentas-viewport .ferramenta-card {
+    .carrossel-ferramentas .carrossel-ferramentas-viewport .card-ferramenta {
         flex: 0 0 calc((100% - 18px) / 2);
+    }
+
+    .organizacao-grid {
+        grid-template-columns: 1fr;
     }
 
     .progresso-faixa {
@@ -1986,29 +1993,40 @@ button:focus-visible {
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    max-width: 900px;
-    margin: 40px auto 18px;
+    max-width: 1160px;
+    margin: 24px auto 14px;
 }
 
 /* carrossel de ferramentas de estudo — 6 cards, 5 visíveis por vez */
 .carrossel-ferramentas {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
     max-width: 1160px;
     margin: 0 auto;
 }
 
+/* overflow: hidden é necessário nos DOIS eixos (senão o 6º card escondido
+   do trilho aparece), então o respiro pro glow do hover só pode existir no
+   eixo vertical (padding/margin negativa, cancelando o deslocamento sem
+   alargar a área realmente clicável/visível). No eixo horizontal a borda
+   de corte fica exata — alargar o padding ali é o que causava o 6º card
+   vazando por cima da seta. Em troca, uma máscara de gradiente (abaixo)
+   esmaece o corte lateral em vez de terminar em uma linha reta. */
 .carrossel-ferramentas-viewport {
     flex: 1;
     min-width: 0;
     overflow: hidden;
+    padding: 24px 0;
+    margin: -24px 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
 }
 
 .ferramentas-grid {
     display: flex;
     gap: 18px;
-    transition: transform 0.35s ease;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .carrossel-ferramentas-seta {
@@ -2016,29 +2034,63 @@ button:focus-visible {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid rgba(205, 163, 73, 0.35);
-    background-color: var(--color-surface-2);
+    background: radial-gradient(circle at 35% 30%, rgba(205, 163, 73, 0.18), var(--color-surface-2) 70%);
     color: var(--color-gold-muted);
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.22s ease, color 0.22s ease, opacity 0.22s ease,
+        transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
 .carrossel-ferramentas-seta svg {
     width: 18px;
     height: 18px;
+    transition: transform 0.22s ease;
 }
 
 .carrossel-ferramentas-seta:hover:not(:disabled) {
-    border-color: var(--color-gold-muted);
+    border-color: var(--color-gold-bright);
     color: var(--color-gold-bright);
+    background: radial-gradient(circle at 35% 30%, rgba(205, 163, 73, 0.32), var(--color-surface-2) 70%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 16px rgba(205, 163, 73, 0.35);
+    transform: translateY(-2px) scale(1.06);
+}
+
+.carrossel-ferramentas-seta:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+}
+
+.carrossel-ferramentas-seta-esquerda:hover:not(:disabled) svg {
+    transform: translateX(-2px);
+}
+
+.carrossel-ferramentas-seta-direita:hover:not(:disabled) svg {
+    transform: translateX(2px);
+}
+
+.carrossel-ferramentas-seta:focus-visible {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 3px;
 }
 
 .carrossel-ferramentas-seta:disabled {
     opacity: 0.3;
     cursor: default;
+    box-shadow: none;
+}
+
+/* grid da seção "Organização" — mesma largura das demais faixas da home,
+   cards compactos (ícone + título + descrição curta + seta) */
+.organizacao-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    max-width: 1160px;
+    margin: 0 auto;
 }
 
 /* glow por categoria compartilhado por toda a família de cards do dashboard —
@@ -2075,14 +2127,26 @@ button:focus-visible {
     line-height: 1.5;
 }
 
-.ferramenta-card {
+/* .card-ferramenta é a classe única de tamanho/padding compartilhada por
+   TODO card no formato "ferramenta" (carrossel de estudo + Organização) —
+   qualquer ajuste de altura/padding feito aqui vale pros dois ao mesmo
+   tempo, então não tem como divergir por regra separada. .ferramenta-card
+   continua existindo à parte pra estilo (cor, glow, ícone etc.). */
+/* height fixa (não min-height): a largura do card muda MUITO entre o
+   carrossel (~198px, 5 por linha) e a Organização (2 por linha, bem mais
+   largo), e isso faz a descrição quebrar em mais ou menos linhas — com
+   min-height os dois card iam parar em alturas diferentes mesmo com o
+   mesmo padding. Altura fixa (medida a partir do card mais estreito, que é
+   o que precisa de mais altura pra descrição não estourar) garante que
+   Organização e carrossel fiquem sempre com a mesma altura, ponto. */
+.card-ferramenta {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 10px;
-    min-height: 150px;
-    padding: 18px 18px;
+    gap: 14px;
+    height: 313px;
+    padding: 28px 26px;
     box-sizing: border-box;
     text-decoration: none;
     transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
@@ -2090,7 +2154,7 @@ button:focus-visible {
 
 /* dentro do carrossel, cada card ocupa 1/5 da largura do viewport (6 cards
    no trilho, 5 visíveis por vez) */
-.carrossel-ferramentas-viewport .ferramenta-card {
+.carrossel-ferramentas-viewport .card-ferramenta {
     flex: 0 0 calc((100% - 4 * 18px) / 5);
     min-width: 0;
 }
@@ -2115,17 +2179,17 @@ button:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
     background-color: rgba(255, 255, 255, 0.03);
     box-shadow: 0 0 16px rgba(var(--cor-categoria), 0.35), inset 0 0 0 1px rgba(var(--cor-categoria), 0.4);
     transition: transform 0.22s ease;
 }
 
 .ferramenta-icone svg {
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
 }
 
 .ferramenta-card:hover .ferramenta-icone {
@@ -2149,7 +2213,7 @@ button:focus-visible {
 
 .ferramenta-titulo {
     color: var(--color-text);
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
 }
 
@@ -2158,10 +2222,6 @@ button:focus-visible {
     font-size: var(--text-sm);
     line-height: 1.5;
     margin: -6px 0 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .ferramenta-seta {
@@ -2379,7 +2439,9 @@ button:focus-visible {
     align-items: center;
     justify-content: center;
     gap: 28px;
+    width: 100%;
     max-width: 1160px;
+    box-sizing: border-box;
     margin: 24px auto 0;
     padding: 18px 28px;
     background:
