@@ -2001,29 +2001,32 @@ button:focus-visible {
 .carrossel-ferramentas {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
     max-width: 1160px;
     margin: 0 auto;
 }
 
-/* overflow: hidden continua necessário no eixo horizontal (senão o 6º card
-   escondido do trilho aparece), mas isso corta o box-shadow de glow do
-   hover nas bordas. Compensamos dando um respiro (padding) pro glow "sair"
-   do card sem revelar o próximo card escondido (218px de distância, bem
-   além do blur de 26px do hover) — e cancelamos esse respiro com margin
-   negativa igual, pra não deslocar o layout ao redor. */
+/* overflow: hidden é necessário nos DOIS eixos (senão o 6º card escondido
+   do trilho aparece), então o respiro pro glow do hover só pode existir no
+   eixo vertical (padding/margin negativa, cancelando o deslocamento sem
+   alargar a área realmente clicável/visível). No eixo horizontal a borda
+   de corte fica exata — alargar o padding ali é o que causava o 6º card
+   vazando por cima da seta. Em troca, uma máscara de gradiente (abaixo)
+   esmaece o corte lateral em vez de terminar em uma linha reta. */
 .carrossel-ferramentas-viewport {
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    padding: 24px 28px;
-    margin: -24px -28px;
+    padding: 24px 0;
+    margin: -24px 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
 }
 
 .ferramentas-grid {
     display: flex;
     gap: 18px;
-    transition: transform 0.35s ease;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .carrossel-ferramentas-seta {
@@ -2031,29 +2034,53 @@ button:focus-visible {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid rgba(205, 163, 73, 0.35);
-    background-color: var(--color-surface-2);
+    background: radial-gradient(circle at 35% 30%, rgba(205, 163, 73, 0.18), var(--color-surface-2) 70%);
     color: var(--color-gold-muted);
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.22s ease, color 0.22s ease, opacity 0.22s ease,
+        transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
 .carrossel-ferramentas-seta svg {
     width: 18px;
     height: 18px;
+    transition: transform 0.22s ease;
 }
 
 .carrossel-ferramentas-seta:hover:not(:disabled) {
-    border-color: var(--color-gold-muted);
+    border-color: var(--color-gold-bright);
     color: var(--color-gold-bright);
+    background: radial-gradient(circle at 35% 30%, rgba(205, 163, 73, 0.32), var(--color-surface-2) 70%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 16px rgba(205, 163, 73, 0.35);
+    transform: translateY(-2px) scale(1.06);
+}
+
+.carrossel-ferramentas-seta:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+}
+
+.carrossel-ferramentas-seta-esquerda:hover:not(:disabled) svg {
+    transform: translateX(-2px);
+}
+
+.carrossel-ferramentas-seta-direita:hover:not(:disabled) svg {
+    transform: translateX(2px);
+}
+
+.carrossel-ferramentas-seta:focus-visible {
+    outline: 2px solid var(--terciary-color);
+    outline-offset: 3px;
 }
 
 .carrossel-ferramentas-seta:disabled {
     opacity: 0.3;
     cursor: default;
+    box-shadow: none;
 }
 
 /* grid da seção "Organização" — mesma largura das demais faixas da home,
