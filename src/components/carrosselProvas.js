@@ -36,47 +36,26 @@ export function formatarContagemRegressiva(dias) {
     return `em ${dias} dias`;
 }
 
-function formatarDataCurta(dataIso) {
-    return paraDataLocal(dataIso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
-}
-
-function criarCartaoProva(prova) {
-    const cartao = document.createElement("div");
-    cartao.className = "prova-card";
-
-    const materia = document.createElement("span");
-    materia.className = "prova-card-materia";
-    materia.textContent = prova.materia;
-
-    const data = document.createElement("span");
-    data.className = "prova-card-data";
-    data.textContent = formatarDataCurta(prova.data);
-
-    const contagem = document.createElement("span");
-    contagem.className = "prova-card-contagem";
-    contagem.textContent = formatarContagemRegressiva(calcularDiasAteProva(prova.data));
-
-    cartao.append(materia, data, contagem);
-    return cartao;
-}
-
+// "Próximas provas" hoje é exibida como uma linha discreta dentro do card
+// "Missão do dia" (só a prova mais próxima), não mais como carrossel de
+// cartões — se não houver prova cadastrada, a linha simplesmente some.
 export async function inicializarCarrosselProvas() {
-    const container = document.getElementById("carrossel-provas");
-    const vazio = document.getElementById("carrossel-provas-vazio");
-    if (!container || !vazio) return;
+    const linha = document.getElementById("proxima-prova-linha");
+    if (!linha) return;
 
     try {
         const provas = await listarProvas();
-        const proximas = filtrarProvasFuturas(provas);
+        const [proxima] = filtrarProvasFuturas(provas);
 
-        container.innerHTML = "";
-        proximas.forEach((prova) => container.appendChild(criarCartaoProva(prova)));
+        if (!proxima) {
+            linha.hidden = true;
+            return;
+        }
 
-        container.hidden = proximas.length === 0;
-        vazio.hidden = proximas.length > 0;
+        linha.textContent = `📅 ${proxima.materia} ${formatarContagemRegressiva(calcularDiasAteProva(proxima.data))}`;
+        linha.hidden = false;
     } catch (erro) {
         console.error("Não foi possível carregar as próximas provas:", erro);
-        container.hidden = true;
-        vazio.hidden = false;
+        linha.hidden = true;
     }
 }

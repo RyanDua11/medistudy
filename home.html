@@ -142,6 +142,8 @@
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
                 Continuar estudo
             </a>
+
+            <span id="proxima-prova-linha" class="proxima-prova-linha" hidden></span>
         </div>
 
         <div class="missao-ilustracao">
@@ -172,6 +174,10 @@
 
     </section>
 
+    <!-- "Próximas provas" saiu de seção própria e virou uma linha discreta
+         dentro do card "Missão do dia" (#proxima-prova-linha). Markup original
+         mantido comentado por segurança, mas não é mais usado. -->
+    <!--
     <section id="proximas-provas" aria-label="Próximas provas">
         <h2 class="titulo-secao">Próximas provas</h2>
 
@@ -185,12 +191,19 @@
             <a href="provas.html" class="estado-vazio-cta">Cadastrar prova →</a>
         </div>
     </section>
+    -->
 
     <section id="ferramentas-de-estudo">
         <h2 class="titulo-secao">Ferramentas de estudo</h2>
 
-        <div class="ferramentas-grid">
-            <a class="ferramenta-card" href="flashcards.html" data-cor="azul">
+        <div class="carrossel-ferramentas">
+            <button type="button" class="carrossel-ferramentas-seta carrossel-ferramentas-seta-esquerda" id="ferramentas-seta-esquerda" aria-label="Ferramentas anteriores">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+
+            <div class="carrossel-ferramentas-viewport">
+            <div class="ferramentas-grid" id="carrossel-ferramentas-trilho">
+                <a class="ferramenta-card" href="flashcards.html" data-cor="azul">
                 <span class="ferramenta-icone">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="6" y="6" width="13" height="15" rx="2"/>
@@ -279,10 +292,18 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
                 </span>
             </a>
+            </div>
+            </div>
+
+            <button type="button" class="carrossel-ferramentas-seta carrossel-ferramentas-seta-direita" id="ferramentas-seta-direita" aria-label="Próximas ferramentas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
         </div>
     </section>
 
-    <section id="continue-de-onde-parou">
+    <!-- oculta por enquanto: será reimplementada com lógica real (último item
+         estudado de fato) numa tarefa futura; o card abaixo é estático/mockado -->
+    <section id="continue-de-onde-parou" style="display: none;">
         <h2 class="titulo-secao">Continue de onde parou</h2>
 
         <a class="continuar-card" href="flashcards.html">
@@ -337,29 +358,53 @@
         </div>
     </section>
 
-    <section id="estatisticas">
-        <h2 class="titulo-secao">Seu progresso</h2>
+    <section id="progresso-faixa" aria-label="Resumo de progresso">
+        <div class="progresso-faixa">
+            <div class="progresso-metrica">
+                <span class="progresso-metrica-valor" id="estatistica-taxa-acerto">--</span>
+                <span class="progresso-metrica-rotulo">Taxa de acerto</span>
+            </div>
+            <div class="progresso-metrica">
+                <span class="progresso-metrica-valor" id="estatistica-revisoes">--</span>
+                <span class="progresso-metrica-rotulo">Revisões feitas</span>
+            </div>
+            <div class="progresso-metrica">
+                <span class="progresso-metrica-valor" id="estatistica-a-revisar">--</span>
+                <span class="progresso-metrica-rotulo">A revisar agora</span>
+            </div>
+            <div class="progresso-metrica">
+                <span class="progresso-metrica-valor" id="estatistica-provas-semana">--</span>
+                <span class="progresso-metrica-rotulo">Provas em 7 dias</span>
+            </div>
 
-        <div class="estatisticas-grid">
-            <div class="estatistica-tile">
-                <span class="estatistica-valor" id="estatistica-taxa-acerto">--</span>
-                <span class="estatistica-rotulo">Taxa de acerto</span>
+            <div class="progresso-faixa-divisor" aria-hidden="true"></div>
+
+            <div class="progresso-semanal">
+                <div class="progresso-semanal-anel-container">
+                    <svg class="progresso-semanal-anel" viewBox="0 0 60 60" aria-hidden="true">
+                        <circle class="progresso-semanal-anel-fundo" cx="30" cy="30" r="26"></circle>
+                        <circle id="progresso-semanal-anel-valor" class="progresso-semanal-anel-progresso" cx="30" cy="30" r="26"></circle>
+                    </svg>
+                    <span class="progresso-semanal-percentual" id="progresso-semanal-percentual">--%</span>
+                </div>
+                <span class="progresso-semanal-rotulo">Seu progresso<br>esta semana</span>
             </div>
-            <div class="estatistica-tile">
-                <span class="estatistica-valor" id="estatistica-revisoes">--</span>
-                <span class="estatistica-rotulo">Revisões feitas</span>
+
+            <div class="progresso-metrica">
+                <!-- TODO: tempo de estudo real (agregar sessões do Pomodoro por dia) -->
+                <span class="progresso-metrica-valor" id="progresso-tempo-estudo">0h</span>
+                <span class="progresso-metrica-rotulo">Tempo de estudo</span>
             </div>
-            <div class="estatistica-tile">
-                <span class="estatistica-valor" id="estatistica-a-revisar">--</span>
-                <span class="estatistica-rotulo">A revisar agora</span>
-            </div>
-            <div class="estatistica-tile">
-                <span class="estatistica-valor" id="estatistica-provas-semana">--</span>
-                <span class="estatistica-rotulo">Provas em 7 dias</span>
+            <div class="progresso-metrica">
+                <!-- TODO: dias de sequência (streak) real de estudo consecutivo -->
+                <span class="progresso-metrica-valor" id="progresso-streak">0</span>
+                <span class="progresso-metrica-rotulo">Dias de sequência</span>
             </div>
         </div>
     </section>
 
+    <!-- gráficos "Notas por matéria" e "Flashcards criados" movidos para perfil -->
+    <!--
     <section id="evolucao">
         <h2 class="titulo-secao">Evolução</h2>
 
@@ -391,6 +436,7 @@
             </div>
         </div>
     </section>
+    -->
 
 </main>
 
