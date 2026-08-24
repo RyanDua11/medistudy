@@ -39,7 +39,7 @@ const MATERIAS = [
     "Humanidades",
 ];
 
-const ALTURA_LINHA_TEXTAREA_PX = 22;
+const ALTURA_LINHA_TEXTAREA_PX = 20;
 const LINHAS_MAXIMAS_TEXTAREA = 5;
 
 const listaConversasEl = document.getElementById("chat-lista");

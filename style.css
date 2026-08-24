@@ -4214,13 +4214,62 @@ body.pagina-chat {
        continua como rede de segurança pro caso extremo de nada caber. */
     height: 100vh;
     overflow-y: auto;
+    padding-left: 0;
 }
 
-/* full-bleed: preenche a tela toda abaixo do header, em vez de um card
-   flutuando com max-width:1280px sobrando espaço morto nas laterais em
-   monitores grandes — a mesma abordagem do ChatGPT/Claude/Gemini (o app
-   ocupa a janela inteira; quem fica numa coluna de leitura confortável é
-   só o conteúdo — mensagens, composer — não o app inteiro). */
+/* o header fixo (70px) e a barra lateral de navegação global comem espaço
+   vertical/horizontal que o chat, sendo uma ferramenta cheia de tela,
+   aproveita melhor sozinho — some com os dois e sobra só um botão
+   compacto de voltar pra home no canto. */
+body.pagina-chat #header,
+body.pagina-chat .sidebar,
+body.pagina-chat .bottom-nav {
+    display: none;
+}
+
+/* faz parte do fluxo normal do cabeçalho da sidebar (ao lado de "Nova
+   conversa"), não mais flutuante por cima — flutuante colidia com o botão
+   de nova conversa em telas reais */
+.chat-sidebar-header-topo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.chat-voltar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background-color: var(--color-surface-2);
+    color: var(--color-gold-muted);
+    transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.chat-sidebar-header-topo .chat-nova-conversa {
+    flex: 1;
+}
+
+.chat-voltar-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.chat-voltar-btn:hover {
+    border-color: var(--color-gold-bright);
+    color: var(--color-gold-bright);
+    transform: translateX(-2px);
+}
+
+/* full-bleed: preenche a tela toda (sem header/sidebar globais, ver acima),
+   em vez de um card flutuando com max-width:1280px sobrando espaço morto
+   nas laterais em monitores grandes — a mesma abordagem do ChatGPT/Claude/
+   Gemini (o app ocupa a janela inteira; quem fica numa coluna de leitura
+   confortável é só o conteúdo — mensagens, composer — não o app inteiro). */
 .chat-layout {
     flex: 1;
     min-height: 0;
@@ -4228,10 +4277,9 @@ body.pagina-chat {
     grid-template-columns: 280px 1fr;
     gap: 0;
     width: 100%;
-    margin: 70px 0 0;
+    margin: 0;
     padding: 0;
     box-sizing: border-box;
-    border-top: 1px solid var(--color-border-muted);
     background-color: var(--color-surface-3);
 }
 
@@ -4803,10 +4851,10 @@ body.pagina-chat {
 }
 
 .chat-mensagem-conteudo {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: var(--radius-md);
-    font-size: 15px;
-    line-height: 1.65;
+    font-size: 14px;
+    line-height: 1.55;
     word-wrap: break-word;
 }
 
@@ -4995,10 +5043,10 @@ body.pagina-chat {
     background: none;
     color: var(--color-text);
     font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 22px;
-    max-height: 110px;
-    padding: 8px 0;
+    font-size: 14px;
+    line-height: 20px;
+    max-height: 100px;
+    padding: 7px 0;
     overflow-y: auto;
 }
 
