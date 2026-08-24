@@ -839,13 +839,15 @@ main {
     border: 1px solid rgba(205, 163, 73, 0.3);
     border-radius: 16px;
     padding: 40px;
-    max-width: 1040px;
+    width: 100%;
+    max-width: 1160px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .proxima-prova-linha {
@@ -1899,8 +1901,12 @@ button:focus-visible {
         padding-left: 0;
     }
 
-    .carrossel-ferramentas-viewport .ferramenta-card {
+    .carrossel-ferramentas .carrossel-ferramentas-viewport .ferramenta-card {
         flex: 0 0 calc((100% - 18px) / 2);
+    }
+
+    .organizacao-grid {
+        grid-template-columns: 1fr;
     }
 
     .progresso-faixa {
@@ -1986,8 +1992,8 @@ button:focus-visible {
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    max-width: 900px;
-    margin: 40px auto 18px;
+    max-width: 1160px;
+    margin: 24px auto 14px;
 }
 
 /* carrossel de ferramentas de estudo — 6 cards, 5 visíveis por vez */
@@ -1999,10 +2005,18 @@ button:focus-visible {
     margin: 0 auto;
 }
 
+/* overflow: hidden continua necessário no eixo horizontal (senão o 6º card
+   escondido do trilho aparece), mas isso corta o box-shadow de glow do
+   hover nas bordas. Compensamos dando um respiro (padding) pro glow "sair"
+   do card sem revelar o próximo card escondido (218px de distância, bem
+   além do blur de 26px do hover) — e cancelamos esse respiro com margin
+   negativa igual, pra não deslocar o layout ao redor. */
 .carrossel-ferramentas-viewport {
     flex: 1;
     min-width: 0;
     overflow: hidden;
+    padding: 24px 28px;
+    margin: -24px -28px;
 }
 
 .ferramentas-grid {
@@ -2039,6 +2053,16 @@ button:focus-visible {
 .carrossel-ferramentas-seta:disabled {
     opacity: 0.3;
     cursor: default;
+}
+
+/* grid da seção "Organização" — mesma largura das demais faixas da home,
+   cards compactos (ícone + título + descrição curta + seta) */
+.organizacao-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    max-width: 1160px;
+    margin: 0 auto;
 }
 
 /* glow por categoria compartilhado por toda a família de cards do dashboard —
@@ -2379,7 +2403,9 @@ button:focus-visible {
     align-items: center;
     justify-content: center;
     gap: 28px;
+    width: 100%;
     max-width: 1160px;
+    box-sizing: border-box;
     margin: 24px auto 0;
     padding: 18px 28px;
     background:

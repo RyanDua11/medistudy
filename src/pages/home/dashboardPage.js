@@ -26,10 +26,15 @@ const elProgressoPercentual = document.getElementById("progresso-semanal-percent
 const CIRCUNFERENCIA_ANEL = 163.4; // 2 * PI * r(26), ver .progresso-semanal-anel-progresso
 
 // nome vem do user_metadata.full_name do Supabase Auth; sem esse campo, cai
-// pra parte antes do @ do email — nunca expõe o email completo na saudação
+// pra parte antes do primeiro "." ou "@" do email (o que vier primeiro —
+// ex: "teste.medistudy@gmail.com" -> "teste"), nunca o email completo
 function primeiroNome(usuario) {
-    const nomeCompleto = usuario.user_metadata?.full_name || usuario.email?.split("@")[0] || "";
-    return nomeCompleto.trim().split(/\s+/)[0] || "";
+    const bruto = usuario.user_metadata?.full_name
+        ? usuario.user_metadata.full_name.trim().split(/\s+/)[0]
+        : usuario.email?.split(/[@.]/)[0] || "";
+
+    if (!bruto) return "";
+    return bruto.charAt(0).toUpperCase() + bruto.slice(1);
 }
 
 function exibirSaudacao(usuario) {
