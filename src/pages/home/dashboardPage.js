@@ -30,10 +30,15 @@ const CIRCUNFERENCIA_ANEL = 163.4; // 2 * PI * r(26), ver .progresso-semanal-ane
 // teste), então o nome de exibição por enquanto vem do localStorage — a
 // página de perfil (tarefa futura) é quem vai pedir e salvar esse valor.
 // Sem nome salvo ainda, mostra só "Olá" (nunca email ou prefixo de email).
+// IMPORTANTE: localStorage é a fonte da verdade absoluta pra saudação — essa
+// função não lê sessao.user/Auth em nenhuma hipótese, então não existe
+// condição de corrida possível entre os dois.
 function exibirSaudacao() {
     if (!elSaudacao) return;
 
     const nome = localStorage.getItem(CHAVE_NOME_USUARIO);
+    console.log("[saudacao] valor lido de localStorage:", CHAVE_NOME_USUARIO, "=", nome);
+
     elSaudacao.textContent = nome ? `Boa noite, ${nome} 🌙` : "Olá";
 }
 
