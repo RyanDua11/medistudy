@@ -3,7 +3,6 @@ import { traduzErroSupabase } from "./erroAmigavel.js";
 
 const TABELA_CONVERSAS = "conversas_chat";
 const TABELA_MENSAGENS = "mensagens_chat";
-const ATRASO_RESPOSTA_MOCK_MS = 1500;
 const TAMANHO_MAXIMO_TITULO = 40;
 
 /** Gera o título automático de uma conversa a partir da primeira mensagem (máx 40 caracteres). */
@@ -134,11 +133,14 @@ export async function limparMensagensConversa(conversaId) {
     if (error) throw new Error(traduzErroSupabase(error));
 }
 
-/** Simula uma resposta de IA com um atraso de 1.5s (integração real fica para uma fase posterior). */
-export async function gerarRespostaMock(mensagem) {
-    await new Promise((resolve) => setTimeout(resolve, ATRASO_RESPOSTA_MOCK_MS));
+/** Chama a Edge Function chat-medistudy (Dra. Mah) com a mensagem e o histórico da conversa. */
+export async function gerarResposta(mensagem, historico = []) {
+    const { data, error } = await supabase.functions.invoke("chat-medistudy", {
+        body: { mensagem, historico },
+    });
 
-    const primeirasPalavras = (mensagem ?? "").trim().split(/\s+/).slice(0, 6).join(" ");
+    if (error) throw new Error(traduzErroSupabase(error));
+    if (data?.erro) throw new Error(data.erro);
 
-    return `Entendi sua pergunta sobre **${primeirasPalavras}**. A integração com a IA estará disponível em breve! Por enquanto, use os Casos Clínicos e Flashcards para estudar esse conteúdo.`;
+    return data.resposta;
 }

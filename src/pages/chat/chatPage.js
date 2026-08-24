@@ -8,9 +8,8 @@ import {
     atualizarMateriaConversa,
     excluirConversa,
     limparMensagensConversa,
-    gerarRespostaMock,
+    gerarResposta,
     formatarTimestampRelativo,
-    estimarTokens,
 } from "../../services/chatService.js";
 import { corPorMateria } from "../../services/corMateria.js";
 import { inicializarNotificacaoRevisao } from "../../components/notificacaoRevisao.js";
@@ -50,18 +49,19 @@ const menuOpcoes = document.getElementById("chat-menu-opcoes");
 const formInput = document.getElementById("chat-input-area");
 const textarea = document.getElementById("chat-textarea");
 const enviarBtn = document.getElementById("chat-enviar-btn");
-const tokenCountEl = document.getElementById("chat-token-count");
 
 const materiaBtn = document.getElementById("chat-materia-btn");
 const materiaOpcoesEl = document.getElementById("chat-materia-opcoes");
 
+const CHAVE_NOME_USUARIO = "medistudy_nome_usuario";
+
 let usuarioId = null;
-let nomeUsuaria = "";
 let conversas = [];
 let conversaAtualId = null;
 let conversaAtualMateria = null;
 let filtroBusca = "";
 let enviandoMensagem = false;
+let historicoMensagens = [];
 
 // ---------- utilidades de renderização ----------
 
@@ -138,9 +138,9 @@ function criarElementoMensagem(mensagem) {
 
     if (mensagem.role === "assistant") {
         const avatar = document.createElement("img");
-        avatar.src = "caduceu.png";
-        avatar.alt = "";
-        avatar.className = "chat-mensagem-avatar";
+        avatar.src = "/DraMah.png";
+        avatar.alt = "Dra. Mah";
+        avatar.className = "chat-mensagem-avatar avatar-dra-mah";
         wrapper.appendChild(avatar);
     }
 
@@ -173,10 +173,14 @@ function criarElementoLoading() {
     wrapper.className = "chat-mensagem chat-mensagem--assistant chat-mensagem--loading";
     wrapper.id = "chat-loading-temp";
 
+    const avatarWrap = document.createElement("div");
+    avatarWrap.className = "avatar-dra-mah-wrap avatar-dra-mah-wrap--pensando";
+
     const avatar = document.createElement("img");
-    avatar.src = "caduceu.png";
-    avatar.alt = "";
-    avatar.className = "chat-mensagem-avatar";
+    avatar.src = "/DraMah.png";
+    avatar.alt = "Dra. Mah pensando";
+    avatar.className = "chat-mensagem-avatar avatar-dra-mah";
+    avatarWrap.appendChild(avatar);
 
     const corpo = document.createElement("div");
     corpo.className = "chat-mensagem-corpo";
@@ -185,7 +189,7 @@ function criarElementoLoading() {
     loading.innerHTML = "<span></span><span></span><span></span>";
     corpo.appendChild(loading);
 
-    wrapper.append(avatar, corpo);
+    wrapper.append(avatarWrap, corpo);
     return wrapper;
 }
 
@@ -230,6 +234,7 @@ function atualizarConversaLocal(id, alteracoes) {
 function mostrarBoasVindas() {
     conversaAtualId = null;
     conversaAtualMateria = null;
+    historicoMensagens = [];
     boasVindasEl.hidden = false;
     conversaAtivaEl.hidden = true;
     renderizarListaConversas();
@@ -251,6 +256,7 @@ async function abrirConversa(id) {
     const mensagens = await buscarMensagens(id);
     mensagensEl.innerHTML = "";
     mensagens.forEach((mensagem) => mensagensEl.appendChild(criarElementoMensagem(mensagem)));
+    historicoMensagens = mensagens.map((m) => ({ role: m.role, content: m.conteudo }));
     scrollParaFinal();
     textarea.focus();
 }
@@ -270,6 +276,7 @@ async function enviarMensagem(texto) {
             conversas = [novaConversa, ...conversas];
             conversaAtualId = novaConversa.id;
             conversaAtualMateria = null;
+            historicoMensagens = [];
 
             boasVindasEl.hidden = true;
             conversaAtivaEl.hidden = false;
@@ -289,16 +296,45 @@ async function enviarMensagem(texto) {
         mensagensEl.appendChild(loadingEl);
         scrollParaFinal();
 
-        const resposta = await gerarRespostaMock(textoLimpo);
+        try {
+            const resposta = await gerarResposta(textoLimpo, historicoMensagens);
 
-        loadingEl.remove();
-        const mensagemAssistente = await salvarMensagem(conversaAtualId, "assistant", resposta);
-        mensagensEl.appendChild(criarElementoMensagem(mensagemAssistente));
-        scrollParaFinal();
+            await removerLoadingComFadeout(loadingEl);
+            const mensagemAssistente = await salvarMensagem(conversaAtualId, "assistant", resposta);
+            mensagensEl.appendChild(criarElementoMensagem(mensagemAssistente));
+            scrollParaFinal();
+
+            historicoMensagens = [
+                ...historicoMensagens,
+                { role: "user", content: textoLimpo },
+                { role: "assistant", content: resposta },
+            ];
+        } catch (erro) {
+            console.error("Falha ao obter resposta da Dra. Mah:", erro);
+            await removerLoadingComFadeout(loadingEl);
+            const erroEl = document.createElement("p");
+            erroEl.className = "chat-erro-resposta";
+            erroEl.textContent = "Não consegui responder agora. Tente de novo em instantes.";
+            mensagensEl.appendChild(erroEl);
+            scrollParaFinal();
+        }
     } finally {
         enviandoMensagem = false;
         atualizarEstadoBotaoEnviar();
     }
+}
+
+// remove o anel dourado (transição de fadeout) antes de tirar a bolha de
+// "pensando" da tela, em vez de sumir tudo de uma vez
+function removerLoadingComFadeout(loadingEl) {
+    const avatarWrap = loadingEl.querySelector(".avatar-dra-mah-wrap");
+    avatarWrap?.classList.remove("avatar-dra-mah-wrap--pensando");
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            loadingEl.remove();
+            resolve();
+        }, 300);
+    });
 }
 
 function atualizarEstadoBotaoEnviar() {
@@ -311,15 +347,10 @@ function redimensionarTextarea() {
     textarea.style.height = `${Math.min(textarea.scrollHeight, alturaMaxima)}px`;
 }
 
-function atualizarContadorTokens() {
-    tokenCountEl.textContent = `~${estimarTokens(textarea.value)} tokens`;
-}
-
 // ---------- eventos ----------
 
 textarea.addEventListener("input", () => {
     redimensionarTextarea();
-    atualizarContadorTokens();
     atualizarEstadoBotaoEnviar();
 });
 
@@ -335,7 +366,6 @@ formInput.addEventListener("submit", async (evento) => {
     const texto = textarea.value;
     textarea.value = "";
     redimensionarTextarea();
-    atualizarContadorTokens();
     atualizarEstadoBotaoEnviar();
     await enviarMensagem(texto);
 });
@@ -464,9 +494,9 @@ async function iniciar() {
     if (!sessao) return;
 
     usuarioId = sessao.user.id;
-    nomeUsuaria = sessao.user.user_metadata?.nome || sessao.user.email?.split("@")[0] || "";
-    boasVindasTitulo.textContent = nomeUsuaria
-        ? `Olá, ${nomeUsuaria}! Como posso te ajudar hoje?`
+    const nome = localStorage.getItem(CHAVE_NOME_USUARIO);
+    boasVindasTitulo.textContent = nome
+        ? `Olá, ${nome}! Como posso te ajudar hoje?`
         : "Olá! Como posso te ajudar hoje?";
 
     inicializarNotificacaoRevisao();

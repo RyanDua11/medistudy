@@ -1,10 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 
+const mockInvoke = vi.fn();
+
 vi.mock("./supabaseClient.js", () => ({
-    supabase: { from: vi.fn() },
+    supabase: { from: vi.fn(), functions: { invoke: (...args) => mockInvoke(...args) } },
 }));
 
-const { gerarTituloConversa, formatarTimestampRelativo, estimarTokens } = await import("./chatService.js");
+const { gerarTituloConversa, formatarTimestampRelativo, estimarTokens, gerarResposta } = await import(
+    "./chatService.js"
+);
 
 describe("gerarTituloConversa", () => {
     it("retorna a mensagem inteira quando ela tem 40 caracteres ou menos", () => {
@@ -62,6 +66,45 @@ describe("formatarTimestampRelativo", () => {
 
     it("retorna string vazia para data nula", () => {
         expect(formatarTimestampRelativo(null, AGORA)).toBe("");
+    });
+});
+
+describe("gerarResposta", () => {
+    it("chama supabase.functions.invoke('chat-medistudy', ...) com mensagem e histórico corretos", async () => {
+        mockInvoke.mockResolvedValueOnce({ data: { resposta: "Sepse é..." }, error: null });
+
+        const historico = [{ role: "user", content: "oi" }];
+        const resultado = await gerarResposta("O que é sepse?", historico);
+
+        expect(mockInvoke).toHaveBeenCalledWith("chat-medistudy", {
+            body: { mensagem: "O que é sepse?", historico },
+        });
+        expect(resultado).toBe("Sepse é...");
+    });
+
+    it("usa histórico vazio por padrão quando não informado", async () => {
+        mockInvoke.mockResolvedValueOnce({ data: { resposta: "Oi!" }, error: null });
+
+        await gerarResposta("Oi");
+
+        expect(mockInvoke).toHaveBeenCalledWith("chat-medistudy", {
+            body: { mensagem: "Oi", historico: [] },
+        });
+    });
+
+    it("lança erro quando a invocação da function falha", async () => {
+        mockInvoke.mockResolvedValueOnce({ data: null, error: { message: "network error" } });
+
+        await expect(gerarResposta("oi")).rejects.toThrow();
+    });
+
+    it("lança erro quando a function responde com { erro }", async () => {
+        mockInvoke.mockResolvedValueOnce({
+            data: { erro: "Todos os provedores de IA falharam." },
+            error: null,
+        });
+
+        await expect(gerarResposta("oi")).rejects.toThrow("Todos os provedores de IA falharam.");
     });
 });
 

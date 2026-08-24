@@ -4182,11 +4182,22 @@ button:focus-visible {
     .pulso-sucesso { animation: none; }
     .pomodoro-anel-progresso { transition: none; }
     .chat-loading span { animation: none; }
+    .avatar-dra-mah-wrap--pensando::after { animation: none; }
     .ferramentas-grid { transition: none; }
     .progresso-semanal-anel-progresso { transition: none; }
 }
 
 /* ===== CHAT ===== */
+
+/* a página do chat nunca rola — só a área de mensagens (.chat-mensagens)
+   internamente. body.pagina-home por padrão é overflow-y:auto (rolagem de
+   página normal nas outras telas); aqui isso precisa ficar travado, senão
+   um chat-layout um pixel mais alto que o viewport cria um scroll duplo
+   (da página inteira E das mensagens). */
+body.pagina-chat {
+    height: 100vh;
+    overflow: hidden;
+}
 
 .chat-layout {
     flex: 1;
@@ -4599,6 +4610,60 @@ button:focus-visible {
     box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.4);
 }
 
+/* avatar da Dra. Mah — maior que o padrão de .chat-mensagem-avatar (40px),
+   usado tanto nas mensagens do assistente quanto na bolha de "pensando" */
+.avatar-dra-mah {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* wrapper do avatar na bolha de "pensando": o anel dourado gira em volta
+   via ::after (CSS puro, sem lib) enquanto aguarda a Edge Function
+   responder. Ao chegar a resposta, a classe --pensando é removida e o
+   anel esmaece (fadeout) antes da bolha sumir — ver removerLoadingComFadeout
+   em chatPage.js. */
+.avatar-dra-mah-wrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.avatar-dra-mah-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.avatar-dra-mah-wrap--pensando::after {
+    border-top-color: var(--color-gold);
+    opacity: 1;
+    animation: girar 1s linear infinite;
+}
+
+@keyframes girar {
+    to { transform: rotate(360deg); }
+}
+
+.chat-erro-resposta {
+    align-self: flex-start;
+    max-width: 72%;
+    margin: 0;
+    padding: 10px var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-danger);
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger);
+    font-size: 13px;
+}
+
 .chat-mensagem-corpo {
     display: flex;
     flex-direction: column;
@@ -4842,12 +4907,6 @@ button:focus-visible {
 
 .chat-materia-opcoes button:hover {
     background-color: rgba(201, 168, 76, 0.1);
-}
-
-.chat-token-count {
-    font-size: 11px;
-    color: var(--color-text-muted);
-    white-space: nowrap;
 }
 
 @media (max-width: 900px) {
