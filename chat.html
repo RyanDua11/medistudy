@@ -134,10 +134,15 @@
 
     <aside class="chat-sidebar" aria-label="Conversas">
         <div class="chat-sidebar-header">
-            <button type="button" id="botao-nova-conversa" class="chat-nova-conversa">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                Nova conversa
-            </button>
+            <div class="chat-sidebar-header-topo">
+                <a href="home.html" class="chat-voltar-btn" aria-label="Voltar para a home">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </a>
+                <button type="button" id="botao-nova-conversa" class="chat-nova-conversa">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                    Nova conversa
+                </button>
+            </div>
             <div class="chat-busca-wrapper">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="chat-busca-icone"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
                 <input type="search" id="busca-conversas" class="chat-busca" placeholder="Buscar conversas...">
@@ -163,7 +168,7 @@
         </div>
 
         <div class="chat-sidebar-footer">
-            <img src="/DraMah-small.png" alt="" class="chat-sidebar-footer-avatar">
+            <img src="/DraMah-small.png" alt="" class="chat-sidebar-footer-avatar" onerror="corrigirAvatarQuebrado(this)">
             <span>Dra. Mah está sempre por aqui pra tirar dúvidas.</span>
         </div>
     </aside>
@@ -172,7 +177,7 @@
 
         <div id="chat-boas-vindas" class="chat-boas-vindas">
             <div class="chat-boas-vindas-avatar" aria-hidden="true">
-                <img src="/DraMah-small.png" alt="" class="chat-boas-vindas-avatar-img">
+                <img src="/DraMah-small.png" alt="" class="chat-boas-vindas-avatar-img" onerror="corrigirAvatarQuebrado(this)">
             </div>
             <span class="chat-boas-vindas-assinatura">Dra. Mah</span>
             <h1 id="chat-boas-vindas-titulo">Olá! Como posso te ajudar hoje?</h1>
@@ -189,7 +194,7 @@
         <div id="chat-conversa-ativa" class="chat-conversa-ativa" hidden>
             <div class="chat-header-conversa">
                 <div class="chat-header-conversa-info">
-                    <img src="/DraMah-small.png" alt="" class="chat-header-avatar">
+                    <img src="/DraMah-small.png" alt="" class="chat-header-avatar" onerror="corrigirAvatarQuebrado(this)">
                     <div class="chat-header-conversa-textos">
                         <h2 id="chat-titulo-conversa" class="chat-titulo-conversa" tabindex="0" title="Clique duas vezes para renomear">Nova conversa</h2>
                         <span class="chat-header-assinatura">Dra. Mah<span id="chat-materia-badge" class="chat-materia-badge" hidden></span></span>
