@@ -2,6 +2,7 @@ import { supabase } from "./supabaseClient.js";
 import { obterIdUsuarioLogado } from "./authService.js";
 import { calcularFSRS, RATING } from "./fsrs.js";
 import { traduzErroSupabase } from "./erroAmigavel.js";
+import { registrarErroEstudo } from "./diarioErrosService.js";
 
 const TABELA_FLASHCARDS = "flashcards";
 const TABELA_LOG_REVISOES = "log_revisoes";
@@ -77,6 +78,16 @@ export async function marcarRevisao(flashcard, rating) {
     });
 
     if (erroLog) throw new Error(traduzErroSupabase(erroLog));
+
+    if (!acertou) {
+        registrarErroEstudo({
+            ferramenta: "flashcards",
+            materia: flashcard.materia,
+            topico: flashcard.subtopico ?? null,
+            perguntaResumo: flashcard.pergunta,
+            respostaCorreta: flashcard.resposta,
+        });
+    }
 
     return data;
 }

@@ -10,6 +10,7 @@ import {
 } from "./validacaoCasoClinicoV2.js";
 import { ehCasoDeHoje } from "./casosClinicosLogica.js";
 import { traduzErroSupabase } from "./erroAmigavel.js";
+import { registrarErroEstudo } from "./diarioErrosService.js";
 
 const TABELA_CASOS_CLINICOS = "casos_clinicos";
 const TABELA_LOG_RESOLUCOES_CASOS = "log_resolucoes_casos";
@@ -212,7 +213,7 @@ export async function marcarResolvidoHoje(casoId, jaResolveramAntes) {
 
 // --- leitura geral / histórico ---
 
-export async function registrarResolucaoCaso(casoClinicoId, alternativaEscolhida, acertou) {
+export async function registrarResolucaoCaso(casoClinicoId, alternativaEscolhida, acertou, contextoErro = null) {
     const userId = await obterIdUsuarioLogado();
 
     const { data, error } = await supabase
@@ -227,6 +228,18 @@ export async function registrarResolucaoCaso(casoClinicoId, alternativaEscolhida
         .single();
 
     if (error) throw new Error(traduzErroSupabase(error));
+
+    if (!acertou && contextoErro) {
+        registrarErroEstudo({
+            ferramenta: "casos_clinicos",
+            materia: contextoErro.materia ?? null,
+            topico: contextoErro.topico ?? null,
+            perguntaResumo: contextoErro.perguntaResumo ?? null,
+            respostaUsuario: contextoErro.respostaUsuario ?? null,
+            respostaCorreta: contextoErro.respostaCorreta ?? null,
+        });
+    }
+
     return data;
 }
 

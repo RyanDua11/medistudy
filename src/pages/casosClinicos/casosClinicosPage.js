@@ -312,7 +312,12 @@ async function tratarRespostaRapido(indiceEscolhido, botaoEscolhido) {
     rapidoFeedback.hidden = false;
 
     try {
-        await registrarResolucaoCaso(rapidoCaso.id, indiceEscolhido, acertou);
+        await registrarResolucaoCaso(rapidoCaso.id, indiceEscolhido, acertou, {
+            materia: sessaoAtual.materia,
+            perguntaResumo: pergunta.pergunta,
+            respostaUsuario: pergunta.alternativas[indiceEscolhido],
+            respostaCorreta: pergunta.alternativas[pergunta.alternativa_correta],
+        });
     } catch (erro) {
         mostrarMensagem(`Resposta registrada aqui, mas não foi possível salvar seu histórico: ${erro.message}`);
     }
@@ -638,7 +643,13 @@ async function finalizarInterativo() {
     interativoTokensUsados.textContent = `Você usou ${TOKENS_INICIAIS_INTERATIVO - tokensRestantes} de ${TOKENS_INICIAIS_INTERATIVO} tokens em exames.`;
 
     try {
-        await registrarResolucaoCaso(interativoCasoRow.id, condutaEscolhidaIndice, condutaEscolhida.correta);
+        await registrarResolucaoCaso(interativoCasoRow.id, condutaEscolhidaIndice, condutaEscolhida.correta, {
+            materia: sessaoAtual.materia,
+            topico: "Conduta",
+            perguntaResumo: "Qual a melhor conduta para este caso?",
+            respostaUsuario: condutaEscolhida.texto,
+            respostaCorreta: interativoDados.condutas.find((c) => c.correta)?.texto,
+        });
         if (interativoEhCasoDoDia && casoDoDia) {
             const atualizado = await marcarResolvidoHoje(casoDoDia.id, casoDoDia.usuarios_resolveram_hoje ?? []);
             if (atualizado) casoDoDia = atualizado;
@@ -755,7 +766,14 @@ async function finalizarAnamnese() {
         anamneseHipoteseInferida.textContent = `Hipótese inferida pela sua entrevista: ${resultado.hipotese_inferida}`;
 
         try {
-            await registrarResolucaoCaso(anamneseCasoRow.id, 0, resultado.coletadas.length >= resultado.esquecidas.length);
+            const acertouAnamnese = resultado.coletadas.length >= resultado.esquecidas.length;
+            await registrarResolucaoCaso(anamneseCasoRow.id, 0, acertouAnamnese, {
+                materia: sessaoAtual.materia,
+                topico: "Anamnese",
+                perguntaResumo: "Quais perguntas essenciais coletar na anamnese?",
+                respostaUsuario: resultado.coletadas.join(", "),
+                respostaCorreta: [...resultado.coletadas, ...resultado.esquecidas].join(", "),
+            });
         } catch {
             // feedback já foi exibido; falha ao salvar histórico não deve travar a tela
         }

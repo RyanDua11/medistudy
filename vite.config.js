@@ -20,6 +20,7 @@ export default defineConfig({
                 notas: resolve(__dirname, "notas.html"),
                 chat: resolve(__dirname, "chat.html"),
                 admin: resolve(__dirname, "admin.html"),
+                diarioErros: resolve(__dirname, "diario-erros.html"),
             },
         },
     },
