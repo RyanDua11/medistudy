@@ -44,7 +44,7 @@ Deno.test("arquivoAceito rejeita tipos não suportados", () => {
 
 Deno.test("montarPayloadGemini monta uma mensagem multimodal (texto + image_url em data URI)", () => {
     const payload = montarPayloadGemini("QkFTRTY0", "image/png");
-    assertEquals(payload.model, "gemini-2.0-flash");
+    assertEquals(payload.model, "gemini-3.6-flash");
     const conteudo = payload.messages[0].content;
     assertEquals(conteudo[1], { type: "image_url", image_url: { url: "data:image/png;base64,QkFTRTY0" } });
     assertStringIncludes((conteudo[0] as { text: string }).text, "JSON");

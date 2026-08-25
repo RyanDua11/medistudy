@@ -12,6 +12,8 @@ const ICONE_PDF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const ICONE_ALERTA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
 const ICONE_COPIAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 const ICONE_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICONE_NOVA_ANALISE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
+const ICONE_ESTRELAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>';
 
 const mensagemEl = document.getElementById("exame-mensagem");
 const dropzoneEl = document.getElementById("exame-dropzone");
@@ -130,9 +132,12 @@ function renderizarResultado(resultado) {
             <h4>Interpretação</h4>
             <p id="exame-texto-interpretacao">${resultado.interpretacao}</p>
         </div>
-        <div class="exame-resultado-acoes">
-            <button type="button" id="exame-btn-copiar" class="exame-btn-secundario">${ICONE_COPIAR} Copiar interpretação</button>
-            <button type="button" id="exame-btn-nova-analise" class="exame-btn-primario">Nova análise</button>
+        <div class="exame-resultado-rodape">
+            <span class="exame-resultado-selo"><span class="exame-resultado-selo-icone" aria-hidden="true">${ICONE_ESTRELAS}</span>Análise gerada por IA · Gemini</span>
+            <div class="exame-resultado-acoes">
+                <button type="button" id="exame-btn-copiar" class="exame-btn-secundario">${ICONE_COPIAR} Copiar</button>
+                <button type="button" id="exame-btn-nova-analise" class="exame-btn-primario">${ICONE_NOVA_ANALISE} Nova análise</button>
+            </div>
         </div>
     `;
 
@@ -145,7 +150,7 @@ function renderizarResultado(resultado) {
             botaoCopiar.innerHTML = `${ICONE_CHECK} Copiado!`;
             botaoCopiar.classList.add("exame-copiado");
             setTimeout(() => {
-                botaoCopiar.innerHTML = `${ICONE_COPIAR} Copiar interpretação`;
+                botaoCopiar.innerHTML = `${ICONE_COPIAR} Copiar`;
                 botaoCopiar.classList.remove("exame-copiado");
             }, 2000);
         } catch {

@@ -196,6 +196,20 @@
             color: var(--color-gold-bright);
         }
 
+        .exame-btn-primario,
+        .exame-btn-secundario {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .exame-btn-primario svg,
+        .exame-btn-secundario svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
         .exame-loading {
             text-align: center;
             padding: var(--space-8) var(--space-5);
@@ -323,19 +337,80 @@
             white-space: pre-wrap;
         }
 
+        .exame-resultado-rodape {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4) var(--space-5);
+        }
+
+        .exame-resultado-selo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+        }
+
+        .exame-resultado-selo-icone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(201, 168, 76, 0.12);
+            color: var(--color-gold);
+            flex-shrink: 0;
+        }
+
+        .exame-resultado-selo-icone svg {
+            width: 13px;
+            height: 13px;
+        }
+
         .exame-resultado-acoes {
             display: flex;
             gap: var(--space-3);
         }
 
+        .exame-btn-primario,
+        .exame-btn-secundario {
+            min-height: 42px;
+            justify-content: center;
+        }
+
         .exame-copiado {
             color: #5fbf87 !important;
+            border-color: #5fbf87 !important;
         }
 
         @media (max-width: 640px) {
             .exame-preview { flex-wrap: wrap; }
             .exame-preview-acoes { width: 100%; }
             .exame-preview-acoes button { flex: 1; }
+
+            .exame-resultado-rodape {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .exame-resultado-selo {
+                justify-content: center;
+            }
+
+            .exame-resultado-acoes {
+                width: 100%;
+            }
+
+            .exame-resultado-acoes button {
+                flex: 1;
+            }
         }
     </style>
 </head>
