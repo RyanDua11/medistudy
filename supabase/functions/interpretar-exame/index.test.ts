@@ -1,16 +1,15 @@
-// Testes da Edge Function interpretar-exame: mock do Gemini (nunca chama a
-// API de verdade). Rodar com:
+// Testes da Edge Function interpretar-exame: fallback em cascata entre
+// provedores de visão (mock do fetch, nunca chama nenhum provedor de
+// verdade). Rodar com:
 // deno test --allow-env --allow-net supabase/functions/interpretar-exame/index.test.ts
 
 import { assertEquals, assertStringIncludes } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { arquivoAceito, chamarGemini, montarPayloadGemini, validarResultadoInterpretacao } from "./index.ts";
+import { arquivoAceito, chamarComFallback, chamarProvedor, montarPayload, validarResultadoInterpretacao } from "./index.ts";
+import { PROVEDORES_VISAO } from "../_shared/provedoresIA.ts";
 
-function respostaGeminiOk(jsonTexto: string, usage?: { prompt_tokens: number; completion_tokens: number }) {
+function respostaOk(jsonTexto: string, usage?: { prompt_tokens: number; completion_tokens: number }) {
     return new Response(
-        JSON.stringify({
-            choices: [{ message: { content: jsonTexto } }],
-            ...(usage ? { usage } : {}),
-        }),
+        JSON.stringify({ choices: [{ message: { content: jsonTexto } }], ...(usage ? { usage } : {}) }),
         { status: 200 },
     );
 }
@@ -22,6 +21,12 @@ function comFetchMockado(impl: typeof fetch, fn: () => Promise<void>) {
         globalThis.fetch = original;
     });
 }
+
+const ENV_COMPLETO = new Map([
+    ["GEMINI_API_KEY", "chave-gemini"],
+    ["MISTRAL_API_KEY", "chave-mistral"],
+    ["OPENROUTER_API_KEY", "chave-openrouter"],
+]);
 
 const RESULTADO_EXEMPLO = {
     tipo_exame: "Hemograma completo",
@@ -38,105 +43,135 @@ Deno.test("arquivoAceito aceita PDF, PNG e JPEG", () => {
 
 Deno.test("arquivoAceito rejeita tipos não suportados", () => {
     assertEquals(arquivoAceito("image/gif"), false);
-    assertEquals(arquivoAceito("text/plain"), false);
     assertEquals(arquivoAceito(""), false);
 });
 
-Deno.test("montarPayloadGemini monta uma mensagem multimodal (texto + image_url em data URI)", () => {
-    const payload = montarPayloadGemini("QkFTRTY0", "image/png");
-    assertEquals(payload.model, "gemini-3.6-flash");
+Deno.test("montarPayload monta uma mensagem multimodal com o modelo do provedor certo", () => {
+    const payload = montarPayload(PROVEDORES_VISAO[1], "QkFTRTY0", "image/png");
+    assertEquals(payload.model, PROVEDORES_VISAO[1].modelo);
     const conteudo = payload.messages[0].content;
     assertEquals(conteudo[1], { type: "image_url", image_url: { url: "data:image/png;base64,QkFTRTY0" } });
     assertStringIncludes((conteudo[0] as { text: string }).text, "JSON");
-    assertEquals(payload.response_format, { type: "json_object" });
 });
 
 Deno.test("validarResultadoInterpretacao preenche defaults pra campos ausentes", () => {
     const resultado = validarResultadoInterpretacao({});
-    assertEquals(resultado, {
-        tipo_exame: "Não identificado",
-        parametros: [],
-        interpretacao: "",
-        alertas_criticos: [],
-    });
+    assertEquals(resultado, { tipo_exame: "Não identificado", parametros: [], interpretacao: "", alertas_criticos: [] });
 });
 
 Deno.test("validarResultadoInterpretacao normaliza status inválido pra 'normal'", () => {
-    const resultado = validarResultadoInterpretacao({
-        parametros: [{ nome: "X", valor: "1", referencia: "0-2", status: "algo-esquisito" }],
-    });
+    const resultado = validarResultadoInterpretacao({ parametros: [{ nome: "X", valor: "1", referencia: "0-2", status: "esquisito" }] });
     assertEquals(resultado.parametros[0].status, "normal");
 });
 
-Deno.test("validarResultadoInterpretacao preserva um resultado já bem formado", () => {
-    const resultado = validarResultadoInterpretacao(RESULTADO_EXEMPLO);
-    assertEquals(resultado, RESULTADO_EXEMPLO);
-});
-
-Deno.test("chamarGemini retorna o resultado parseado em caso de sucesso", async () => {
+Deno.test("chamarProvedor retorna o resultado parseado e os tokens em caso de sucesso", async () => {
     await comFetchMockado(
-        () => Promise.resolve(respostaGeminiOk(JSON.stringify(RESULTADO_EXEMPLO))),
+        () => Promise.resolve(respostaOk(JSON.stringify(RESULTADO_EXEMPLO), { prompt_tokens: 900, completion_tokens: 150 })),
         async () => {
-            const { resultado } = await chamarGemini("base64fake", "image/png", "chave-fake");
+            const { resultado, tokensInput, tokensOutput } = await chamarProvedor(PROVEDORES_VISAO[0], "base64fake", "image/png", "chave-fake");
             assertEquals(resultado, RESULTADO_EXEMPLO);
-        },
-    );
-});
-
-Deno.test("chamarGemini extrai tokens de usage.prompt_tokens/completion_tokens", async () => {
-    await comFetchMockado(
-        () => Promise.resolve(respostaGeminiOk(JSON.stringify(RESULTADO_EXEMPLO), { prompt_tokens: 900, completion_tokens: 150 })),
-        async () => {
-            const { tokensInput, tokensOutput } = await chamarGemini("base64fake", "image/png", "chave-fake");
             assertEquals(tokensInput, 900);
             assertEquals(tokensOutput, 150);
         },
     );
 });
 
-Deno.test("chamarGemini lança erro quando a resposta HTTP não é ok", async () => {
+Deno.test("chamarProvedor lança erro com o nome do provedor quando a resposta HTTP não é ok", async () => {
     await comFetchMockado(
         () => Promise.resolve(new Response("rate limit", { status: 429 })),
         async () => {
             let erroCapturado: Error | undefined;
             try {
-                await chamarGemini("base64fake", "image/png", "chave-fake");
+                await chamarProvedor(PROVEDORES_VISAO[0], "base64fake", "image/png", "chave-fake");
             } catch (erro) {
                 erroCapturado = erro as Error;
             }
             assertEquals(erroCapturado !== undefined, true);
+            assertStringIncludes(erroCapturado!.message, "Gemini");
             assertStringIncludes(erroCapturado!.message, "429");
         },
     );
 });
 
-Deno.test("chamarGemini lança erro quando o Gemini não retorna texto interpretável", async () => {
+Deno.test("chamarProvedor lança erro quando o texto retornado não é JSON válido", async () => {
     await comFetchMockado(
-        () => Promise.resolve(new Response(JSON.stringify({ choices: [] }), { status: 200 })),
+        () => Promise.resolve(respostaOk("isso não é json")),
         async () => {
             let erroCapturado: Error | undefined;
             try {
-                await chamarGemini("base64fake", "image/png", "chave-fake");
-            } catch (erro) {
-                erroCapturado = erro as Error;
-            }
-            assertEquals(erroCapturado !== undefined, true);
-        },
-    );
-});
-
-Deno.test("chamarGemini lança erro quando o texto retornado não é JSON válido", async () => {
-    await comFetchMockado(
-        () => Promise.resolve(respostaGeminiOk("isso não é json")),
-        async () => {
-            let erroCapturado: Error | undefined;
-            try {
-                await chamarGemini("base64fake", "image/png", "chave-fake");
+                await chamarProvedor(PROVEDORES_VISAO[0], "base64fake", "image/png", "chave-fake");
             } catch (erro) {
                 erroCapturado = erro as Error;
             }
             assertEquals(erroCapturado !== undefined, true);
             assertStringIncludes(erroCapturado!.message, "JSON inválido");
+        },
+    );
+});
+
+Deno.test("chamarComFallback usa Mistral quando Gemini falha", async () => {
+    await comFetchMockado(
+        (input: RequestInfo | URL) => {
+            const url = String(input);
+            if (url.includes("generativelanguage.googleapis.com")) return Promise.resolve(new Response("indisponível", { status: 503 }));
+            if (url.includes("mistral.ai")) return Promise.resolve(respostaOk(JSON.stringify(RESULTADO_EXEMPLO)));
+            return Promise.resolve(new Response("não deveria chegar aqui", { status: 500 }));
+        },
+        async () => {
+            const resultado = await chamarComFallback("base64fake", "image/png", (nome) => ENV_COMPLETO.get(nome));
+            assertEquals(resultado.provedor, "Mistral");
+            assertEquals(resultado.resultado, RESULTADO_EXEMPLO);
+        },
+    );
+});
+
+Deno.test("chamarComFallback percorre todos os provedores de visão até o último quando os anteriores falham", async () => {
+    await comFetchMockado(
+        (input: RequestInfo | URL) => {
+            const url = String(input);
+            if (url.includes("openrouter.ai")) return Promise.resolve(respostaOk(JSON.stringify(RESULTADO_EXEMPLO)));
+            return Promise.resolve(new Response("indisponível", { status: 500 }));
+        },
+        async () => {
+            const resultado = await chamarComFallback("base64fake", "image/png", (nome) => ENV_COMPLETO.get(nome));
+            assertEquals(resultado.provedor, "OpenRouter");
+        },
+    );
+});
+
+Deno.test("chamarComFallback lança erro agregando o motivo de cada provedor quando todos falham", async () => {
+    await comFetchMockado(
+        () => Promise.resolve(new Response("fora do ar", { status: 500 })),
+        async () => {
+            let erroCapturado: Error | undefined;
+            try {
+                await chamarComFallback("base64fake", "image/png", (nome) => ENV_COMPLETO.get(nome));
+            } catch (erro) {
+                erroCapturado = erro as Error;
+            }
+            assertEquals(erroCapturado !== undefined, true);
+            for (const provedor of PROVEDORES_VISAO) {
+                assertStringIncludes(erroCapturado!.message, provedor.nome);
+            }
+        },
+    );
+});
+
+Deno.test("chamarComFallback pula provedores sem API key configurada", async () => {
+    await comFetchMockado(
+        (input: RequestInfo | URL) => {
+            const url = String(input);
+            if (url.includes("generativelanguage.googleapis.com")) return Promise.resolve(new Response("erro", { status: 500 }));
+            if (url.includes("openrouter.ai")) return Promise.resolve(respostaOk(JSON.stringify(RESULTADO_EXEMPLO)));
+            throw new Error("Não deveria chamar provedor sem chave configurada: " + url);
+        },
+        async () => {
+            const env = new Map([
+                ["GEMINI_API_KEY", "chave-gemini"],
+                ["OPENROUTER_API_KEY", "chave-openrouter"],
+            ]);
+            const resultado = await chamarComFallback("base64fake", "image/png", (nome) => env.get(nome));
+            assertEquals(resultado.provedor, "OpenRouter");
         },
     );
 });

@@ -133,7 +133,7 @@ function renderizarResultado(resultado) {
             <p id="exame-texto-interpretacao">${resultado.interpretacao}</p>
         </div>
         <div class="exame-resultado-rodape">
-            <span class="exame-resultado-selo"><span class="exame-resultado-selo-icone" aria-hidden="true">${ICONE_ESTRELAS}</span>Análise gerada por IA · Gemini</span>
+            <span class="exame-resultado-selo"><span class="exame-resultado-selo-icone" aria-hidden="true">${ICONE_ESTRELAS}</span>Análise gerada por IA${resultado.provedor ? ` · ${resultado.provedor}` : ""}</span>
             <div class="exame-resultado-acoes">
                 <button type="button" id="exame-btn-copiar" class="exame-btn-secundario">${ICONE_COPIAR} Copiar</button>
                 <button type="button" id="exame-btn-nova-analise" class="exame-btn-primario">${ICONE_NOVA_ANALISE} Nova análise</button>

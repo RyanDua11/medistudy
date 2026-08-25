@@ -1,22 +1,13 @@
 // Edge Function: Interpretador de Exames — recebe um exame médico (imagem)
-// em base64 e devolve uma leitura estruturada via Gemini, multimodal.
+// em base64 e devolve uma leitura estruturada via IA, multimodal.
 //
-// Usa o endpoint OpenAI-compatible do Gemini (mesmo endpoint e mesma chave
-// que chat-medistudy já usa com sucesso) em vez do endpoint nativo
-// generateContent: a GEMINI_API_KEY configurada neste projeto só fala o
-// formato OpenAI-compat (fica claro pelo "API key not valid" que o endpoint
-// nativo devolve pra essa mesma chave) — provavelmente uma chave de proxy/
-// gateway, não uma chave direta do Google AI Studio. Requer o secret
-// GEMINI_API_KEY (já configurado):
-//   supabase secrets set GEMINI_API_KEY=sua_chave_aqui
-//
-// Ferramenta de estudo, não substitui avaliação médica profissional — esse
-// aviso é fixo no frontend (/interpretador-exames.html).
+// Fallback em cascata entre os provedores com suporte a entrada multimodal
+// (image_url em data URI) — ver PROVEDORES_VISAO em _shared/provedoresIA.ts.
+// Só passa pro próximo se o anterior falhar, igual ao chat-medistudy e ao
+// gerar-caso-clinico, pra não depender de um único provedor de visão.
 
 import { registrarLogUso } from "../_shared/logUsoIA.ts";
-
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const GEMINI_MODEL = "gemini-3.6-flash";
+import { PROVEDORES_VISAO, type Provedor } from "../_shared/provedoresIA.ts";
 
 const CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
@@ -62,9 +53,9 @@ export function arquivoAceito(tipoMime: string): boolean {
     return TIPOS_MIME_ACEITOS.includes(tipoMime);
 }
 
-export function montarPayloadGemini(arquivoBase64: string, tipoMime: string) {
+export function montarPayload(provedor: Provedor, arquivoBase64: string, tipoMime: string) {
     return {
-        model: GEMINI_MODEL,
+        model: provedor.modelo,
         messages: [
             {
                 role: "user",
@@ -78,7 +69,7 @@ export function montarPayloadGemini(arquivoBase64: string, tipoMime: string) {
     };
 }
 
-/** Garante que o JSON devolvido pelo Gemini tem o formato esperado, preenchendo defaults pra campos ausentes. */
+/** Garante que o JSON devolvido pelo modelo tem o formato esperado, preenchendo defaults pra campos ausentes. */
 export function validarResultadoInterpretacao(bruto: unknown): ResultadoInterpretacao {
     const obj = (bruto ?? {}) as Record<string, unknown>;
 
@@ -99,33 +90,33 @@ export function validarResultadoInterpretacao(bruto: unknown): ResultadoInterpre
     };
 }
 
-export interface ResultadoGemini {
+export interface ResultadoProvedorVisao {
     resultado: ResultadoInterpretacao;
     tokensInput: number | null;
     tokensOutput: number | null;
 }
 
-export async function chamarGemini(arquivoBase64: string, tipoMime: string, apiKey: string): Promise<ResultadoGemini> {
-    const resposta = await fetch(GEMINI_URL, {
+export async function chamarProvedor(provedor: Provedor, arquivoBase64: string, tipoMime: string, apiKey: string): Promise<ResultadoProvedorVisao> {
+    const resposta = await fetch(provedor.url, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify(montarPayloadGemini(arquivoBase64, tipoMime)),
+        body: JSON.stringify(montarPayload(provedor, arquivoBase64, tipoMime)),
     });
 
     if (!resposta.ok) {
         const detalhe = await resposta.text();
-        throw new Error(`Falha ao chamar Gemini (status ${resposta.status}): ${detalhe}`);
+        throw new Error(`Falha ao chamar ${provedor.nome} (status ${resposta.status}): ${detalhe}`);
     }
 
     const dados = await resposta.json();
     const texto = dados.choices?.[0]?.message?.content;
-    if (!texto) throw new Error("Gemini não retornou conteúdo interpretável");
+    if (!texto) throw new Error(`${provedor.nome} não retornou conteúdo interpretável`);
 
     let bruto: unknown;
     try {
         bruto = JSON.parse(texto);
     } catch {
-        throw new Error("Gemini retornou um JSON inválido");
+        throw new Error(`${provedor.nome} retornou um JSON inválido`);
     }
 
     return {
@@ -133,6 +124,37 @@ export async function chamarGemini(arquivoBase64: string, tipoMime: string, apiK
         tokensInput: dados.usage?.prompt_tokens ?? null,
         tokensOutput: dados.usage?.completion_tokens ?? null,
     };
+}
+
+export interface ResultadoFallbackVisao extends ResultadoProvedorVisao {
+    provedor: string;
+    modelo: string;
+}
+
+export async function chamarComFallback(
+    arquivoBase64: string,
+    tipoMime: string,
+    obterEnv: (nome: string) => string | undefined = (nome) => Deno.env.get(nome),
+): Promise<ResultadoFallbackVisao> {
+    const falhas: string[] = [];
+
+    for (const provedor of PROVEDORES_VISAO) {
+        const apiKey = obterEnv(provedor.envVar);
+        if (!apiKey) {
+            falhas.push(`${provedor.nome}: ${provedor.envVar} não configurada`);
+            continue;
+        }
+
+        try {
+            const resultado = await chamarProvedor(provedor, arquivoBase64, tipoMime, apiKey);
+            return { ...resultado, provedor: provedor.nome, modelo: provedor.modelo };
+        } catch (erro) {
+            const mensagem = erro instanceof Error ? erro.message : String(erro);
+            falhas.push(`${provedor.nome}: ${mensagem}`);
+        }
+    }
+
+    throw new Error(`Todos os provedores de visão falharam. ${falhas.join(" | ")}`);
 }
 
 Deno.serve(async (req) => {
@@ -143,14 +165,6 @@ Deno.serve(async (req) => {
     if (req.method !== "POST") {
         return new Response(JSON.stringify({ erro: "Método não permitido" }), {
             status: 405,
-            headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-        });
-    }
-
-    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!geminiApiKey) {
-        return new Response(JSON.stringify({ erro: "GEMINI_API_KEY não configurada no projeto Supabase" }), {
-            status: 500,
             headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         });
     }
@@ -185,11 +199,11 @@ Deno.serve(async (req) => {
     const inicio = Date.now();
 
     try {
-        const { resultado, tokensInput, tokensOutput } = await chamarGemini(arquivoBase64, tipoMime, geminiApiKey);
+        const { resultado, tokensInput, tokensOutput, provedor, modelo } = await chamarComFallback(arquivoBase64, tipoMime);
 
         await registrarLogUso({
-            provedor: "Gemini",
-            modelo: GEMINI_MODEL,
+            provedor,
+            modelo,
             funcionalidade: "interpretador-exames",
             sucesso: true,
             tokensInput,
@@ -197,7 +211,7 @@ Deno.serve(async (req) => {
             tempoRespostaMs: Date.now() - inicio,
         });
 
-        return new Response(JSON.stringify(resultado), {
+        return new Response(JSON.stringify({ ...resultado, provedor }), {
             status: 200,
             headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         });
@@ -205,8 +219,8 @@ Deno.serve(async (req) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
 
         await registrarLogUso({
-            provedor: "Gemini",
-            modelo: GEMINI_MODEL,
+            provedor: "todos",
+            modelo: "-",
             funcionalidade: "interpretador-exames",
             sucesso: false,
             erroMensagem: mensagem,
