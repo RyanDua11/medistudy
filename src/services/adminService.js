@@ -1,13 +1,29 @@
 const UM_DIA_MS = 24 * 60 * 60 * 1000;
 
-/** Agrupa linhas de log_uso_ia por provedor: total de chamadas, taxa de sucesso (%) e última chamada. */
+// Todos os provedores que alguma Edge Function do MediStudy pode chamar —
+// usado pra sempre listar os 8 no painel admin, mesmo os que não tiveram
+// nenhuma chamada nas últimas 24h (ver PROVEDORES em
+// supabase/functions/chat-medistudy/index.ts, a cascata de fallback;
+// gerar-caso-clinico usa só "Groq", já incluído aqui).
+export const PROVEDORES_CONHECIDOS = ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace"];
+
+/** Agrupa linhas de log_uso_ia por provedor: total de chamadas, taxa de sucesso (%), tokens e última chamada. */
 export function agruparUsoPorProvedor(linhas) {
     const porProvedor = new Map();
 
     for (const linha of linhas) {
-        const atual = porProvedor.get(linha.provedor) ?? { provedor: linha.provedor, total: 0, sucessos: 0, ultimaChamada: null };
+        const atual = porProvedor.get(linha.provedor) ?? {
+            provedor: linha.provedor,
+            total: 0,
+            sucessos: 0,
+            tokensInput: 0,
+            tokensOutput: 0,
+            ultimaChamada: null,
+        };
         atual.total += 1;
         if (linha.sucesso) atual.sucessos += 1;
+        atual.tokensInput += linha.tokens_input ?? 0;
+        atual.tokensOutput += linha.tokens_output ?? 0;
         if (!atual.ultimaChamada || linha.criado_em > atual.ultimaChamada) atual.ultimaChamada = linha.criado_em;
         porProvedor.set(linha.provedor, atual);
     }
@@ -18,9 +34,35 @@ export function agruparUsoPorProvedor(linhas) {
             total: p.total,
             erros: p.total - p.sucessos,
             taxaSucesso: p.total === 0 ? 0 : Math.round((p.sucessos / p.total) * 100),
+            tokensInput: p.tokensInput,
+            tokensOutput: p.tokensOutput,
             ultimaChamada: p.ultimaChamada,
         }))
         .sort((a, b) => b.total - a.total);
+}
+
+/**
+ * Garante que todo provedor de `listaCompleta` apareça no resultado, mesmo
+ * sem nenhuma chamada registrada (status "sem dados" em vez de simplesmente
+ * sumir do painel). Provedores com dados vêm primeiro (já ordenados por
+ * volume), os sem dados ficam no fim, em ordem alfabética.
+ */
+export function completarProvedoresSemDados(dadosAgrupados, listaCompleta) {
+    const jaPresentes = new Set(dadosAgrupados.map((p) => p.provedor));
+    const semDados = listaCompleta
+        .filter((nome) => !jaPresentes.has(nome))
+        .sort((a, b) => a.localeCompare(b))
+        .map((provedor) => ({
+            provedor,
+            total: 0,
+            erros: 0,
+            taxaSucesso: null,
+            tokensInput: 0,
+            tokensOutput: 0,
+            ultimaChamada: null,
+        }));
+
+    return [...dadosAgrupados, ...semDados];
 }
 
 /** Agrupa linhas de log_uso_ia por dia (YYYY-MM-DD local): total de chamadas e total de erros. */
@@ -42,11 +84,11 @@ export async function buscarUsoPorProvedor(client) {
     const desde = new Date(Date.now() - UM_DIA_MS).toISOString();
     const { data, error } = await client
         .from("log_uso_ia")
-        .select("provedor, sucesso, criado_em")
+        .select("provedor, sucesso, criado_em, tokens_input, tokens_output")
         .gte("criado_em", desde);
 
     if (error) throw error;
-    return agruparUsoPorProvedor(data ?? []);
+    return completarProvedoresSemDados(agruparUsoPorProvedor(data ?? []), PROVEDORES_CONHECIDOS);
 }
 
 export async function buscarChamadasPorDia(client) {

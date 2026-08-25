@@ -194,7 +194,11 @@ async function chamarGroq(groqApiKey: string, prompt: string, mensagemUsuario: s
     }
 
     const dados = await resposta.json();
-    return dados.choices?.[0]?.message?.content ?? "";
+    return {
+        texto: dados.choices?.[0]?.message?.content ?? "",
+        tokensInput: dados.usage?.prompt_tokens ?? null,
+        tokensOutput: dados.usage?.completion_tokens ?? null,
+    };
 }
 
 function montarPrompt(modo: string, corpo: Record<string, unknown>) {
@@ -274,18 +278,20 @@ Deno.serve(async (req) => {
             ? `Gere o caso agora, no formato JSON pedido.`
             : `Responda agora, no formato JSON pedido.`;
 
-        const texto = await chamarGroq(groqApiKey, prompt, mensagemUsuario);
+        const resultado = await chamarGroq(groqApiKey, prompt, mensagemUsuario);
 
         await registrarLogUso({
             provedor: "Groq",
             modelo: GROQ_MODEL,
             funcionalidade: "casos-clinicos",
             sucesso: true,
+            tokensInput: resultado.tokensInput,
+            tokensOutput: resultado.tokensOutput,
             tempoRespostaMs: Date.now() - inicio,
         });
 
         return new Response(
-            JSON.stringify({ texto }),
+            JSON.stringify({ texto: resultado.texto }),
             { status: 200, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
         );
     } catch (erro) {

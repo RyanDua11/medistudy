@@ -91,11 +91,17 @@ const CORS_HEADERS = {
 
 export const SYSTEM_PROMPT = `Você é a Dra. Mah, assistente de estudos de medicina do MediStudy — uma macrófaga doutora com óculos que adora devorar dúvidas médicas. Seu jeito é didático, direto e levemente bem-humorado, como uma colega mais experiente que explica sem enrolar. Explica conceitos, raciocina junto, faz perguntas socráticas quando faz sentido. Nunca inventa dado clínico. Responde em texto corrido, pode usar markdown leve.`;
 
+export interface ResultadoProvedor {
+    texto: string;
+    tokensInput: number | null;
+    tokensOutput: number | null;
+}
+
 export async function chamarProvedor(
     provedor: Provedor,
     apiKey: string,
     mensagens: MensagemChat[],
-) {
+): Promise<ResultadoProvedor> {
     const resposta = await fetch(provedor.url, {
         method: "POST",
         headers: {
@@ -115,7 +121,15 @@ export async function chamarProvedor(
     }
 
     const dados = await resposta.json();
-    return dados.choices?.[0]?.message?.content ?? "";
+    return {
+        texto: dados.choices?.[0]?.message?.content ?? "",
+        // todo provedor da lista fala o formato OpenAI-compatible (usage.
+        // prompt_tokens/completion_tokens); nem todo provedor free tier
+        // preenche isso de fato, daí o fallback pra null em vez de 0 —
+        // "não informado" é diferente de "zero tokens".
+        tokensInput: dados.usage?.prompt_tokens ?? null,
+        tokensOutput: dados.usage?.completion_tokens ?? null,
+    };
 }
 
 // Tenta cada provedor em PROVEDORES na ordem, passando para o próximo apenas
@@ -125,6 +139,8 @@ export interface ResultadoFallback {
     texto: string;
     provedor: string;
     modelo: string;
+    tokensInput: number | null;
+    tokensOutput: number | null;
 }
 
 export async function chamarComFallback(
@@ -141,8 +157,8 @@ export async function chamarComFallback(
         }
 
         try {
-            const texto = await chamarProvedor(provedor, apiKey, mensagens);
-            return { texto, provedor: provedor.nome, modelo: provedor.modelo };
+            const resultado = await chamarProvedor(provedor, apiKey, mensagens);
+            return { ...resultado, provedor: provedor.nome, modelo: provedor.modelo };
         } catch (erro) {
             const mensagem = erro instanceof Error ? erro.message : String(erro);
             falhas.push(`${provedor.nome}: ${mensagem}`);
@@ -210,6 +226,8 @@ Deno.serve(async (req) => {
             modelo: resultado.modelo,
             funcionalidade: "chat",
             sucesso: true,
+            tokensInput: resultado.tokensInput,
+            tokensOutput: resultado.tokensOutput,
             tempoRespostaMs: Date.now() - inicio,
         });
 
