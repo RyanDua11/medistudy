@@ -1,15 +1,10 @@
 import { protegerRota } from "../../services/routeGuard.js";
 import { supabase } from "../../services/supabaseClient.js";
-import { supabaseAdmin } from "../../services/supabaseAdminClient.js";
-import {
-    buscarUsoPorProvedor,
-    buscarChamadasPorDia,
-    buscarUsuarias,
-    buscarUltimosErros,
-} from "../../services/adminService.js";
+import { buscarPainelAdmin } from "../../services/adminService.js";
 
-// user_id da conta de admin — sem sistema de roles, ver TODO em
-// supabaseAdminClient.js sobre mover isso pra uma Edge Function autenticada.
+// user_id da conta de admin — sem sistema de roles. Mesmo id conferido
+// server-side em supabase/functions/admin-painel/index.ts antes de
+// devolver qualquer dado.
 const ADMIN_USER_ID = "efe4e863-0ea1-4a0f-9656-f58e6f81d60d";
 
 // Cor fixa por nome de provedor (não por índice/ordem) pra não mudar de
@@ -364,8 +359,8 @@ function renderizarErros(erros) {
 async function carregarErros() {
     botaoAtualizarErros.classList.add("girando");
     try {
-        const erros = await buscarUltimosErros(supabaseAdmin, 20);
-        renderizarErros(erros);
+        const { ultimosErros } = await buscarPainelAdmin(supabase);
+        renderizarErros(ultimosErros);
     } finally {
         setTimeout(() => botaoAtualizarErros.classList.remove("girando"), 400);
     }
@@ -408,17 +403,13 @@ function mensagemGlobal(texto, sucesso) {
 }
 
 async function carregarPainel() {
-    const [usoPorProvedor, chamadasPorDia, usuarias] = await Promise.all([
-        buscarUsoPorProvedor(supabaseAdmin),
-        buscarChamadasPorDia(supabaseAdmin),
-        buscarUsuarias(supabaseAdmin),
-    ]);
+    const { usoPorProvedor, chamadasPorDia, usuarias, ultimosErros } = await buscarPainelAdmin(supabase);
 
     renderizarKpis(usoPorProvedor, usuarias, chamadasPorDia);
     renderizarCardsProvedor(usoPorProvedor);
     renderizarGraficoChamadas(chamadasPorDia);
     renderizarTabelaUsuarias(usuarias);
-    await carregarErros();
+    renderizarErros(ultimosErros);
 }
 
 async function iniciar() {
