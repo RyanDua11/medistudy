@@ -1,6 +1,6 @@
 // Testes da Edge Function chat-medistudy: cobrem o fallback em cascata entre
-// os 8 provedores de IA (Groq → Gemini → Cerebras → OpenRouter → Mistral →
-// SambaNova → DeepSeek → HuggingFace) e a montagem de mensagens do chat.
+// os 9 provedores de IA (Groq → Gemini → Cerebras → OpenRouter → Mistral →
+// SambaNova → DeepSeek → HuggingFace → NVIDIA) e a montagem de mensagens do chat.
 //
 // Rodar com: deno test --allow-env --allow-net supabase/functions/chat-medistudy/index.test.ts
 
@@ -35,16 +35,18 @@ const ENV_COMPLETO = new Map([
     ["SAMBANOVA_API_KEY", "chave-sambanova"],
     ["DEEPSEEK_API_KEY", "chave-deepseek"],
     ["HUGGINGFACE_API_KEY", "chave-huggingface"],
+    ["NVIDIA_API_KEY", "chave-nvidia"],
 ]);
 
-Deno.test("PROVEDORES está na ordem Groq, Gemini, Cerebras, OpenRouter, Mistral, SambaNova, DeepSeek, HuggingFace", () => {
+Deno.test("PROVEDORES está na ordem Groq, Gemini, Cerebras, OpenRouter, Mistral, SambaNova, DeepSeek, HuggingFace, NVIDIA", () => {
     assertEquals(
         PROVEDORES.map((p) => p.nome),
-        ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace"],
+        ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace", "NVIDIA"],
     );
     assertEquals(PROVEDORES[0].modelo, "openai/gpt-oss-20b");
     assertEquals(PROVEDORES[1].modelo, "gemini-3.6-flash");
     assertEquals(PROVEDORES[7].modelo, "meta-llama/Llama-3.3-70B-Instruct");
+    assertEquals(PROVEDORES[8].modelo, "meta/llama-3.3-70b-instruct");
 });
 
 Deno.test("montarMensagens monta system prompt + histórico + mensagem nova, nessa ordem", () => {
@@ -178,11 +180,11 @@ Deno.test("chamarComFallback retorna o nome e o modelo do provedor que respondeu
     );
 });
 
-Deno.test("chamarComFallback percorre todos os 8 provedores até o último quando todos os anteriores falham", async () => {
+Deno.test("chamarComFallback percorre todos os 9 provedores até o último quando todos os anteriores falham", async () => {
     await comFetchMockado(
         (input: RequestInfo | URL) => {
             const url = String(input);
-            if (url.includes("router.huggingface.co")) return Promise.resolve(respostaOk("resposta da huggingface"));
+            if (url.includes("integrate.api.nvidia.com")) return Promise.resolve(respostaOk("resposta da nvidia"));
             return Promise.resolve(respostaErro(500, "indisponível"));
         },
         async () => {
@@ -190,7 +192,7 @@ Deno.test("chamarComFallback percorre todos os 8 provedores até o último quand
                 [{ role: "user", content: "oi" }],
                 (nome) => ENV_COMPLETO.get(nome),
             );
-            assertEquals(resultado.texto, "resposta da huggingface");
+            assertEquals(resultado.texto, "resposta da nvidia");
         },
     );
 });

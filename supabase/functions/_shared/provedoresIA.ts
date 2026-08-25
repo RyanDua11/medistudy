@@ -72,6 +72,12 @@ export const PROVEDORES: Provedor[] = [
         modelo: "meta-llama/Llama-3.3-70B-Instruct",
         envVar: "HUGGINGFACE_API_KEY",
     },
+    {
+        nome: "NVIDIA",
+        url: "https://integrate.api.nvidia.com/v1/chat/completions",
+        modelo: "meta/llama-3.3-70b-instruct",
+        envVar: "NVIDIA_API_KEY",
+    },
 ];
 
 /** Provedores com suporte a entrada multimodal (imagem via image_url em data URI), pro Interpretador de Exames. */
