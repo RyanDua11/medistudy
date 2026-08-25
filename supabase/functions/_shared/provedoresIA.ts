@@ -39,7 +39,7 @@ export const PROVEDORES: Provedor[] = [
     {
         nome: "Cerebras",
         url: "https://api.cerebras.ai/v1/chat/completions",
-        modelo: "llama-3.3-70b",
+        modelo: "gpt-oss-120b",
         envVar: "CEREBRAS_API_KEY",
     },
     {
