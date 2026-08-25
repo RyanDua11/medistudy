@@ -1,4 +1,8 @@
-import { sair } from "../services/authService.js";
+import { sair, obterIdUsuarioLogado } from "../services/authService.js";
+
+// mesmo user_id hardcoded usado em src/pages/admin/adminPage.js e na
+// policy RLS de log_uso_ia — sem sistema de roles ainda.
+const ADMIN_USER_ID = "efe4e863-0ea1-4a0f-9656-f58e6f81d60d";
 
 let ouvintesGlobaisRegistrados = false;
 
@@ -61,6 +65,17 @@ export function inicializarUsuarioMenu() {
 
     opcoes.appendChild(botaoSair);
     menu.append(gatilho, opcoes);
+
+    obterIdUsuarioLogado()
+        .then((id) => {
+            if (id !== ADMIN_USER_ID) return;
+            const linkAdmin = document.createElement("a");
+            linkAdmin.href = "admin.html";
+            linkAdmin.className = "usuario-menu-admin";
+            linkAdmin.textContent = "Painel Admin";
+            opcoes.insertBefore(linkAdmin, botaoSair);
+        })
+        .catch(() => {});
 
     function alternar() {
         const abrir = opcoes.hidden;
