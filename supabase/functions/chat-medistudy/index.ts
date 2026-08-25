@@ -16,6 +16,8 @@
 // persistir é o cliente (tabelas conversas_chat/mensagens_chat), mesmo
 // padrão usado no restante do MediStudy.
 
+import { registrarLogUso } from "../_shared/logUsoIA.ts";
+
 interface Provedor {
     nome: string;
     url: string;
@@ -119,10 +121,16 @@ export async function chamarProvedor(
 // Tenta cada provedor em PROVEDORES na ordem, passando para o próximo apenas
 // se o anterior lançar exceção. `obterEnv` é injetável para permitir testar
 // sem depender de Deno.env global.
+export interface ResultadoFallback {
+    texto: string;
+    provedor: string;
+    modelo: string;
+}
+
 export async function chamarComFallback(
     mensagens: MensagemChat[],
     obterEnv: (nome: string) => string | undefined = (nome) => Deno.env.get(nome),
-) {
+): Promise<ResultadoFallback> {
     const falhas: string[] = [];
 
     for (const provedor of PROVEDORES) {
@@ -133,7 +141,8 @@ export async function chamarComFallback(
         }
 
         try {
-            return await chamarProvedor(provedor, apiKey, mensagens);
+            const texto = await chamarProvedor(provedor, apiKey, mensagens);
+            return { texto, provedor: provedor.nome, modelo: provedor.modelo };
         } catch (erro) {
             const mensagem = erro instanceof Error ? erro.message : String(erro);
             falhas.push(`${provedor.nome}: ${mensagem}`);
@@ -187,16 +196,39 @@ Deno.serve(async (req) => {
         );
     }
 
+    const inicio = Date.now();
+
     try {
         const mensagens = montarMensagens(mensagem, historico);
-        const resposta = await chamarComFallback(mensagens);
+        const resultado = await chamarComFallback(mensagens);
+
+        // aguardado (não fire-and-forget): depois da Response ser retornada,
+        // o isolate da Edge Function pode ser congelado antes de uma
+        // promise pendente terminar, perdendo o log
+        await registrarLogUso({
+            provedor: resultado.provedor,
+            modelo: resultado.modelo,
+            funcionalidade: "chat",
+            sucesso: true,
+            tempoRespostaMs: Date.now() - inicio,
+        });
 
         return new Response(
-            JSON.stringify({ resposta }),
+            JSON.stringify({ resposta: resultado.texto }),
             { status: 200, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
         );
     } catch (erro) {
         const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+
+        await registrarLogUso({
+            provedor: "todos",
+            modelo: "-",
+            funcionalidade: "chat",
+            sucesso: false,
+            erroMensagem: mensagemErro,
+            tempoRespostaMs: Date.now() - inicio,
+        });
+
         return new Response(
             JSON.stringify({ erro: mensagemErro }),
             { status: 502, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }

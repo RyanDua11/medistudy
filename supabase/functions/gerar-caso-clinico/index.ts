@@ -13,6 +13,8 @@
 // quem decide o que persistir é o cliente, que já tem essa responsabilidade
 // para os demais dados do app (mesmo padrão usado no restante do MediStudy).
 
+import { registrarLogUso } from "../_shared/logUsoIA.ts";
+
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_MODEL = "openai/gpt-oss-20b";
 
@@ -264,6 +266,8 @@ Deno.serve(async (req) => {
         );
     }
 
+    const inicio = Date.now();
+
     try {
         const prompt = montarPrompt(modo, corpo);
         const mensagemUsuario = MODOS_GERACAO.has(modo)
@@ -272,6 +276,14 @@ Deno.serve(async (req) => {
 
         const texto = await chamarGroq(groqApiKey, prompt, mensagemUsuario);
 
+        await registrarLogUso({
+            provedor: "Groq",
+            modelo: GROQ_MODEL,
+            funcionalidade: "casos-clinicos",
+            sucesso: true,
+            tempoRespostaMs: Date.now() - inicio,
+        });
+
         return new Response(
             JSON.stringify({ texto }),
             { status: 200, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
@@ -279,6 +291,16 @@ Deno.serve(async (req) => {
     } catch (erro) {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
         const status = mensagem.startsWith("Campo") ? 400 : 502;
+
+        await registrarLogUso({
+            provedor: "Groq",
+            modelo: GROQ_MODEL,
+            funcionalidade: "casos-clinicos",
+            sucesso: false,
+            erroMensagem: mensagem,
+            tempoRespostaMs: Date.now() - inicio,
+        });
+
         return new Response(
             JSON.stringify({ erro: mensagem }),
             { status, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
