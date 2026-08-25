@@ -65,14 +65,21 @@ export function podeRealizarExame(exame, tokensRestantes) {
 
 // --- Caso do Dia ---
 
+// data_caso é uma coluna `date default current_date` no Postgres (migration
+// 010) — o Supabase roda em UTC, então current_date reflete o dia em UTC no
+// momento do insert. Comparar com a data LOCAL do navegador (getFullYear/
+// getMonth/getDate) causa falso-negativo em fusos atrás de UTC (ex: Brasil,
+// UTC-3) durante a janela em que UTC já virou o dia mas o horário local
+// ainda não (~21h-00h local) — o app acha que não existe caso do dia e tenta
+// gerar um novo à toa. Por isso a comparação usa UTC dos dois lados.
 function formatarDataISO(data) {
-    const ano = data.getFullYear();
-    const mes = String(data.getMonth() + 1).padStart(2, "0");
-    const dia = String(data.getDate()).padStart(2, "0");
+    const ano = data.getUTCFullYear();
+    const mes = String(data.getUTCMonth() + 1).padStart(2, "0");
+    const dia = String(data.getUTCDate()).padStart(2, "0");
     return `${ano}-${mes}-${dia}`;
 }
 
-/** O Caso do Dia é o mesmo para todas as usuárias — compara a data salva com a data local de hoje. */
+/** O Caso do Dia é o mesmo para todas as usuárias — compara a data salva com a data de hoje em UTC (ver nota acima). */
 export function ehCasoDeHoje(caso, agora = new Date()) {
     if (!caso?.data_caso) return false;
     return caso.data_caso.slice(0, 10) === formatarDataISO(agora);
