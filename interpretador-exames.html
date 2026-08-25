@@ -5,12 +5,339 @@
 
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediStudy - Notas</title>
+    <title>MediStudy - Interpretador de Exames</title>
     <link rel="icon" type="image/png" href="caduceu.png">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .exame-aviso {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            background: rgba(201, 168, 76, 0.08);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-md);
+            padding: var(--space-3) var(--space-4);
+            margin: -8px 0 var(--space-6);
+            font-size: var(--text-sm);
+            color: var(--color-text-soft);
+        }
+
+        .exame-aviso svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-gold);
+            flex-shrink: 0;
+        }
+
+        .exame-dropzone {
+            border: 2px dashed var(--color-border-muted);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8) var(--space-6);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+            background: var(--color-surface);
+        }
+
+        .exame-dropzone:hover,
+        .exame-dropzone:focus-visible {
+            border-color: var(--color-gold);
+            background-color: rgba(201, 168, 76, 0.05);
+        }
+
+        .exame-dropzone.exame-dropzone-arrastando {
+            border-color: var(--color-gold-bright);
+            background-color: rgba(201, 168, 76, 0.1);
+            transform: scale(1.01);
+        }
+
+        .exame-dropzone-icone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, var(--color-gold-brightest) 0%, var(--color-gold-muted) 52%, var(--color-gold-deep) 100%);
+            color: var(--color-bg);
+            margin-bottom: var(--space-4);
+            transition: transform 0.2s ease;
+        }
+
+        .exame-dropzone.exame-dropzone-arrastando .exame-dropzone-icone {
+            transform: scale(1.1) rotate(-4deg);
+        }
+
+        .exame-dropzone-icone svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        .exame-dropzone h3 {
+            font-family: var(--font-display, 'Cinzel', serif);
+            color: var(--color-gold-bright);
+            margin: 0 0 var(--space-2);
+            font-size: var(--text-lg);
+        }
+
+        .exame-dropzone p {
+            color: var(--color-text-muted);
+            margin: 0;
+            font-size: var(--text-sm);
+        }
+
+        .exame-preview:not([hidden]) {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4) var(--space-5);
+            animation: exame-entrada 0.3s ease both;
+        }
+
+        @keyframes exame-entrada {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .exame-preview-thumb {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+            border: 1px solid var(--color-border-muted);
+            flex-shrink: 0;
+        }
+
+        .exame-preview-icone-arquivo {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            background: rgba(201, 168, 76, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-gold);
+            flex-shrink: 0;
+        }
+
+        .exame-preview-icone-arquivo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .exame-preview-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .exame-preview-nome {
+            color: var(--color-text);
+            font-weight: 600;
+            font-size: var(--text-md);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .exame-preview-tamanho {
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+        }
+
+        .exame-preview-acoes {
+            display: flex;
+            gap: var(--space-2);
+            flex-shrink: 0;
+        }
+
+        .exame-btn-primario,
+        .exame-btn-secundario {
+            padding: 10px 20px;
+            border-radius: var(--radius-pill);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .exame-btn-primario {
+            border: none;
+            background: linear-gradient(180deg, var(--color-gold-brightest) 0%, var(--color-gold-muted) 52%, var(--color-gold-deep) 100%);
+            color: var(--color-bg);
+        }
+
+        .exame-btn-primario:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-glow-gold);
+        }
+
+        .exame-btn-primario:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .exame-btn-secundario {
+            border: 1px solid var(--color-border-muted);
+            background: transparent;
+            color: var(--color-text-soft);
+        }
+
+        .exame-btn-secundario:hover {
+            border-color: var(--color-gold-deep);
+            color: var(--color-gold-bright);
+        }
+
+        .exame-loading {
+            text-align: center;
+            padding: var(--space-8) var(--space-5);
+        }
+
+        .exame-loading-icone {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto var(--space-4);
+            border-radius: 50%;
+            border: 3px solid var(--color-border-muted);
+            border-top-color: var(--color-gold);
+            animation: exame-girar 0.8s linear infinite;
+        }
+
+        @keyframes exame-girar {
+            to { transform: rotate(360deg); }
+        }
+
+        .exame-loading p {
+            color: var(--color-text-soft);
+            font-size: var(--text-md);
+            margin: 0;
+        }
+
+        .exame-loading-sub {
+            color: var(--color-text-muted) !important;
+            font-size: var(--text-sm) !important;
+            margin-top: var(--space-2) !important;
+        }
+
+        .exame-resultado {
+            animation: exame-entrada 0.35s ease both;
+        }
+
+        .exame-alerta-critico {
+            display: flex;
+            gap: var(--space-3);
+            background: var(--color-danger-bg);
+            border: 1px solid var(--color-danger);
+            border-radius: var(--radius-md);
+            padding: var(--space-4) var(--space-5);
+            margin-bottom: var(--space-5);
+        }
+
+        .exame-alerta-critico svg {
+            width: 22px;
+            height: 22px;
+            color: var(--color-danger);
+            flex-shrink: 0;
+        }
+
+        .exame-alerta-critico h4 {
+            margin: 0 0 var(--space-1);
+            color: var(--color-danger);
+            font-size: var(--text-md);
+        }
+
+        .exame-alerta-critico ul {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--color-text-soft);
+            font-size: var(--text-sm);
+        }
+
+        .exame-resultado-titulo {
+            font-family: var(--font-display, 'Cinzel', serif);
+            color: var(--color-gold-bright);
+            font-size: var(--text-xl);
+            margin: 0 0 var(--space-4);
+        }
+
+        .exame-parametros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+        }
+
+        .exame-parametro-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-left: 3px solid var(--cor-status);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+        }
+
+        .exame-parametro-nome {
+            font-size: var(--text-sm);
+            color: var(--color-text-soft);
+            margin-bottom: 4px;
+        }
+
+        .exame-parametro-valor {
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--cor-status);
+            margin-bottom: 4px;
+        }
+
+        .exame-parametro-referencia {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+
+        .exame-interpretacao {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            margin-bottom: var(--space-5);
+        }
+
+        .exame-interpretacao h4 {
+            margin: 0 0 var(--space-3);
+            color: var(--color-gold);
+            font-size: var(--text-md);
+        }
+
+        .exame-interpretacao p {
+            margin: 0;
+            color: var(--color-text-soft);
+            line-height: 1.6;
+            font-size: var(--text-md);
+            white-space: pre-wrap;
+        }
+
+        .exame-resultado-acoes {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .exame-copiado {
+            color: #5fbf87 !important;
+        }
+
+        @media (max-width: 640px) {
+            .exame-preview { flex-wrap: wrap; }
+            .exame-preview-acoes { width: 100%; }
+            .exame-preview-acoes button { flex: 1; }
+        }
+    </style>
 </head>
 
 <body class="pagina-home">
@@ -96,7 +423,7 @@
         <a href="diario-erros.html" class="sidebar-link" data-pagina="diario-erros" aria-label="Diário de Erros">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
         </a>
-        <a href="interpretador-exames.html" class="sidebar-link" data-pagina="interpretador-exames" aria-label="Interpretador de Exames">
+        <a href="interpretador-exames.html" class="sidebar-link ativo" data-pagina="interpretador-exames" aria-label="Interpretador de Exames">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5"/><path d="M14 3l6 6"/><path d="M14 3v6h6"/><circle cx="15.5" cy="16.5" r="3"/><path d="M18 19l2.5 2.5"/></svg>
         </a>
         <a href="em-breve.html?ferramenta=configuracoes" class="sidebar-link" data-pagina="configuracoes" aria-label="Configurações">
@@ -133,7 +460,7 @@
             <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
             <span class="bottom-nav-label">Erros</span>
         </a>
-        <a href="interpretador-exames.html" class="bottom-nav-link" data-pagina="interpretador-exames">
+        <a href="interpretador-exames.html" class="bottom-nav-link ativo" data-pagina="interpretador-exames">
             <span class="bottom-nav-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5"/><path d="M14 3l6 6"/><path d="M14 3v6h6"/><circle cx="15.5" cy="16.5" r="3"/><path d="M18 19l2.5 2.5"/></svg></span>
             <span class="bottom-nav-label">Exames</span>
         </a>
@@ -150,140 +477,37 @@
         Painel
     </a>
 
-    <h1 class="titulo-pagina">Notas</h1>
+    <h1 class="titulo-pagina">Interpretador de Exames</h1>
 
-    <p id="mensagem-notas" class="mensagem-erro" hidden></p>
+    <div class="exame-aviso">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <span>Este interpretador é uma ferramenta de estudo — não substitui avaliação médica profissional.</span>
+    </div>
 
-    <!-- TELA 1 — ESCOLHA -->
-    <section id="tela-escolha" class="tela-modo" data-tela="escolha">
-        <div class="tela-centralizada-corpo">
+    <p id="exame-mensagem" class="mensagem-erro" hidden></p>
 
-        <div class="stat-cards-grid">
-            <div class="stat-card" data-cor="dourado">
-                <span class="stat-card-icone" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
-                </span>
-                <span class="stat-card-info">
-                    <span class="estatistica-valor" id="stat-total-notas">0</span>
-                    <span class="estatistica-rotulo">Notas lançadas</span>
-                </span>
-            </div>
-            <div class="stat-card" data-cor="verde">
-                <span class="stat-card-icone" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-2.5 1.5-5-3-8-4.5 3-4.5 5.5-3 8"/><path d="M4 20l6-6M20 20l-6-6"/><circle cx="12" cy="9" r="1.5"/></svg>
-                </span>
-                <span class="stat-card-info">
-                    <span class="estatistica-valor" id="stat-materias-com-notas">0</span>
-                    <span class="estatistica-rotulo">Matérias com notas</span>
-                </span>
-            </div>
-        </div>
+    <div id="exame-dropzone" class="exame-dropzone" tabindex="0" role="button" aria-label="Enviar exame">
+        <span class="exame-dropzone-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        </span>
+        <h3>Arraste um exame aqui</h3>
+        <p>ou clique pra escolher um arquivo — PDF, PNG ou JPG, até 10MB</p>
+        <input type="file" id="exame-input-arquivo" accept="application/pdf,image/png,image/jpeg" hidden>
+    </div>
 
-        <div class="escolha-acoes">
-            <button id="botao-ir-lancar" type="button" class="botao-escolha botao-escolha-primario">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                Lançar nota
-            </button>
-            <button id="botao-ir-calcular" type="button" class="botao-escolha botao-escolha-secundario">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>
-                Calcular o que falta
-            </button>
-        </div>
+    <div id="exame-preview" class="exame-preview" hidden></div>
 
-        <button id="botao-ir-lista" type="button" class="link-modo-padrao link-ver-todos">Ver notas lançadas</button>
-        </div>
-    </section>
+    <div id="exame-loading" class="exame-loading" hidden>
+        <div class="exame-loading-icone" aria-hidden="true"></div>
+        <p>Analisando com IA...</p>
+        <p class="exame-loading-sub">Isso pode levar alguns segundos.</p>
+    </div>
 
-    <!-- TELA 2 — LANÇAR -->
-    <section id="tela-lancar" class="tela-modo" data-tela="lancar" hidden>
-        <button type="button" class="botao-voltar-tela" data-voltar>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            Voltar
-        </button>
-
-        <div class="flashcards-coluna flashcards-coluna-criacao tela-centralizada-corpo">
-            <h2 id="titulo-form-nota">Nova nota</h2>
-            <form id="form-nota">
-                <div class="input-group-simples">
-                    <label for="campo-materia-nota">Matéria</label>
-                    <input type="text" id="campo-materia-nota" placeholder="Ex: Farmacologia II" required>
-                </div>
-                <div class="input-group-simples">
-                    <label for="campo-avaliacao-nota">Avaliação</label>
-                    <input type="text" id="campo-avaliacao-nota" placeholder="Ex: P1" required>
-                </div>
-                <div class="input-group-simples">
-                    <label for="campo-peso-nota">Peso</label>
-                    <input type="number" id="campo-peso-nota" step="0.1" min="0" required>
-                </div>
-                <div class="input-group-simples">
-                    <label for="campo-valor-nota">Nota</label>
-                    <input type="number" id="campo-valor-nota" step="0.1" min="0" max="10" required>
-                </div>
-                <button type="submit" id="botao-salvar-nota">Adicionar nota</button>
-                <button type="button" id="botao-cancelar-edicao-nota" class="botao-outline" hidden>Cancelar edição</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- TELA 3 — VER NOTAS -->
-    <section id="tela-lista" class="tela-modo" data-tela="lista" hidden>
-        <button type="button" class="botao-voltar-tela" data-voltar>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            Voltar
-        </button>
-
-        <div class="flashcards-coluna flashcards-coluna-lista">
-            <h2>Notas lançadas</h2>
-            <div id="notas-carregando" class="skeleton-carregando" role="status">
-                <span class="sr-only">Carregando…</span>
-                <span class="skeleton-barra"></span>
-                <span class="skeleton-barra"></span>
-                <span class="skeleton-barra skeleton-barra-media"></span>
-            </div>
-            <ul id="lista-notas"></ul>
-            <div id="notas-vazio" class="estado-vazio" data-cor="verde" hidden>
-                <span class="estado-vazio-icone" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v18M4 8h5M4 13h5M4 18h5"/><path d="M14 5l6 2-1.5 12L14 17z"/></svg>
-                </span>
-                <strong class="estado-vazio-titulo">Nenhuma nota lançada</strong>
-                <p>Lance sua primeira nota para acompanhar sua evolução.</p>
-                <button id="botao-ir-lancar-vazio" type="button" class="estado-vazio-cta">Lançar nota</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- TELA 4 — CALCULAR -->
-    <section id="tela-calcular" class="tela-modo" data-tela="calcular" hidden>
-        <button type="button" class="botao-voltar-tela" data-voltar>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            Voltar
-        </button>
-
-        <div class="flashcards-coluna flashcards-coluna-criacao tela-centralizada-corpo">
-            <h2>O que falta tirar</h2>
-            <div class="input-group-simples">
-                <label for="select-materia-calculo">Matéria</label>
-                <select id="select-materia-calculo" aria-label="Escolher matéria">
-                    <option value="">Escolha a matéria...</option>
-                </select>
-            </div>
-            <div class="input-group-simples">
-                <label for="campo-media-necessaria">Média necessária</label>
-                <input type="number" id="campo-media-necessaria" step="0.1" min="0" max="10" value="7">
-            </div>
-            <div class="input-group-simples">
-                <label for="campo-peso-proxima">Peso da próxima avaliação</label>
-                <input type="number" id="campo-peso-proxima" step="0.1" min="0.1" value="1">
-            </div>
-            <button id="botao-calcular-nota" type="button">Calcular</button>
-            <p id="resultado-calculo"></p>
-        </div>
-    </section>
+    <div id="exame-resultado" class="exame-resultado" hidden></div>
 
 </main>
 
-<script type="module" src="src/pages/notas/notasPage.js"></script>
+<script type="module" src="src/pages/interpretadorExames/interpretadorExamesPage.js"></script>
 
 </body>
 

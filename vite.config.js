@@ -21,6 +21,7 @@ export default defineConfig({
                 chat: resolve(__dirname, "chat.html"),
                 admin: resolve(__dirname, "admin.html"),
                 diarioErros: resolve(__dirname, "diario-erros.html"),
+                interpretadorExames: resolve(__dirname, "interpretador-exames.html"),
             },
         },
     },
