@@ -1,4 +1,5 @@
 import { protegerRota } from "../../services/routeGuard.js";
+import { supabase } from "../../services/supabaseClient.js";
 import { supabaseAdmin } from "../../services/supabaseAdminClient.js";
 import {
     buscarUsoPorProvedor,
@@ -42,6 +43,7 @@ const cardsProvedorEl = document.getElementById("admin-cards-provedor");
 const tabelaUsuariasEl = document.getElementById("admin-tabela-usuarias");
 const listaErrosEl = document.getElementById("admin-lista-erros");
 const botaoAtualizarErros = document.getElementById("admin-botao-atualizar-erros");
+const botaoTestarProvedores = document.getElementById("admin-botao-testar-provedores");
 const relogioEl = document.getElementById("admin-relogio");
 let graficoChamadas = null;
 
@@ -369,6 +371,42 @@ async function carregarErros() {
     }
 }
 
+async function testarProvedores() {
+    botaoTestarProvedores.classList.add("girando");
+    botaoTestarProvedores.disabled = true;
+    const textoOriginal = botaoTestarProvedores.innerHTML;
+    botaoTestarProvedores.innerHTML = botaoTestarProvedores.innerHTML.replace("Testar provedores", "Testando...");
+
+    try {
+        const { data, error } = await supabase.functions.invoke("testar-provedores");
+        if (error) throw error;
+
+        const total = data?.resultados?.length ?? 0;
+        const sucessos = data?.resultados?.filter((r) => r.sucesso).length ?? 0;
+        mensagemGlobal(`Teste concluído: ${sucessos}/${total} provedores respondendo.`, sucessos === total);
+
+        await carregarPainel();
+    } catch (erro) {
+        mensagemGlobal(`Falha ao testar provedores: ${erro.message}`, false);
+    } finally {
+        botaoTestarProvedores.classList.remove("girando");
+        botaoTestarProvedores.disabled = false;
+        botaoTestarProvedores.innerHTML = textoOriginal;
+    }
+}
+
+function mensagemGlobal(texto, sucesso) {
+    const existente = document.getElementById("admin-mensagem-global");
+    if (existente) existente.remove();
+
+    const el = document.createElement("div");
+    el.id = "admin-mensagem-global";
+    el.textContent = texto;
+    el.style.cssText = `position:fixed; top:20px; right:20px; z-index:999; padding:12px 20px; border-radius:10px; font-size:13px; font-family:var(--admin-font-mono); background:${sucesso ? "rgba(16,185,129,0.16)" : "rgba(239,68,68,0.16)"}; border:1px solid ${sucesso ? "var(--admin-green)" : "var(--admin-red)"}; color:${sucesso ? "var(--admin-green)" : "var(--admin-red)"};`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+}
+
 async function carregarPainel() {
     const [usoPorProvedor, chamadasPorDia, usuarias] = await Promise.all([
         buscarUsoPorProvedor(supabaseAdmin),
@@ -393,6 +431,7 @@ async function iniciar() {
     conteudoEl.hidden = false;
     iniciarRelogio();
     botaoAtualizarErros.addEventListener("click", carregarErros);
+    botaoTestarProvedores.addEventListener("click", testarProvedores);
     await carregarPainel();
 }
 

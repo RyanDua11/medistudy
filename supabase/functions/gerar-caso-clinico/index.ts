@@ -1,22 +1,16 @@
-// Edge Function: gera e conduz casos clínicos via API da Groq, nos 3 modos
-// de estudo (Rápido, Interativo, Simulador de Anamnese) e nas chamadas
-// conversacionais que cada modo precisa (responder, avaliar).
-//
-// Requer o secret GROQ_API_KEY configurado no projeto Supabase:
-//   supabase secrets set GROQ_API_KEY=sua_chave_aqui
-//
-// Modelo: openai/gpt-oss-20b (mesmo modelo já usado por gerar-flashcard/
-// index.ts com esta mesma chave Groq — moonshotai/kimi-k2-instruct não está
-// acessível na conta configurada, retornando "model_not_found").
+// Edge Function: gera e conduz casos clínicos, nos 3 modos de estudo
+// (Rápido, Interativo, Simulador de Anamnese) e nas chamadas conversacionais
+// que cada modo precisa (responder, avaliar). Fallback em cascata entre os
+// mesmos 8 provedores de IA usados pelo chat-medistudy (ver
+// _shared/provedoresIA.ts) — se a Groq falhar, tenta o próximo, e assim por
+// diante, em vez de depender de um único provedor.
 //
 // Esta função é propositalmente stateless (não grava nada no Supabase):
 // quem decide o que persistir é o cliente, que já tem essa responsabilidade
 // para os demais dados do app (mesmo padrão usado no restante do MediStudy).
 
 import { registrarLogUso } from "../_shared/logUsoIA.ts";
-
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "openai/gpt-oss-20b";
+import { PROVEDORES, type Provedor } from "../_shared/provedoresIA.ts";
 
 const CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
@@ -171,15 +165,21 @@ Formato exato do JSON:
 const MODOS_GERACAO = new Set(["rapido", "interativo", "anamnese", "caso_do_dia"]);
 const MODOS_CONVERSA = new Set(["responder_anamnese", "avaliar_hipotese", "avaliar_anamnese"]);
 
-async function chamarGroq(groqApiKey: string, prompt: string, mensagemUsuario: string) {
-    const resposta = await fetch(GROQ_URL, {
+export interface ResultadoProvedorTexto {
+    texto: string;
+    tokensInput: number | null;
+    tokensOutput: number | null;
+}
+
+export async function chamarProvedor(provedor: Provedor, apiKey: string, prompt: string, mensagemUsuario: string): Promise<ResultadoProvedorTexto> {
+    const resposta = await fetch(provedor.url, {
         method: "POST",
         headers: {
-            Authorization: `Bearer ${groqApiKey}`,
+            Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: GROQ_MODEL,
+            model: provedor.modelo,
             response_format: { type: "json_object" },
             messages: [
                 { role: "system", content: prompt },
@@ -190,7 +190,7 @@ async function chamarGroq(groqApiKey: string, prompt: string, mensagemUsuario: s
 
     if (!resposta.ok) {
         const detalhe = await resposta.text();
-        throw new Error(`Falha ao chamar a Groq: ${detalhe}`);
+        throw new Error(`Falha ao chamar ${provedor.nome} (status ${resposta.status}): ${detalhe}`);
     }
 
     const dados = await resposta.json();
@@ -199,6 +199,37 @@ async function chamarGroq(groqApiKey: string, prompt: string, mensagemUsuario: s
         tokensInput: dados.usage?.prompt_tokens ?? null,
         tokensOutput: dados.usage?.completion_tokens ?? null,
     };
+}
+
+export interface ResultadoFallbackTexto extends ResultadoProvedorTexto {
+    provedor: string;
+    modelo: string;
+}
+
+export async function chamarComFallback(
+    prompt: string,
+    mensagemUsuario: string,
+    obterEnv: (nome: string) => string | undefined = (nome) => Deno.env.get(nome),
+): Promise<ResultadoFallbackTexto> {
+    const falhas: string[] = [];
+
+    for (const provedor of PROVEDORES) {
+        const apiKey = obterEnv(provedor.envVar);
+        if (!apiKey) {
+            falhas.push(`${provedor.nome}: ${provedor.envVar} não configurada`);
+            continue;
+        }
+
+        try {
+            const resultado = await chamarProvedor(provedor, apiKey, prompt, mensagemUsuario);
+            return { ...resultado, provedor: provedor.nome, modelo: provedor.modelo };
+        } catch (erro) {
+            const mensagem = erro instanceof Error ? erro.message : String(erro);
+            falhas.push(`${provedor.nome}: ${mensagem}`);
+        }
+    }
+
+    throw new Error(`Todos os provedores de IA falharam. ${falhas.join(" | ")}`);
 }
 
 function montarPrompt(modo: string, corpo: Record<string, unknown>) {
@@ -241,14 +272,6 @@ Deno.serve(async (req) => {
         );
     }
 
-    const groqApiKey = Deno.env.get("GROQ_API_KEY");
-    if (!groqApiKey) {
-        return new Response(
-            JSON.stringify({ erro: "GROQ_API_KEY não configurada no projeto Supabase" }),
-            { status: 500, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
-        );
-    }
-
     let corpo: Record<string, unknown>;
     try {
         corpo = await req.json();
@@ -278,11 +301,11 @@ Deno.serve(async (req) => {
             ? `Gere o caso agora, no formato JSON pedido.`
             : `Responda agora, no formato JSON pedido.`;
 
-        const resultado = await chamarGroq(groqApiKey, prompt, mensagemUsuario);
+        const resultado = await chamarComFallback(prompt, mensagemUsuario);
 
         await registrarLogUso({
-            provedor: "Groq",
-            modelo: GROQ_MODEL,
+            provedor: resultado.provedor,
+            modelo: resultado.modelo,
             funcionalidade: "casos-clinicos",
             sucesso: true,
             tokensInput: resultado.tokensInput,
@@ -299,8 +322,8 @@ Deno.serve(async (req) => {
         const status = mensagem.startsWith("Campo") ? 400 : 502;
 
         await registrarLogUso({
-            provedor: "Groq",
-            modelo: GROQ_MODEL,
+            provedor: "todos",
+            modelo: "-",
             funcionalidade: "casos-clinicos",
             sucesso: false,
             erroMensagem: mensagem,

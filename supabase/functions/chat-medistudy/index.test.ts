@@ -43,7 +43,7 @@ Deno.test("PROVEDORES está na ordem Groq, Gemini, Cerebras, OpenRouter, Mistral
         ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace"],
     );
     assertEquals(PROVEDORES[0].modelo, "openai/gpt-oss-20b");
-    assertEquals(PROVEDORES[1].modelo, "gemini-2.0-flash");
+    assertEquals(PROVEDORES[1].modelo, "gemini-3.6-flash");
     assertEquals(PROVEDORES[7].modelo, "meta-llama/Llama-3.3-70B-Instruct");
 });
 
@@ -173,7 +173,7 @@ Deno.test("chamarComFallback retorna o nome e o modelo do provedor que respondeu
                 (nome) => ENV_COMPLETO.get(nome),
             );
             assertEquals(resultado.provedor, "Gemini");
-            assertEquals(resultado.modelo, "gemini-2.0-flash");
+            assertEquals(resultado.modelo, "gemini-3.6-flash");
         },
     );
 });

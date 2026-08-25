@@ -17,71 +17,14 @@
 // padrão usado no restante do MediStudy.
 
 import { registrarLogUso } from "../_shared/logUsoIA.ts";
-
-interface Provedor {
-    nome: string;
-    url: string;
-    modelo: string;
-    envVar: string;
-}
+import { PROVEDORES, type Provedor } from "../_shared/provedoresIA.ts";
 
 export interface MensagemChat {
     role: "system" | "user" | "assistant";
     content: string;
 }
 
-// Ordem de fallback: tenta cada provedor nesta sequência, só passando para o
-// próximo se o anterior lançar exceção.
-export const PROVEDORES: Provedor[] = [
-    {
-        nome: "Groq",
-        url: "https://api.groq.com/openai/v1/chat/completions",
-        modelo: "openai/gpt-oss-20b",
-        envVar: "GROQ_API_KEY",
-    },
-    {
-        nome: "Gemini",
-        url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-        modelo: "gemini-2.0-flash",
-        envVar: "GEMINI_API_KEY",
-    },
-    {
-        nome: "Cerebras",
-        url: "https://api.cerebras.ai/v1/chat/completions",
-        modelo: "llama-3.3-70b",
-        envVar: "CEREBRAS_API_KEY",
-    },
-    {
-        nome: "OpenRouter",
-        url: "https://openrouter.ai/api/v1/chat/completions",
-        modelo: "meta-llama/llama-3.3-70b-instruct:free",
-        envVar: "OPENROUTER_API_KEY",
-    },
-    {
-        nome: "Mistral",
-        url: "https://api.mistral.ai/v1/chat/completions",
-        modelo: "mistral-small-latest",
-        envVar: "MISTRAL_API_KEY",
-    },
-    {
-        nome: "SambaNova",
-        url: "https://api.sambanova.ai/v1/chat/completions",
-        modelo: "Meta-Llama-3.3-70B-Instruct",
-        envVar: "SAMBANOVA_API_KEY",
-    },
-    {
-        nome: "DeepSeek",
-        url: "https://api.deepseek.com/chat/completions",
-        modelo: "deepseek-chat",
-        envVar: "DEEPSEEK_API_KEY",
-    },
-    {
-        nome: "HuggingFace",
-        url: "https://api-inference.huggingface.co/v1/chat/completions",
-        modelo: "meta-llama/Llama-3.3-70B-Instruct",
-        envVar: "HUGGINGFACE_API_KEY",
-    },
-];
+export { PROVEDORES };
 
 const CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
