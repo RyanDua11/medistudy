@@ -22,6 +22,8 @@ const CORES_PROVEDOR = {
     HuggingFace: "#2DD4BF",
     NVIDIA: "#76B900",
     GitHubModels: "#8250DF",
+    Cohere: "#39594D",
+    CloudflareWorkersAI: "#F6821F",
 };
 const COR_PROVEDOR_PADRAO = "#94A3B8";
 

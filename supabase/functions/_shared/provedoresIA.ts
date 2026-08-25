@@ -13,6 +13,19 @@
 //   supabase secrets set SAMBANOVA_API_KEY=sua_chave_aqui
 //   supabase secrets set DEEPSEEK_API_KEY=sua_chave_aqui
 //   supabase secrets set HUGGINGFACE_API_KEY=sua_chave_aqui
+//   supabase secrets set NVIDIA_API_KEY=sua_chave_aqui
+//   supabase secrets set GITHUB_MODELS_API_KEY=seu_pat_aqui
+//   supabase secrets set COHERE_API_KEY=sua_chave_aqui
+//   supabase secrets set CLOUDFLARE_API_KEY=sua_chave_aqui
+//   supabase secrets set CLOUDFLARE_ACCOUNT_ID=seu_account_id_aqui
+
+// Lida uma vez no carregamento do módulo — estável durante a vida do isolate
+// (env vars não mudam entre invocações da mesma function deployada), usada
+// só pra montar a URL da Cloudflare, que precisa do account_id no path (os
+// demais provedores têm URL fixa). Se ausente, a URL fica com um buraco no
+// meio (".../accounts//ai/..."), o fetch dá 404 e cai no fluxo de erro
+// normal do fallback — não precisa de tratamento especial.
+const CLOUDFLARE_ACCOUNT_ID = Deno.env.get("CLOUDFLARE_ACCOUNT_ID") ?? "";
 
 export interface Provedor {
     nome: string;
@@ -45,7 +58,7 @@ export const PROVEDORES: Provedor[] = [
     {
         nome: "OpenRouter",
         url: "https://openrouter.ai/api/v1/chat/completions",
-        modelo: "google/gemma-4-31b-it:free",
+        modelo: "nvidia/nemotron-3-super-120b-a12b:free",
         envVar: "OPENROUTER_API_KEY",
     },
     {
@@ -83,6 +96,25 @@ export const PROVEDORES: Provedor[] = [
         url: "https://models.github.ai/inference/chat/completions",
         modelo: "openai/gpt-4o-mini",
         envVar: "GITHUB_MODELS_API_KEY",
+    },
+    {
+        // 1000 chamadas/mês grátis. Endpoint OpenAI-compatible oficial da
+        // Cohere (não precisa do SDK deles nem de payload no formato nativo).
+        nome: "Cohere",
+        url: "https://api.cohere.com/compatibility/v1/chat/completions",
+        modelo: "command-r-plus",
+        envVar: "COHERE_API_KEY",
+    },
+    {
+        // Cloudflare Workers AI. Tem sim um endpoint OpenAI-compatible
+        // (não precisa do formato nativo "/ai/run/@cf/..."), mas o path
+        // inclui o account_id — só a Cloudflare, entre todos os provedores
+        // daqui, precisa de uma segunda credencial além da API key (ver
+        // CLOUDFLARE_ACCOUNT_ID acima). Modelo é gratuito na Workers AI.
+        nome: "CloudflareWorkersAI",
+        url: `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1/chat/completions`,
+        modelo: "@cf/meta/llama-3.1-8b-instruct",
+        envVar: "CLOUDFLARE_API_KEY",
     },
 ];
 
