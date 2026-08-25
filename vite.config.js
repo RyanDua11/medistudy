@@ -19,6 +19,7 @@ export default defineConfig({
                 provas: resolve(__dirname, "provas.html"),
                 notas: resolve(__dirname, "notas.html"),
                 chat: resolve(__dirname, "chat.html"),
+                admin: resolve(__dirname, "admin.html"),
             },
         },
     },

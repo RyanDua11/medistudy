@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediStudy - Admin</title>
+    <link rel="icon" type="image/png" href="caduceu.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4" defer></script>
+    <style>
+        body.pagina-admin {
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            padding: var(--space-7) var(--space-6) var(--space-8);
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: var(--space-4);
+            margin-bottom: var(--space-7);
+            flex-wrap: wrap;
+        }
+
+        .admin-header h1 {
+            font-family: var(--font-display);
+            color: var(--color-gold-bright);
+            font-size: var(--text-3xl);
+            margin: 0;
+        }
+
+        .admin-header p {
+            color: var(--color-text-muted);
+            margin: var(--space-1) 0 0;
+            font-size: var(--text-sm);
+        }
+
+        .admin-bloqueado {
+            max-width: 480px;
+            margin: 20vh auto;
+            text-align: center;
+            padding: var(--space-6);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-lg);
+        }
+
+        .admin-bloqueado h1 {
+            font-family: var(--font-display);
+            color: var(--color-gold-bright);
+            font-size: var(--text-2xl);
+            margin: 0 0 var(--space-2);
+        }
+
+        .admin-bloqueado p {
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+
+        .admin-secao {
+            margin-bottom: var(--space-8);
+        }
+
+        .admin-secao h2 {
+            font-family: var(--font-display);
+            color: var(--color-gold);
+            font-size: var(--text-xl);
+            margin: 0 0 var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-3);
+        }
+
+        .admin-cards-provedor {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .admin-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-card);
+        }
+
+        .admin-card-provedor-nome {
+            font-family: var(--font-display);
+            color: var(--color-gold-bright);
+            font-size: var(--text-lg);
+            text-transform: capitalize;
+            margin: 0 0 var(--space-3);
+        }
+
+        .admin-card-linha {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--text-sm);
+            color: var(--color-text-soft);
+            padding: var(--space-1) 0;
+        }
+
+        .admin-card-linha strong {
+            color: var(--color-text);
+        }
+
+        .admin-card-taxa-boa { color: #5fbf87; }
+        .admin-card-taxa-ruim { color: var(--color-danger); }
+
+        .admin-grafico-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            height: 320px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .admin-tabela-wrapper {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-muted);
+            border-radius: var(--radius-md);
+            overflow-x: auto;
+            box-shadow: var(--shadow-card);
+        }
+
+        table.admin-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--text-sm);
+        }
+
+        table.admin-tabela th,
+        table.admin-tabela td {
+            text-align: left;
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border-muted);
+            white-space: nowrap;
+        }
+
+        table.admin-tabela th {
+            color: var(--color-gold);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: var(--text-xs);
+            letter-spacing: 0.04em;
+        }
+
+        table.admin-tabela tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        table.admin-tabela tbody tr:hover {
+            background: var(--color-surface-focus);
+        }
+
+        .admin-botao-atualizar {
+            background: transparent;
+            border: 1px solid var(--color-gold-deep);
+            color: var(--color-gold-bright);
+            border-radius: var(--radius-pill);
+            padding: var(--space-2) var(--space-4);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .admin-botao-atualizar:hover {
+            background: var(--color-surface-focus);
+            border-color: var(--color-gold-bright);
+        }
+
+        .admin-erro-item {
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border-muted);
+            font-size: var(--text-sm);
+        }
+
+        .admin-erro-item:last-child { border-bottom: none; }
+
+        .admin-erro-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-3);
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+            margin-bottom: var(--space-1);
+        }
+
+        .admin-erro-provedor {
+            color: var(--color-gold);
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .admin-erro-mensagem {
+            color: var(--color-danger);
+        }
+
+        .admin-estado-vazio {
+            padding: var(--space-6);
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+    </style>
+</head>
+
+<body class="pagina-admin">
+
+<div id="admin-bloqueado" class="admin-bloqueado" hidden>
+    <h1>Acesso restrito</h1>
+    <p>Você não tem permissão para ver este painel.</p>
+</div>
+
+<main id="admin-conteudo" hidden>
+
+    <div class="admin-header">
+        <div>
+            <h1>Painel de Administração</h1>
+            <p>Uso de IA, usuárias e erros — MediStudy</p>
+        </div>
+    </div>
+
+    <section class="admin-secao">
+        <h2>Uso por provedor (últimas 24h)</h2>
+        <div id="admin-cards-provedor" class="admin-cards-provedor"></div>
+    </section>
+
+    <section class="admin-secao">
+        <h2>Chamadas por dia (últimos 7 dias)</h2>
+        <div class="admin-grafico-container">
+            <canvas id="admin-grafico-chamadas"></canvas>
+        </div>
+    </section>
+
+    <section class="admin-secao">
+        <h2>Usuárias</h2>
+        <div class="admin-tabela-wrapper">
+            <table class="admin-tabela">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Mensagens</th>
+                        <th>Casos clínicos</th>
+                        <th>Flashcards</th>
+                        <th>Último acesso</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-tabela-usuarias"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="admin-secao">
+        <h2>
+            Últimos erros
+            <button type="button" id="admin-botao-atualizar-erros" class="admin-botao-atualizar">Atualizar</button>
+        </h2>
+        <div id="admin-lista-erros" class="admin-tabela-wrapper"></div>
+    </section>
+
+</main>
+
+<script type="module" src="src/pages/admin/adminPage.js"></script>
+
+</body>
+
+</html>

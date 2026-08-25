@@ -128,13 +128,32 @@ Deno.test("chamarComFallback usa Gemini quando Groq falha", async () => {
                 [{ role: "user", content: "oi" }],
                 (nome) => ENV_COMPLETO.get(nome),
             );
-            assertEquals(resultado, "resposta da gemini");
+            assertEquals(resultado.texto, "resposta da gemini");
         },
     );
 
     assertEquals(chamadasPorUrl.some((u) => u.includes("groq.com")), true);
     assertEquals(chamadasPorUrl.some((u) => u.includes("generativelanguage.googleapis.com")), true);
     assertEquals(chamadasPorUrl.some((u) => u.includes("cerebras.ai")), false);
+});
+
+Deno.test("chamarComFallback retorna o nome e o modelo do provedor que respondeu", async () => {
+    await comFetchMockado(
+        (input: RequestInfo | URL) => {
+            const url = String(input);
+            if (url.includes("groq.com")) return Promise.resolve(respostaErro(503, "groq indisponível"));
+            if (url.includes("generativelanguage.googleapis.com")) return Promise.resolve(respostaOk("resposta da gemini"));
+            return Promise.resolve(respostaErro(500, "não deveria chegar aqui"));
+        },
+        async () => {
+            const resultado = await chamarComFallback(
+                [{ role: "user", content: "oi" }],
+                (nome) => ENV_COMPLETO.get(nome),
+            );
+            assertEquals(resultado.provedor, "Gemini");
+            assertEquals(resultado.modelo, "gemini-2.0-flash");
+        },
+    );
 });
 
 Deno.test("chamarComFallback percorre todos os 8 provedores até o último quando todos os anteriores falham", async () => {
@@ -149,7 +168,7 @@ Deno.test("chamarComFallback percorre todos os 8 provedores até o último quand
                 [{ role: "user", content: "oi" }],
                 (nome) => ENV_COMPLETO.get(nome),
             );
-            assertEquals(resultado, "resposta da huggingface");
+            assertEquals(resultado.texto, "resposta da huggingface");
         },
     );
 });
@@ -188,7 +207,7 @@ Deno.test("chamarComFallback pula provedores sem API key configurada e segue pro
                 ["MISTRAL_API_KEY", "chave-mistral"],
             ]);
             const resultado = await chamarComFallback([{ role: "user", content: "oi" }], (nome) => env.get(nome));
-            assertEquals(resultado, "resposta mistral");
+            assertEquals(resultado.texto, "resposta mistral");
         },
     );
 });
