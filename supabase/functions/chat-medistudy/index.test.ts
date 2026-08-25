@@ -1,7 +1,7 @@
 // Testes da Edge Function chat-medistudy: cobrem o fallback em cascata entre
-// os 10 provedores de IA (Groq → Gemini → Cerebras → OpenRouter → Mistral →
-// SambaNova → DeepSeek → HuggingFace → NVIDIA → GitHubModels) e a montagem
-// de mensagens do chat.
+// os 12 provedores de IA (Groq → Gemini → Cerebras → OpenRouter → Mistral →
+// SambaNova → DeepSeek → HuggingFace → NVIDIA → GitHubModels → Cohere →
+// CloudflareWorkersAI) e a montagem de mensagens do chat.
 //
 // Rodar com: deno test --allow-env --allow-net supabase/functions/chat-medistudy/index.test.ts
 
@@ -38,18 +38,23 @@ const ENV_COMPLETO = new Map([
     ["HUGGINGFACE_API_KEY", "chave-huggingface"],
     ["NVIDIA_API_KEY", "chave-nvidia"],
     ["GITHUB_MODELS_API_KEY", "chave-github-models"],
+    ["COHERE_API_KEY", "chave-cohere"],
+    ["CLOUDFLARE_API_KEY", "chave-cloudflare"],
 ]);
 
-Deno.test("PROVEDORES está na ordem Groq, Gemini, Cerebras, OpenRouter, Mistral, SambaNova, DeepSeek, HuggingFace, NVIDIA, GitHubModels", () => {
+Deno.test("PROVEDORES está na ordem Groq, Gemini, Cerebras, OpenRouter, Mistral, SambaNova, DeepSeek, HuggingFace, NVIDIA, GitHubModels, Cohere, CloudflareWorkersAI", () => {
     assertEquals(
         PROVEDORES.map((p) => p.nome),
-        ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace", "NVIDIA", "GitHubModels"],
+        ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace", "NVIDIA", "GitHubModels", "Cohere", "CloudflareWorkersAI"],
     );
     assertEquals(PROVEDORES[0].modelo, "openai/gpt-oss-20b");
     assertEquals(PROVEDORES[1].modelo, "gemini-3.6-flash");
     assertEquals(PROVEDORES[7].modelo, "meta-llama/Llama-3.3-70B-Instruct");
     assertEquals(PROVEDORES[8].modelo, "meta/llama-3.3-70b-instruct");
     assertEquals(PROVEDORES[9].modelo, "openai/gpt-4o-mini");
+    assertEquals(PROVEDORES[10].modelo, "command-r-plus");
+    assertEquals(PROVEDORES[11].modelo, "@cf/meta/llama-3.1-8b-instruct");
+    assertStringIncludes(PROVEDORES[11].url, "/ai/v1/chat/completions");
 });
 
 Deno.test("montarMensagens monta system prompt + histórico + mensagem nova, nessa ordem", () => {
@@ -183,11 +188,11 @@ Deno.test("chamarComFallback retorna o nome e o modelo do provedor que respondeu
     );
 });
 
-Deno.test("chamarComFallback percorre todos os 10 provedores até o último quando todos os anteriores falham", async () => {
+Deno.test("chamarComFallback percorre todos os 12 provedores até o último quando todos os anteriores falham", async () => {
     await comFetchMockado(
         (input: RequestInfo | URL) => {
             const url = String(input);
-            if (url.includes("models.github.ai")) return Promise.resolve(respostaOk("resposta da github models"));
+            if (url.includes("api.cloudflare.com")) return Promise.resolve(respostaOk("resposta da cloudflare"));
             return Promise.resolve(respostaErro(500, "indisponível"));
         },
         async () => {
@@ -195,7 +200,7 @@ Deno.test("chamarComFallback percorre todos os 10 provedores até o último quan
                 [{ role: "user", content: "oi" }],
                 (nome) => ENV_COMPLETO.get(nome),
             );
-            assertEquals(resultado.texto, "resposta da github models");
+            assertEquals(resultado.texto, "resposta da cloudflare");
         },
     );
 });

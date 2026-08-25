@@ -36,6 +36,8 @@ const ENV_COMPLETO = new Map([
     ["HUGGINGFACE_API_KEY", "chave-huggingface"],
     ["NVIDIA_API_KEY", "chave-nvidia"],
     ["GITHUB_MODELS_API_KEY", "chave-github-models"],
+    ["COHERE_API_KEY", "chave-cohere"],
+    ["CLOUDFLARE_API_KEY", "chave-cloudflare"],
 ]);
 
 Deno.test("chamarProvedor retorna texto e tokens em caso de sucesso", async () => {
@@ -83,16 +85,16 @@ Deno.test("chamarComFallback usa Gemini quando Groq falha", async () => {
     );
 });
 
-Deno.test("chamarComFallback percorre todos os 10 provedores até o último quando todos os anteriores falham", async () => {
+Deno.test("chamarComFallback percorre todos os 12 provedores até o último quando todos os anteriores falham", async () => {
     await comFetchMockado(
         (input: RequestInfo | URL) => {
             const url = String(input);
-            if (url.includes("models.github.ai")) return Promise.resolve(respostaOk('{"caso":"github-models"}'));
+            if (url.includes("api.cloudflare.com")) return Promise.resolve(respostaOk('{"caso":"cloudflare"}'));
             return Promise.resolve(respostaErro(500, "indisponível"));
         },
         async () => {
             const resultado = await chamarComFallback("prompt", "gere agora", (nome) => ENV_COMPLETO.get(nome));
-            assertEquals(resultado.provedor, "GitHubModels");
+            assertEquals(resultado.provedor, "CloudflareWorkersAI");
         },
     );
 });
