@@ -11,12 +11,23 @@ import {
 // supabaseAdminClient.js sobre mover isso pra uma Edge Function autenticada.
 const ADMIN_USER_ID = "efe4e863-0ea1-4a0f-9656-f58e6f81d60d";
 
+const CORES_PROVEDOR = ["#C9A84C", "#7C3AED", "#F97316", "#94A3B8", "#10B981", "#A78BFA", "#EF4444", "#60A5FA"];
+
+const ICONE_RAIO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>';
+const ICONE_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>';
+const ICONE_RELOGIO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>';
+const ICONE_TRIANGULO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
+const ICONE_USUARIOS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+const ICONE_ESCUDO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+
 const bloqueadoEl = document.getElementById("admin-bloqueado");
 const conteudoEl = document.getElementById("admin-conteudo");
+const kpisEl = document.getElementById("admin-kpis");
 const cardsProvedorEl = document.getElementById("admin-cards-provedor");
 const tabelaUsuariasEl = document.getElementById("admin-tabela-usuarias");
 const listaErrosEl = document.getElementById("admin-lista-erros");
 const botaoAtualizarErros = document.getElementById("admin-botao-atualizar-erros");
+const relogioEl = document.getElementById("admin-relogio");
 let graficoChamadas = null;
 
 function formatarData(iso) {
@@ -24,30 +35,150 @@ function formatarData(iso) {
     return new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
 
-function renderizarCardsProvedor(dados) {
-    if (dados.length === 0) {
-        cardsProvedorEl.innerHTML = '<p class="admin-estado-vazio">Nenhuma chamada registrada nas últimas 24h.</p>';
-        return;
-    }
+function iniciarRelogio() {
+    const atualizar = () => {
+        relogioEl.textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    };
+    atualizar();
+    setInterval(atualizar, 1000);
+}
 
-    cardsProvedorEl.innerHTML = dados
+function classeTaxa(taxa) {
+    if (taxa >= 90) return "admin-card-taxa-boa";
+    if (taxa >= 70) return "admin-card-taxa-media";
+    return "admin-card-taxa-ruim";
+}
+
+function corTaxa(taxa) {
+    if (taxa >= 90) return "var(--admin-green)";
+    if (taxa >= 70) return "var(--admin-orange)";
+    return "var(--admin-red)";
+}
+
+function renderizarKpis(usoPorProvedor, usuarias, chamadasPorDia) {
+    const totalChamadas = usoPorProvedor.reduce((soma, p) => soma + p.total, 0);
+    const totalErros = usoPorProvedor.reduce((soma, p) => soma + p.erros, 0);
+    const taxaGlobal = totalChamadas === 0 ? 100 : Math.round(((totalChamadas - totalErros) / totalChamadas) * 100);
+    const usuariasAtivas = usuarias.filter((u) => u.totalMensagens + u.totalCasos + u.totalFlashcards > 0).length;
+    const chamadasHoje = chamadasPorDia.at(-1)?.total ?? 0;
+
+    const kpis = [
+        { rotulo: "Chamadas (24h)", valor: totalChamadas, icone: ICONE_RAIO, cor: "var(--admin-gold)", bg: "rgba(201, 168, 76, 0.14)" },
+        { rotulo: "Taxa de sucesso", valor: `${taxaGlobal}%`, icone: ICONE_ESCUDO, cor: corTaxa(taxaGlobal), bg: `${corTaxa(taxaGlobal)}22` },
+        { rotulo: "Usuárias ativas", valor: `${usuariasAtivas} <small>/ ${usuarias.length}</small>`, icone: ICONE_USUARIOS, cor: "var(--admin-purple-soft)", bg: "rgba(124, 58, 237, 0.16)" },
+        { rotulo: "Erros hoje", valor: chamadasHoje ? chamadasPorDia.at(-1)?.erros ?? 0 : 0, icone: ICONE_TRIANGULO, cor: "var(--admin-red)", bg: "rgba(239, 68, 68, 0.14)" },
+    ];
+
+    kpisEl.innerHTML = kpis
         .map(
-            (p) => `
-        <div class="admin-card">
-            <h3 class="admin-card-provedor-nome">${p.provedor}</h3>
-            <div class="admin-card-linha"><span>Chamadas</span><strong>${p.total}</strong></div>
-            <div class="admin-card-linha"><span>Taxa de sucesso</span><strong class="${p.taxaSucesso >= 90 ? "admin-card-taxa-boa" : "admin-card-taxa-ruim"}">${p.taxaSucesso}%</strong></div>
-            <div class="admin-card-linha"><span>Última chamada</span><strong>${formatarData(p.ultimaChamada)}</strong></div>
+            (k) => `
+        <div class="admin-kpi">
+            <div class="admin-kpi-topo">
+                <span class="admin-kpi-rotulo">${k.rotulo}</span>
+                <span class="admin-kpi-icone" style="background:${k.bg}; color:${k.cor};">${k.icone}</span>
+            </div>
+            <div class="admin-kpi-valor" style="color:${k.cor};">${k.valor}</div>
         </div>`,
         )
         .join("");
 }
 
+function renderizarCardsProvedor(dados) {
+    if (dados.length === 0) {
+        cardsProvedorEl.innerHTML = '<div class="admin-estado-vazio"><span class="admin-estado-vazio-icone">🌌</span>Nenhuma chamada registrada nas últimas 24h.</div>';
+        return;
+    }
+
+    cardsProvedorEl.innerHTML = dados
+        .map((p, i) => {
+            const cor = CORES_PROVEDOR[i % CORES_PROVEDOR.length];
+            return `
+        <div class="admin-card">
+            <div class="admin-card-provedor-topo">
+                <span class="admin-card-provedor-dot" style="background:${cor}; color:${cor};"></span>
+                <h3 class="admin-card-provedor-nome">${p.provedor}</h3>
+            </div>
+
+            <div class="admin-card-linha">
+                <span class="admin-card-linha-rotulo">${ICONE_RAIO} Chamadas</span>
+                <strong>${p.total}</strong>
+            </div>
+
+            <div class="admin-card-divisor"></div>
+
+            <div class="admin-card-linha">
+                <span class="admin-card-linha-rotulo">${ICONE_CHECK} Sucesso</span>
+                <strong class="${classeTaxa(p.taxaSucesso)}">${p.taxaSucesso}%</strong>
+            </div>
+            <div class="admin-barra-taxa">
+                <div class="admin-barra-taxa-fill" style="width:${p.taxaSucesso}%; background:${corTaxa(p.taxaSucesso)};"></div>
+            </div>
+
+            <div class="admin-card-divisor"></div>
+
+            <div class="admin-card-linha">
+                <span class="admin-card-linha-rotulo">${ICONE_RELOGIO} Última chamada</span>
+                <strong>${formatarData(p.ultimaChamada)}</strong>
+            </div>
+        </div>`;
+        })
+        .join("");
+}
+
+function textoCorTooltip(ctx, cor) {
+    const el = document.createElement("span");
+    el.className = "admin-tooltip-cosmica-dot";
+    el.style.background = cor;
+    return el.outerHTML;
+}
+
+function criarHandlerTooltipCosmica(container) {
+    let tooltipEl = container.querySelector(".admin-tooltip-cosmica");
+    if (!tooltipEl) {
+        tooltipEl = document.createElement("div");
+        tooltipEl.className = "admin-tooltip-cosmica";
+        container.appendChild(tooltipEl);
+    }
+
+    return (contexto) => {
+        const { tooltip } = contexto;
+
+        if (tooltip.opacity === 0) {
+            tooltipEl.style.opacity = "0";
+            return;
+        }
+
+        const titulo = tooltip.title?.[0] ?? "";
+        const linhas = tooltip.dataPoints
+            .map((ponto) => {
+                const cor = ponto.dataset.borderColor;
+                return `<div class="admin-tooltip-cosmica-linha"><span>${textoCorTooltip(ponto, cor)}${ponto.dataset.label}</span><strong>${ponto.formattedValue}</strong></div>`;
+            })
+            .join("");
+
+        tooltipEl.innerHTML = `<div class="admin-tooltip-cosmica-titulo">${titulo}</div>${linhas}`;
+
+        const { offsetLeft, offsetTop } = contexto.chart.canvas;
+        tooltipEl.style.opacity = "1";
+        tooltipEl.style.left = `${offsetLeft + tooltip.caretX}px`;
+        tooltipEl.style.top = `${offsetTop + tooltip.caretY}px`;
+    };
+}
+
 function renderizarGraficoChamadas(dados) {
     const ctx = document.getElementById("admin-grafico-chamadas");
+    const container = ctx.closest(".admin-grafico-container");
     const labels = dados.map((d) => new Date(d.dia).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }));
 
     if (graficoChamadas) graficoChamadas.destroy();
+
+    const gradienteChamadas = ctx.getContext("2d").createLinearGradient(0, 0, 0, 260);
+    gradienteChamadas.addColorStop(0, "rgba(201, 168, 76, 0.35)");
+    gradienteChamadas.addColorStop(1, "rgba(201, 168, 76, 0)");
+
+    const gradienteErros = ctx.getContext("2d").createLinearGradient(0, 0, 0, 260);
+    gradienteErros.addColorStop(0, "rgba(239, 68, 68, 0.28)");
+    gradienteErros.addColorStop(1, "rgba(239, 68, 68, 0)");
 
     graficoChamadas = new Chart(ctx, {
         type: "line",
@@ -58,16 +189,26 @@ function renderizarGraficoChamadas(dados) {
                     label: "Chamadas",
                     data: dados.map((d) => d.total),
                     borderColor: "#C9A84C",
-                    backgroundColor: "rgba(201, 168, 76, 0.15)",
-                    tension: 0.3,
+                    backgroundColor: gradienteChamadas,
+                    pointBackgroundColor: "#C9A84C",
+                    pointBorderColor: "#0a0a12",
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.35,
                     fill: true,
                 },
                 {
                     label: "Erros",
                     data: dados.map((d) => d.erros),
-                    borderColor: "#ff8080",
-                    backgroundColor: "rgba(255, 128, 128, 0.1)",
-                    tension: 0.3,
+                    borderColor: "#EF4444",
+                    backgroundColor: gradienteErros,
+                    pointBackgroundColor: "#EF4444",
+                    pointBorderColor: "#0a0a12",
+                    pointBorderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.35,
                     fill: true,
                 },
             ],
@@ -75,40 +216,67 @@ function renderizarGraficoChamadas(dados) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
             scales: {
-                x: { ticks: { color: "#C7C2B8" }, grid: { color: "#3A2F2C" } },
-                y: { ticks: { color: "#C7C2B8" }, grid: { color: "#3A2F2C" }, beginAtZero: true },
+                x: { ticks: { color: "#8b87a3", font: { family: "JetBrains Mono", size: 11 } }, grid: { color: "rgba(45, 31, 94, 0.35)" } },
+                y: { ticks: { color: "#8b87a3", font: { family: "JetBrains Mono", size: 11 } }, grid: { color: "rgba(45, 31, 94, 0.35)" }, beginAtZero: true },
             },
             plugins: {
-                legend: { labels: { color: "#f5ede8" } },
+                legend: {
+                    labels: { color: "#f2f0f8", usePointStyle: true, pointStyle: "circle", font: { family: "Work Sans", size: 12 } },
+                },
+                tooltip: {
+                    enabled: false,
+                    external: criarHandlerTooltipCosmica(container),
+                },
             },
         },
     });
 }
 
+function iniciais(email) {
+    return (email ?? "?").slice(0, 2).toUpperCase();
+}
+
 function renderizarTabelaUsuarias(usuarias) {
     if (usuarias.length === 0) {
-        tabelaUsuariasEl.innerHTML = '<tr><td colspan="5" class="admin-estado-vazio">Nenhuma usuária encontrada.</td></tr>';
+        tabelaUsuariasEl.innerHTML = '<tr><td colspan="6" class="admin-estado-vazio"><span class="admin-estado-vazio-icone">👤</span>Nenhuma usuária encontrada.</td></tr>';
         return;
     }
 
+    const maiorEngajamento = Math.max(...usuarias.map((u) => u.totalMensagens + u.totalCasos + u.totalFlashcards), 1);
+    const idMaisAtiva = [...usuarias].sort(
+        (a, b) => b.totalMensagens + b.totalCasos + b.totalFlashcards - (a.totalMensagens + a.totalCasos + a.totalFlashcards),
+    )[0]?.id;
+
     tabelaUsuariasEl.innerHTML = usuarias
-        .map(
-            (u) => `
+        .map((u) => {
+            const total = u.totalMensagens + u.totalCasos + u.totalFlashcards;
+            const percentual = Math.round((total / maiorEngajamento) * 100);
+            return `
         <tr>
-            <td>${u.email}</td>
+            <td>
+                <div class="admin-usuaria-info">
+                    <span class="admin-usuaria-avatar">${iniciais(u.email)}</span>
+                    <span>${u.email}${u.id === idMaisAtiva && total > 0 ? '<span class="admin-badge-top">★ top</span>' : ""}</span>
+                </div>
+            </td>
             <td>${u.totalMensagens}</td>
             <td>${u.totalCasos}</td>
             <td>${u.totalFlashcards}</td>
+            <td>
+                <span class="admin-engajamento-barra"><span class="admin-engajamento-fill" style="width:${percentual}%;"></span></span>
+                <span style="font-family: var(--admin-font-mono); font-size: 12px; color: var(--admin-text-muted);">${total}</span>
+            </td>
             <td>${formatarData(u.ultimoAcesso)}</td>
-        </tr>`,
-        )
+        </tr>`;
+        })
         .join("");
 }
 
 function renderizarErros(erros) {
     if (erros.length === 0) {
-        listaErrosEl.innerHTML = '<p class="admin-estado-vazio">Nenhum erro registrado.</p>';
+        listaErrosEl.innerHTML = '<div class="admin-estado-vazio"><span class="admin-estado-vazio-icone">✨</span>Nenhum erro registrado. Tudo tranquilo por aqui.</div>';
         return;
     }
 
@@ -116,19 +284,27 @@ function renderizarErros(erros) {
         .map(
             (e) => `
         <div class="admin-erro-item">
-            <div class="admin-erro-cabecalho">
-                <span><span class="admin-erro-provedor">${e.provedor}</span> · ${e.funcionalidade}</span>
-                <span>${formatarData(e.criado_em)}</span>
+            <span class="admin-erro-icone" aria-hidden="true">${ICONE_TRIANGULO}</span>
+            <div class="admin-erro-corpo">
+                <div class="admin-erro-cabecalho">
+                    <span><span class="admin-erro-provedor">${e.provedor}</span> · ${e.funcionalidade}</span>
+                    <span>${formatarData(e.criado_em)}</span>
+                </div>
+                <div class="admin-erro-mensagem">${e.erro_mensagem ?? "Sem detalhes"}</div>
             </div>
-            <div class="admin-erro-mensagem">${e.erro_mensagem ?? "Sem detalhes"}</div>
         </div>`,
         )
         .join("");
 }
 
 async function carregarErros() {
-    const erros = await buscarUltimosErros(supabaseAdmin, 20);
-    renderizarErros(erros);
+    botaoAtualizarErros.classList.add("girando");
+    try {
+        const erros = await buscarUltimosErros(supabaseAdmin, 20);
+        renderizarErros(erros);
+    } finally {
+        setTimeout(() => botaoAtualizarErros.classList.remove("girando"), 400);
+    }
 }
 
 async function carregarPainel() {
@@ -138,6 +314,7 @@ async function carregarPainel() {
         buscarUsuarias(supabaseAdmin),
     ]);
 
+    renderizarKpis(usoPorProvedor, usuarias, chamadasPorDia);
     renderizarCardsProvedor(usoPorProvedor);
     renderizarGraficoChamadas(chamadasPorDia);
     renderizarTabelaUsuarias(usuarias);
@@ -152,6 +329,7 @@ async function iniciar() {
     }
 
     conteudoEl.hidden = false;
+    iniciarRelogio();
     botaoAtualizarErros.addEventListener("click", carregarErros);
     await carregarPainel();
 }

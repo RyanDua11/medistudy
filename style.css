@@ -606,6 +606,25 @@ body.pagina-home::before {
     display: none;
 }
 
+.usuario-menu-admin {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    padding: 6px 14px;
+    font-size: 13px;
+    background-color: transparent;
+    color: var(--terciary-color);
+    border-color: transparent;
+    text-align: left;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.usuario-menu-admin:hover {
+    background-color: rgba(201, 168, 76, 0.12);
+    box-shadow: none;
+}
+
 .usuario-menu-sair {
     width: 100%;
     white-space: nowrap;

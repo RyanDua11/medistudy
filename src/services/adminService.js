@@ -16,6 +16,7 @@ export function agruparUsoPorProvedor(linhas) {
         .map((p) => ({
             provedor: p.provedor,
             total: p.total,
+            erros: p.total - p.sucessos,
             taxaSucesso: p.total === 0 ? 0 : Math.round((p.sucessos / p.total) * 100),
             ultimaChamada: p.ultimaChamada,
         }))

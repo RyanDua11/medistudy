@@ -7,211 +7,569 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediStudy - Admin</title>
     <link rel="icon" type="image/png" href="caduceu.png">
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4" defer></script>
     <style>
+        :root {
+            --admin-bg: #0a0a12;
+            --admin-card-bg: #13111f;
+            --admin-border: #2d1f5e;
+            --admin-gold: #C9A84C;
+            --admin-silver: #94A3B8;
+            --admin-purple: #7C3AED;
+            --admin-orange: #F97316;
+            --admin-green: #10B981;
+            --admin-red: #EF4444;
+            --admin-purple-soft: #A78BFA;
+            --admin-text: #f2f0f8;
+            --admin-text-muted: #8b87a3;
+            --admin-nebula: radial-gradient(circle at top right, #1e1040, #0a0a12);
+            --admin-font-display: 'Cinzel', serif;
+            --admin-font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --admin-font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; }
+
         body.pagina-admin {
-            background: var(--color-bg);
-            color: var(--color-text);
-            font-family: var(--font-body);
+            background: var(--admin-bg);
+            background-image:
+                radial-gradient(circle at 12% 8%, rgba(124, 58, 237, 0.14), transparent 32%),
+                radial-gradient(circle at 88% 4%, rgba(201, 168, 76, 0.08), transparent 28%),
+                radial-gradient(circle at 50% 100%, rgba(249, 115, 22, 0.06), transparent 40%);
+            background-attachment: fixed;
+            color: var(--admin-text);
+            font-family: var(--admin-font-body);
             min-height: 100vh;
-            padding: var(--space-7) var(--space-6) var(--space-8);
+            margin: 0;
+            padding: 40px 32px 64px;
         }
 
         .admin-header {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
-            gap: var(--space-4);
-            margin-bottom: var(--space-7);
+            gap: 16px;
+            margin-bottom: 36px;
             flex-wrap: wrap;
         }
 
+        .admin-header-titulo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .admin-header-icone {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--admin-purple), var(--admin-gold));
+            box-shadow: 0 0 24px -4px rgba(124, 58, 237, 0.6);
+            flex-shrink: 0;
+        }
+
+        .admin-header-icone svg { width: 24px; height: 24px; stroke: #0a0a12; }
+
         .admin-header h1 {
-            font-family: var(--font-display);
-            color: var(--color-gold-bright);
-            font-size: var(--text-3xl);
+            font-family: var(--admin-font-display);
+            background: linear-gradient(120deg, var(--admin-gold), var(--admin-purple-soft) 70%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 28px;
             margin: 0;
+            letter-spacing: 0.01em;
         }
 
         .admin-header p {
-            color: var(--color-text-muted);
-            margin: var(--space-1) 0 0;
-            font-size: var(--text-sm);
+            color: var(--admin-text-muted);
+            margin: 2px 0 0;
+            font-size: 13px;
+        }
+
+        .admin-header-relogio {
+            font-family: var(--admin-font-mono);
+            font-size: 13px;
+            color: var(--admin-silver);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid var(--admin-border);
+            border-radius: 999px;
+            background: rgba(19, 17, 31, 0.6);
+        }
+
+        .admin-pulso {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--admin-green);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+            animation: admin-pulso 2s infinite;
+        }
+
+        @keyframes admin-pulso {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+            70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         .admin-bloqueado {
-            max-width: 480px;
-            margin: 20vh auto;
+            max-width: 440px;
+            margin: 22vh auto;
             text-align: center;
-            padding: var(--space-6);
-            background: var(--color-surface);
-            border: 1px solid var(--color-border-muted);
-            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            background: var(--admin-nebula);
+            border: 1px solid var(--admin-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px -20px rgba(124, 58, 237, 0.35);
         }
 
+        .admin-bloqueado-icone { font-size: 40px; margin-bottom: 12px; }
+
         .admin-bloqueado h1 {
-            font-family: var(--font-display);
-            color: var(--color-gold-bright);
-            font-size: var(--text-2xl);
-            margin: 0 0 var(--space-2);
+            font-family: var(--admin-font-display);
+            color: var(--admin-orange);
+            font-size: 22px;
+            margin: 0 0 8px;
         }
 
         .admin-bloqueado p {
-            color: var(--color-text-muted);
+            color: var(--admin-text-muted);
             margin: 0;
+            font-size: 14px;
         }
 
-        .admin-secao {
-            margin-bottom: var(--space-8);
+        .admin-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
         }
 
-        .admin-secao h2 {
-            font-family: var(--font-display);
-            color: var(--color-gold);
-            font-size: var(--text-xl);
-            margin: 0 0 var(--space-4);
+        .admin-kpi {
+            background: var(--admin-nebula);
+            border: 1px solid var(--admin-border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-kpi::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+        }
+
+        .admin-kpi-topo {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--space-3);
+            margin-bottom: 10px;
         }
+
+        .admin-kpi-rotulo {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--admin-text-muted);
+            font-weight: 600;
+        }
+
+        .admin-kpi-icone {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .admin-kpi-icone svg { width: 16px; height: 16px; }
+
+        .admin-kpi-valor {
+            font-family: var(--admin-font-mono);
+            font-size: 30px;
+            font-weight: 600;
+            color: var(--admin-text);
+            line-height: 1;
+        }
+
+        .admin-kpi-valor small { font-size: 15px; color: var(--admin-text-muted); font-weight: 400; }
+
+        .admin-secao {
+            margin-bottom: 44px;
+        }
+
+        .admin-secao-cabecalho {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .admin-secao h2 {
+            font-family: var(--admin-font-display);
+            color: var(--admin-text);
+            font-size: 18px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-secao h2 .admin-secao-icone {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(124, 58, 237, 0.16);
+            color: var(--admin-purple-soft);
+        }
+
+        .admin-secao h2 .admin-secao-icone svg { width: 15px; height: 15px; }
 
         .admin-cards-provedor {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: var(--space-4);
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
         }
 
         .admin-card {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border-muted);
-            border-radius: var(--radius-md);
-            padding: var(--space-5);
-            box-shadow: var(--shadow-card);
+            background: var(--admin-nebula);
+            border: 1px solid var(--admin-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.6);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+            position: relative;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--admin-purple);
+            box-shadow: 0 16px 36px -14px rgba(124, 58, 237, 0.45);
+        }
+
+        .admin-card-provedor-topo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .admin-card-provedor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px 1px currentColor;
         }
 
         .admin-card-provedor-nome {
-            font-family: var(--font-display);
-            color: var(--color-gold-bright);
-            font-size: var(--text-lg);
+            font-family: var(--admin-font-display);
+            color: var(--admin-text);
+            font-size: 16px;
             text-transform: capitalize;
-            margin: 0 0 var(--space-3);
+            margin: 0;
+        }
+
+        .admin-card-divisor {
+            height: 1px;
+            background: linear-gradient(90deg, var(--admin-border), transparent);
+            margin: 12px 0;
         }
 
         .admin-card-linha {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            font-size: var(--text-sm);
-            color: var(--color-text-soft);
-            padding: var(--space-1) 0;
+            font-size: 13px;
+            color: var(--admin-text-muted);
+            padding: 5px 0;
         }
+
+        .admin-card-linha-rotulo {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .admin-card-linha-rotulo svg { width: 13px; height: 13px; opacity: 0.7; }
 
         .admin-card-linha strong {
-            color: var(--color-text);
+            color: var(--admin-text);
+            font-family: var(--admin-font-mono);
+            font-weight: 600;
         }
 
-        .admin-card-taxa-boa { color: #5fbf87; }
-        .admin-card-taxa-ruim { color: var(--color-danger); }
+        .admin-card-taxa-boa { color: var(--admin-green) !important; }
+        .admin-card-taxa-media { color: var(--admin-orange) !important; }
+        .admin-card-taxa-ruim { color: var(--admin-red) !important; }
+
+        .admin-barra-taxa {
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.12);
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .admin-barra-taxa-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
 
         .admin-grafico-container {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border-muted);
-            border-radius: var(--radius-md);
-            padding: var(--space-5);
-            height: 320px;
-            box-shadow: var(--shadow-card);
+            background: var(--admin-nebula);
+            border: 1px solid var(--admin-border);
+            border-radius: 16px;
+            padding: 22px 22px 12px;
+            height: 340px;
+            box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.6);
         }
 
-        .admin-tabela-wrapper {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border-muted);
-            border-radius: var(--radius-md);
-            overflow-x: auto;
-            box-shadow: var(--shadow-card);
+        .admin-tooltip-cosmica {
+            position: absolute;
+            pointer-events: none;
+            background: #0f0d1c;
+            border: 1px solid var(--admin-purple);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            box-shadow: 0 8px 24px -6px rgba(124, 58, 237, 0.55);
+            transform: translate(-50%, -110%);
+            transition: opacity 0.1s ease, left 0.1s ease, top 0.1s ease;
+            opacity: 0;
+            z-index: 10;
+            min-width: 130px;
         }
+
+        .admin-tooltip-cosmica-titulo {
+            font-family: var(--admin-font-mono);
+            color: var(--admin-text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .admin-tooltip-cosmica-linha {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        .admin-tooltip-cosmica-linha span:first-child { display: flex; align-items: center; gap: 6px; color: var(--admin-text-muted); }
+
+        .admin-tooltip-cosmica-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .admin-tooltip-cosmica-linha strong { color: var(--admin-text); font-family: var(--admin-font-mono); }
+
+        .admin-tabela-wrapper {
+            background: var(--admin-nebula);
+            border: 1px solid var(--admin-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.6);
+        }
+
+        .admin-tabela-scroll { overflow-x: auto; }
 
         table.admin-tabela {
             width: 100%;
             border-collapse: collapse;
-            font-size: var(--text-sm);
+            font-size: 13px;
         }
 
         table.admin-tabela th,
         table.admin-tabela td {
             text-align: left;
-            padding: var(--space-3) var(--space-4);
-            border-bottom: 1px solid var(--color-border-muted);
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(45, 31, 94, 0.5);
             white-space: nowrap;
         }
 
         table.admin-tabela th {
-            color: var(--color-gold);
+            color: var(--admin-purple-soft);
             font-weight: 600;
             text-transform: uppercase;
-            font-size: var(--text-xs);
-            letter-spacing: 0.04em;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            background: rgba(124, 58, 237, 0.06);
         }
 
         table.admin-tabela tbody tr:last-child td {
             border-bottom: none;
         }
 
+        table.admin-tabela tbody tr {
+            transition: background 0.15s ease;
+        }
+
         table.admin-tabela tbody tr:hover {
-            background: var(--color-surface-focus);
+            background: rgba(124, 58, 237, 0.08);
+        }
+
+        .admin-usuaria-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-usuaria-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--admin-font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: #0a0a12;
+            background: linear-gradient(135deg, var(--admin-gold), var(--admin-orange));
+            flex-shrink: 0;
+        }
+
+        .admin-badge-top {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #0a0a12;
+            background: var(--admin-gold);
+            border-radius: 999px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .admin-engajamento-barra {
+            width: 80px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.14);
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .admin-engajamento-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--admin-purple), var(--admin-purple-soft));
+            border-radius: 999px;
         }
 
         .admin-botao-atualizar {
-            background: transparent;
-            border: 1px solid var(--color-gold-deep);
-            color: var(--color-gold-bright);
-            border-radius: var(--radius-pill);
-            padding: var(--space-2) var(--space-4);
-            font-size: var(--text-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid var(--admin-purple);
+            color: var(--admin-purple-soft);
+            border-radius: 999px;
+            padding: 7px 16px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-fast);
+            transition: all 0.15s ease;
         }
+
+        .admin-botao-atualizar svg { width: 13px; height: 13px; transition: transform 0.4s ease; }
 
         .admin-botao-atualizar:hover {
-            background: var(--color-surface-focus);
-            border-color: var(--color-gold-bright);
+            background: var(--admin-purple);
+            color: #fff;
         }
 
+        .admin-botao-atualizar.girando svg { transform: rotate(360deg); }
+
         .admin-erro-item {
-            padding: var(--space-3) var(--space-4);
-            border-bottom: 1px solid var(--color-border-muted);
-            font-size: var(--text-sm);
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(45, 31, 94, 0.5);
+            font-size: 13px;
+            border-left: 3px solid var(--admin-red);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
         }
 
         .admin-erro-item:last-child { border-bottom: none; }
 
+        .admin-erro-icone {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.14);
+            color: var(--admin-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .admin-erro-icone svg { width: 13px; height: 13px; }
+
+        .admin-erro-corpo { flex: 1; min-width: 0; }
+
         .admin-erro-cabecalho {
             display: flex;
             justify-content: space-between;
-            gap: var(--space-3);
-            color: var(--color-text-muted);
-            font-size: var(--text-xs);
-            margin-bottom: var(--space-1);
+            gap: 12px;
+            color: var(--admin-text-muted);
+            font-size: 11px;
+            margin-bottom: 4px;
+            font-family: var(--admin-font-mono);
         }
 
         .admin-erro-provedor {
-            color: var(--color-gold);
+            color: var(--admin-gold);
             font-weight: 600;
             text-transform: capitalize;
+            font-family: var(--admin-font-body);
         }
 
         .admin-erro-mensagem {
-            color: var(--color-danger);
+            color: var(--admin-text);
+            white-space: normal;
+            word-break: break-word;
         }
 
         .admin-estado-vazio {
-            padding: var(--space-6);
+            padding: 40px 20px;
             text-align: center;
-            color: var(--color-text-muted);
-            font-size: var(--text-sm);
+            color: var(--admin-text-muted);
+            font-size: 13px;
+        }
+
+        .admin-estado-vazio-icone { font-size: 26px; display: block; margin-bottom: 8px; opacity: 0.6; }
+
+        @media (max-width: 640px) {
+            body.pagina-admin { padding: 24px 16px 48px; }
+            .admin-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -219,6 +577,7 @@
 <body class="pagina-admin">
 
 <div id="admin-bloqueado" class="admin-bloqueado" hidden>
+    <span class="admin-bloqueado-icone" aria-hidden="true">🔒</span>
     <h1>Acesso restrito</h1>
     <p>Você não tem permissão para ver este painel.</p>
 </div>
@@ -226,47 +585,82 @@
 <main id="admin-conteudo" hidden>
 
     <div class="admin-header">
-        <div>
-            <h1>Painel de Administração</h1>
-            <p>Uso de IA, usuárias e erros — MediStudy</p>
+        <div class="admin-header-titulo">
+            <span class="admin-header-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+            </span>
+            <div>
+                <h1>Painel de Administração</h1>
+                <p>Uso de IA, usuárias e estabilidade — MediStudy</p>
+            </div>
+        </div>
+        <div class="admin-header-relogio">
+            <span class="admin-pulso" aria-hidden="true"></span>
+            <span id="admin-relogio">--:--:--</span>
         </div>
     </div>
 
+    <div id="admin-kpis" class="admin-kpis"></div>
+
     <section class="admin-secao">
-        <h2>Uso por provedor (últimas 24h)</h2>
+        <div class="admin-secao-cabecalho">
+            <h2>
+                <span class="admin-secao-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></span>
+                Uso por provedor <span style="color: var(--admin-text-muted); font-family: var(--admin-font-mono); font-size: 12px; font-weight: 400;">· últimas 24h</span>
+            </h2>
+        </div>
         <div id="admin-cards-provedor" class="admin-cards-provedor"></div>
     </section>
 
     <section class="admin-secao">
-        <h2>Chamadas por dia (últimos 7 dias)</h2>
-        <div class="admin-grafico-container">
+        <div class="admin-secao-cabecalho">
+            <h2>
+                <span class="admin-secao-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg></span>
+                Chamadas por dia <span style="color: var(--admin-text-muted); font-family: var(--admin-font-mono); font-size: 12px; font-weight: 400;">· últimos 7 dias</span>
+            </h2>
+        </div>
+        <div class="admin-grafico-container" style="position: relative;">
             <canvas id="admin-grafico-chamadas"></canvas>
         </div>
     </section>
 
     <section class="admin-secao">
-        <h2>Usuárias</h2>
+        <div class="admin-secao-cabecalho">
+            <h2>
+                <span class="admin-secao-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                Usuárias
+            </h2>
+        </div>
         <div class="admin-tabela-wrapper">
-            <table class="admin-tabela">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Mensagens</th>
-                        <th>Casos clínicos</th>
-                        <th>Flashcards</th>
-                        <th>Último acesso</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-tabela-usuarias"></tbody>
-            </table>
+            <div class="admin-tabela-scroll">
+                <table class="admin-tabela">
+                    <thead>
+                        <tr>
+                            <th>Usuária</th>
+                            <th>Mensagens</th>
+                            <th>Casos clínicos</th>
+                            <th>Flashcards</th>
+                            <th>Engajamento</th>
+                            <th>Último acesso</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-tabela-usuarias"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
     <section class="admin-secao">
-        <h2>
-            Últimos erros
-            <button type="button" id="admin-botao-atualizar-erros" class="admin-botao-atualizar">Atualizar</button>
-        </h2>
+        <div class="admin-secao-cabecalho">
+            <h2>
+                <span class="admin-secao-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>
+                Últimos erros
+            </h2>
+            <button type="button" id="admin-botao-atualizar-erros" class="admin-botao-atualizar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+                Atualizar
+            </button>
+        </div>
         <div id="admin-lista-erros" class="admin-tabela-wrapper"></div>
     </section>
 
