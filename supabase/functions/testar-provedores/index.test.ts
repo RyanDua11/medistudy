@@ -95,6 +95,7 @@ Deno.test("testarTodosProvedores testa todos os 8 provedores, mesmo quando um fa
             DEEPSEEK_API_KEY: "k",
             HUGGINGFACE_API_KEY: "k",
             NVIDIA_API_KEY: "k",
+            GITHUB_MODELS_API_KEY: "k",
             SUPABASE_URL: "",
             SUPABASE_SECRET_KEY: "",
         },

@@ -35,6 +35,7 @@ const ENV_COMPLETO = new Map([
     ["DEEPSEEK_API_KEY", "chave-deepseek"],
     ["HUGGINGFACE_API_KEY", "chave-huggingface"],
     ["NVIDIA_API_KEY", "chave-nvidia"],
+    ["GITHUB_MODELS_API_KEY", "chave-github-models"],
 ]);
 
 Deno.test("chamarProvedor retorna texto e tokens em caso de sucesso", async () => {
@@ -82,16 +83,16 @@ Deno.test("chamarComFallback usa Gemini quando Groq falha", async () => {
     );
 });
 
-Deno.test("chamarComFallback percorre todos os 9 provedores até o último quando todos os anteriores falham", async () => {
+Deno.test("chamarComFallback percorre todos os 10 provedores até o último quando todos os anteriores falham", async () => {
     await comFetchMockado(
         (input: RequestInfo | URL) => {
             const url = String(input);
-            if (url.includes("integrate.api.nvidia.com")) return Promise.resolve(respostaOk('{"caso":"nvidia"}'));
+            if (url.includes("models.github.ai")) return Promise.resolve(respostaOk('{"caso":"github-models"}'));
             return Promise.resolve(respostaErro(500, "indisponível"));
         },
         async () => {
             const resultado = await chamarComFallback("prompt", "gere agora", (nome) => ENV_COMPLETO.get(nome));
-            assertEquals(resultado.provedor, "NVIDIA");
+            assertEquals(resultado.provedor, "GitHubModels");
         },
     );
 });
