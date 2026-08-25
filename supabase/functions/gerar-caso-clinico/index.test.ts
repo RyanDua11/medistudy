@@ -34,6 +34,7 @@ const ENV_COMPLETO = new Map([
     ["SAMBANOVA_API_KEY", "chave-sambanova"],
     ["DEEPSEEK_API_KEY", "chave-deepseek"],
     ["HUGGINGFACE_API_KEY", "chave-huggingface"],
+    ["NVIDIA_API_KEY", "chave-nvidia"],
 ]);
 
 Deno.test("chamarProvedor retorna texto e tokens em caso de sucesso", async () => {
@@ -81,16 +82,16 @@ Deno.test("chamarComFallback usa Gemini quando Groq falha", async () => {
     );
 });
 
-Deno.test("chamarComFallback percorre todos os 8 provedores até o último quando todos os anteriores falham", async () => {
+Deno.test("chamarComFallback percorre todos os 9 provedores até o último quando todos os anteriores falham", async () => {
     await comFetchMockado(
         (input: RequestInfo | URL) => {
             const url = String(input);
-            if (url.includes("router.huggingface.co")) return Promise.resolve(respostaOk('{"caso":"huggingface"}'));
+            if (url.includes("integrate.api.nvidia.com")) return Promise.resolve(respostaOk('{"caso":"nvidia"}'));
             return Promise.resolve(respostaErro(500, "indisponível"));
         },
         async () => {
             const resultado = await chamarComFallback("prompt", "gere agora", (nome) => ENV_COMPLETO.get(nome));
-            assertEquals(resultado.provedor, "HuggingFace");
+            assertEquals(resultado.provedor, "NVIDIA");
         },
     );
 });

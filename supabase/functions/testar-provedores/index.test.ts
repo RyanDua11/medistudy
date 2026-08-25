@@ -94,6 +94,7 @@ Deno.test("testarTodosProvedores testa todos os 8 provedores, mesmo quando um fa
             SAMBANOVA_API_KEY: "k",
             DEEPSEEK_API_KEY: "k",
             HUGGINGFACE_API_KEY: "k",
+            NVIDIA_API_KEY: "k",
             SUPABASE_URL: "",
             SUPABASE_SECRET_KEY: "",
         },

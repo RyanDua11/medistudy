@@ -20,6 +20,7 @@ const CORES_PROVEDOR = {
     SambaNova: "#60A5FA",
     DeepSeek: "#C084FC",
     HuggingFace: "#2DD4BF",
+    NVIDIA: "#76B900",
 };
 const COR_PROVEDOR_PADRAO = "#94A3B8";
 

@@ -23,7 +23,7 @@ const CORS_HEADERS = {
 const ADMIN_USER_ID = "efe4e863-0ea1-4a0f-9656-f58e6f81d60d";
 
 const UM_DIA_MS = 24 * 60 * 60 * 1000;
-const PROVEDORES_CONHECIDOS = ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace"];
+const PROVEDORES_CONHECIDOS = ["Groq", "Gemini", "Cerebras", "OpenRouter", "Mistral", "SambaNova", "DeepSeek", "HuggingFace", "NVIDIA"];
 
 interface LinhaLogUso {
     provedor: string;
