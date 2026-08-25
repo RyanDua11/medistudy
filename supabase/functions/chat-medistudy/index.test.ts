@@ -7,9 +7,9 @@
 import { assertEquals, assertStringIncludes } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import { chamarComFallback, chamarProvedor, montarMensagens, PROVEDORES, SYSTEM_PROMPT } from "./index.ts";
 
-function respostaOk(conteudo: string) {
+function respostaOk(conteudo: string, usage?: { prompt_tokens: number; completion_tokens: number }) {
     return new Response(
-        JSON.stringify({ choices: [{ message: { content: conteudo } }] }),
+        JSON.stringify({ choices: [{ message: { content: conteudo } }], ...(usage ? { usage } : {}) }),
         { status: 200 },
     );
 }
@@ -76,7 +76,29 @@ Deno.test("chamarProvedor retorna o texto da resposta em caso de sucesso (cenár
                 "chave-fake",
                 [{ role: "user", content: "O que é sepse?" }],
             );
-            assertEquals(resultado, "Sepse é uma resposta inflamatória sistêmica...");
+            assertEquals(resultado.texto, "Sepse é uma resposta inflamatória sistêmica...");
+        },
+    );
+});
+
+Deno.test("chamarProvedor extrai tokens de entrada/saída de usage.prompt_tokens/completion_tokens", async () => {
+    await comFetchMockado(
+        () => Promise.resolve(respostaOk("resposta", { prompt_tokens: 42, completion_tokens: 17 })),
+        async () => {
+            const resultado = await chamarProvedor(PROVEDORES[0], "chave-fake", [{ role: "user", content: "oi" }]);
+            assertEquals(resultado.tokensInput, 42);
+            assertEquals(resultado.tokensOutput, 17);
+        },
+    );
+});
+
+Deno.test("chamarProvedor retorna tokens null quando o provedor não manda usage", async () => {
+    await comFetchMockado(
+        () => Promise.resolve(respostaOk("resposta")),
+        async () => {
+            const resultado = await chamarProvedor(PROVEDORES[0], "chave-fake", [{ role: "user", content: "oi" }]);
+            assertEquals(resultado.tokensInput, null);
+            assertEquals(resultado.tokensOutput, null);
         },
     );
 });
