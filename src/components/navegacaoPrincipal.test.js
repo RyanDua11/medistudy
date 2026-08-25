@@ -8,6 +8,7 @@ describe("paginaAtivaPara", () => {
         ["/casos-clinicos.html", "casos-clinicos"],
         ["/provas.html", "provas"],
         ["/notas.html", "notas"],
+        ["/diario-erros.html", "diario-erros"],
         ["/em-breve.html", "configuracoes"],
     ])("mapeia %s para %s", (pathname, esperado) => {
         expect(paginaAtivaPara(pathname)).toBe(esperado);

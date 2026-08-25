@@ -6,6 +6,7 @@ const MAPA_ARQUIVO_PARA_PAGINA = {
     "provas.html": "provas",
     "notas.html": "notas",
     "chat.html": "chat",
+    "diario-erros.html": "diario-erros",
     "em-breve.html": "configuracoes",
 };
 
