@@ -78,6 +78,12 @@ export const PROVEDORES: Provedor[] = [
         modelo: "meta/llama-3.3-70b-instruct",
         envVar: "NVIDIA_API_KEY",
     },
+    {
+        nome: "GitHubModels",
+        url: "https://models.github.ai/inference/chat/completions",
+        modelo: "openai/gpt-4o-mini",
+        envVar: "GITHUB_MODELS_API_KEY",
+    },
 ];
 
 /** Provedores com suporte a entrada multimodal (imagem via image_url em data URI), pro Interpretador de Exames. */

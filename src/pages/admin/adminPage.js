@@ -21,6 +21,7 @@ const CORES_PROVEDOR = {
     DeepSeek: "#C084FC",
     HuggingFace: "#2DD4BF",
     NVIDIA: "#76B900",
+    GitHubModels: "#8250DF",
 };
 const COR_PROVEDOR_PADRAO = "#94A3B8";
 
