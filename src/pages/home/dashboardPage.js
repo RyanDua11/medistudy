@@ -14,6 +14,7 @@ import { inicializarNavegacaoPrincipal } from "../../components/navegacaoPrincip
 import { inicializarPomodoroWidget } from "../../components/pomodoroWidget.js";
 import { inicializarCarrosselProvas } from "../../components/carrosselProvas.js";
 import { inicializarCarrosselFerramentas } from "../../components/carrosselFerramentas.js";
+import { inicializarPrimeiroAcessoModal } from "../../components/primeiroAcessoModal.js";
 
 const CHAVE_NOME_USUARIO = "medistudy_nome_usuario";
 const elSaudacao = document.getElementById("saudacao-texto");
@@ -71,6 +72,7 @@ async function iniciar() {
     if (!sessao) return;
 
     exibirSaudacao();
+    inicializarPrimeiroAcessoModal(exibirSaudacao);
     inicializarNotificacaoRevisao();
     inicializarUsuarioMenu();
     inicializarNavegacaoPrincipal();
