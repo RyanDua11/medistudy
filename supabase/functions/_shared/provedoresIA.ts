@@ -45,7 +45,7 @@ export const PROVEDORES: Provedor[] = [
     {
         nome: "OpenRouter",
         url: "https://openrouter.ai/api/v1/chat/completions",
-        modelo: "meta-llama/llama-3.3-70b-instruct:free",
+        modelo: "google/gemma-4-31b-it:free",
         envVar: "OPENROUTER_API_KEY",
     },
     {
@@ -68,7 +68,7 @@ export const PROVEDORES: Provedor[] = [
     },
     {
         nome: "HuggingFace",
-        url: "https://api-inference.huggingface.co/v1/chat/completions",
+        url: "https://router.huggingface.co/v1/chat/completions",
         modelo: "meta-llama/Llama-3.3-70B-Instruct",
         envVar: "HUGGINGFACE_API_KEY",
     },

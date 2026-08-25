@@ -182,7 +182,7 @@ Deno.test("chamarComFallback percorre todos os 8 provedores até o último quand
     await comFetchMockado(
         (input: RequestInfo | URL) => {
             const url = String(input);
-            if (url.includes("api-inference.huggingface.co")) return Promise.resolve(respostaOk("resposta da huggingface"));
+            if (url.includes("router.huggingface.co")) return Promise.resolve(respostaOk("resposta da huggingface"));
             return Promise.resolve(respostaErro(500, "indisponível"));
         },
         async () => {
